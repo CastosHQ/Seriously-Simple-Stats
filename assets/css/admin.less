@@ -1,0 +1,81 @@
+#podcast-episode-stats {
+	.episode-stat-data {
+		&:before {
+			font: normal 20px/1 'dashicons';
+			color: #888;
+			speak: none;
+			display: inline-block;
+			padding: 0 2px 0 0;
+			top: 0;
+			left: -1px;
+			position: relative;
+			vertical-align: top;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			text-decoration: none !important;
+		}
+		&.total-downloads {
+			&:before {
+				  content: '\f316';
+			}
+		}
+		&.total-listeners {
+			&:before {
+				  content: '\f307';
+			}
+		}
+		&.sources {
+			font-weight: bold;
+  			margin-bottom: 0;
+			&:before {
+				  content: '\f319';
+			}
+		}
+	}
+	ul.sources-list {
+		text-indent: 10px;
+		margin-top: 2px;
+		li {
+			font-style: italic;
+			&:before {
+				font: normal 100%/1 'dashicons';
+				color: #888;
+				speak: none;
+				display: inline-block;
+				padding: 0 2px 0 0;
+				top: 0;
+				left: -1px;
+				position: relative;
+				vertical-align: middle;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				text-decoration: none !important;
+			}
+			&.itunes {
+				&:before {
+					  content: '\f127';
+				}
+			}
+			&.stitcher {
+				&:before {
+					  content: '\f181';
+				}
+			}
+			&.direct {
+				&:before {
+					  content: '\f316';
+				}
+			}
+			&.player {
+				&:before {
+					  content: '\f236';
+				}
+			}
+			&.unknown {
+				&:before {
+					  content: '\f223';
+				}
+			}
+		}
+	}
+}
