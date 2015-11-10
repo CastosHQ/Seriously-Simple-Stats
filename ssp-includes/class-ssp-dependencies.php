@@ -2,7 +2,7 @@
 /**
  * SSP Dependency Checker
  *
- * Checks if Seriously Simple Podcasting is enabled
+ * Checks if Seriously Simple Podcasting is enabled and validates against a minimum required version if specified
  */
 class SSP_Dependencies {
 
@@ -17,13 +17,24 @@ class SSP_Dependencies {
 		}
 	}
 
-	public static function ssp_active_check() {
+	public static function ssp_active_check( $minimum_version = '' ) {
 
 		if ( ! self::$active_plugins ) {
 			self::init();
 		}
 
-		return in_array( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins ) || array_key_exists( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins );
+		if( in_array( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins ) || array_key_exists( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins ) ) {
+			if( $minimum_version ) {
+				$ssp_version = get_option( 'ssp_version', '1.0' );
+				if( version_compare( $ssp_version, $minimum_version, '>=' ) ) {
+					return true;
+				}
+			} else {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

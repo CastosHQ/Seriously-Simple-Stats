@@ -117,7 +117,14 @@ class SSP_Stats {
 		add_action( 'ssp_meta_boxes', array( $this, 'post_meta_box' ), 10, 1 );
 
 		// Load admin JS & CSS
+
+		add_action( 'admin_menu', array( $this , 'add_menu_item' ) );
+
+		// Load necessary javascript for charts
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
+		add_action( 'admin_print_scripts', array( $this, 'chart_data' ), 30 );
+
+		// Load admin CSS
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_styles' ), 10, 1 );
 
 		// Handle localisation
@@ -162,7 +169,7 @@ class SSP_Stats {
 
 		// Check trasnient to prevent excessive tracking
 		if ( get_transient( $transient ) ) {
-			return;
+			// return;
 		}
 
 		// Insert data into database
@@ -224,7 +231,7 @@ class SSP_Stats {
 		if( $total_downloads ) {
 
 			$users = array();
-			$itunes = $stitcher = $direct = $player = $unknown = 0;
+			$itunes = $stitcher = $direct = $new_window = $player = $unknown = 0;
 
 			foreach( $stats as $stat ) {
 				$listeners[ $stat->ip_address ] = $stat->ip_address;
@@ -238,6 +245,9 @@ class SSP_Stats {
 					break;
 					case 'download':
 						++$direct;
+					break;
+					case 'new_window':
+						++$new_window;
 					break;
 					case 'player':
 						++$player;
@@ -253,19 +263,22 @@ class SSP_Stats {
 			$html .= '<p class="episode-stat-data total-listeners">' . __( 'Total listeners', 'ssp-stats' ) . ': <b>' . $total_listeners . '</b></p>';
 			$html .= '<p class="episode-stat-data sources">' . __( 'Download sources', 'ssp-stats' ) . ':</p>';
 			$html .= '<ul class="sources-list">';
-				if( $itunes) {
+				if( $itunes ) {
 					$html .= '<li class="itunes">' . __( 'iTunes', 'ssp-stats' ) . ': <b>' . $itunes . '</b></li>';
 				}
-				if( $stitcher) {
+				if( $stitcher ) {
 					$html .= '<li class="stitcher">' . __( 'Stitcher', 'ssp-stats' ) . ': <b>' . $stitcher . '</b></li>';
 				}
-				if( $direct) {
+				if( $direct ) {
 					$html .= '<li class="direct">' . __( 'Direct download', 'ssp-stats' ) . ': <b>' . $direct . '</b></li>';
 				}
-				if( $player) {
+				if( $new_window ) {
+					$html .= '<li class="new_window">' . __( 'Played in new window', 'ssp-stats' ) . ': <b>' . $new_window . '</b></li>';
+				}
+				if( $player ) {
 					$html .= '<li class="player">' . __( 'Audio player', 'ssp-stats' ) . ': <b>' . $player . '</b></li>';
 				}
-				if( $unknown) {
+				if( $unknown ) {
 					$html .= '<li class="unknown">' . __( 'Unknown', 'ssp-stats' ) . ': <b>' . $unknown . '</b></li>';
 				}
 			$html .= '</ul>';
@@ -274,6 +287,218 @@ class SSP_Stats {
 		echo $html;
 	}
 
+	/**
+	 * Add stats page to menu
+	 * @return  void
+	 */
+	public function add_menu_item() {
+		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Stats', 'ssp-stats' ) , __( 'Stats', 'ssp-stats' ), 'manage_podcast' , 'podcast_stats' , array( $this , 'stats_page' ) );
+	}
+
+	public function stats_page () {
+		$html = '<div class="wrap" id="podcast_settings">' . "\n";
+			$html .= '<h1>' . __( 'Podcast Stats' , 'ssp-stats' ) . '</h1>' . "\n";
+			$html .= '<div class="metabox-holder">' . "\n";
+
+				$html .= '<div class="postbox" id="daily-listens-container">' . "\n";
+					$html .= '<h2 class="hndle ui-sortable-handle">' . "\n";
+				    	$html .= '<span>' . __( 'Daily Listens', 'ssp-stats' ) . '</span>' . "\n";
+					$html .= '</h2>' . "\n";
+					$html .= '<div class="inside">' . "\n";
+						$html .= '<div id="daily_listens"></div>';
+					$html .= '</div>' . "\n";
+				$html .= '</div>' . "\n";
+
+				$html .= '<div class="postbox" id="referrers-container">' . "\n";
+					$html .= '<h2 class="hndle ui-sortable-handle">' . "\n";
+				    	$html .= '<span>' . __( 'Referrers', 'ssp-stats' ) . '</span>' . "\n";
+					$html .= '</h2>' . "\n";
+					$html .= '<div class="inside">' . "\n";
+						$html .= '<div id="referrers"></div>';
+					$html .= '</div>' . "\n";
+				$html .= '</div>' . "\n";
+
+			$html .= '</div>' . "\n";
+		$html .= '</div>' . "\n";
+
+		echo $html;
+	}
+
+	public function chart_data () {
+		global $wpdb;
+
+		$output = '';
+
+		$start_date = strtotime( '1 month ago' );
+		$end_date = time();
+
+		$listens_columns = array(
+			__( 'Date', 'ssp-stats' ) => 'string',
+			__( 'Listens', 'ssp-stats' ) => 'number',
+		);
+
+		$listens_sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d", $start_date, $end_date );
+		$listens_results = $wpdb->get_results( $listens_sql );
+
+		$date_data = array();
+		foreach( $listens_results as $timestamp ) {
+			$date = date( get_option( 'date_format' ), $timestamp->date );
+			if( isset( $date_data[ $date ] ) ) {
+				++$date_data[ $date ];
+			} else {
+				$date_data[ $date ] = 1;
+			}
+		}
+
+		$listens_data = array();
+		foreach( $date_data as $date => $listens ) {
+			$listens_data[] = array( $date, $listens );
+		}
+
+		$output .= $this->generate_chart( 'LineChart', '', $listens_columns, $listens_data, 'daily_listens' );
+
+		$referrers_columns = array(
+			__( 'Referrers', 'ssp-stats' ) => 'string',
+			__( 'Listens', 'ssp-stats' ) => 'number',
+		);
+
+		$referrers_sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d", $start_date, $end_date );
+		$referrers_results = $wpdb->get_results( $referrers_sql );
+
+		$referrer_data = array();
+		foreach( $referrers_results as $ref ) {
+			$referrer = $ref->referrer;
+			if( isset( $referrer_data[ $referrer ] ) ) {
+				++$referrer_data[ $referrer ];
+			} else {
+				$referrer_data[ $referrer ] = 1;
+			}
+		}
+
+		$referrer_labels = array(
+			'download' => __( 'Direct download', 'ssp-stats' ),
+			'player' => __( 'Audio player', 'ssp-stats' ),
+			'new_window' => __( 'Played in new window', 'ssp-stats' ),
+			'itunes' => __( 'iTunes', 'ssp-stats' ),
+			'stitcher' => __( 'Stitcher', 'ssp-stats' ),
+			'' => __( 'Other', 'ssp-stats' ),
+		);
+
+		$referrers_data = array();
+		foreach( $referrer_data as $ref => $listens ) {
+			$ref_label = '';
+			if( isset( $referrer_labels[ $ref ] ) ) {
+				$ref_label = $referrer_labels[ $ref ];
+			}
+			$referrers_data[] = array( $ref_label, $listens );
+		}
+
+		$output .= $this->generate_chart( 'PieChart', '', $referrers_columns, $referrers_data, 'referrers', 600 );
+
+		echo $output;
+	}
+
+	public function generate_chart ( $type = '', $title = '', $columns = array(), $data = array(), $target = '', $height = 400, $width = '100%' ) {
+
+		if( ! $type || ! $target || ! is_array( $columns )  || ! is_array( $data ) ) {
+			return;
+		}
+
+		$column_data = '';
+		foreach( $columns as $column_label => $column_type ) {
+			$column_data .= "data.addColumn('$column_type', '$column_label');" . "\n";
+		}
+
+		$chart_data = '';
+		foreach( $data as $data_set ) {
+			$chart_data .= "[";
+			foreach( $data_set as $item ) {
+				if( is_numeric( $item ) ) {
+					$chart_data .= "$item,";
+				} else {
+					$chart_data .= "'$item',";
+				}
+			}
+			$chart_data .= "]," . "\n";
+		}
+
+		// Get comprehensively unique ID for chart
+		$chartid = uniqid() . '_' . mt_rand( 0, 9999 );
+
+		$options = '';
+		switch( $type ) {
+			case 'LineChart':
+				$options .= "legend: 'none'," . "\n";
+				$options .= "vAxis: { minValue: 0 }" . "\n";
+			break;
+			case 'PieChart':
+				$options .= "is3D: true" . "\n";
+			break;
+		}
+
+		if( $options ) {
+			$options .= ',';
+		}
+
+		ob_start();
+		?>
+		<script type="text/javascript">
+
+			// Set a callback to run when the Google Visualization API is loaded
+			google.setOnLoadCallback(draw_chart_<?php echo $chartid; ?>);
+
+			// Draw chart using supplied data
+			function draw_chart_<?php echo $chartid; ?>() {
+
+				// Create the data table
+				var data = new google.visualization.DataTable();
+				<?php echo $column_data; ?>
+				data.addRows([ <?php echo $chart_data; ?> ]);
+
+				// Set chart options
+				var options = {
+					title: '<?php echo $title; ?>',
+					width: '<?php echo $width; ?>',
+					height: '<?php echo $height; ?>',
+					<?php echo $options; ?>
+				};
+
+				// Instantiate and draw the chart
+				var chart = new google.visualization.<?php echo $type; ?>( document.getElementById( '<?php echo $target; ?>' ) );
+				chart.draw( data, options );
+				// chart.draw( data, google.charts.Line.convertOptions(options) );
+			}
+
+	    </script>
+	    <?php
+
+	    return ob_get_clean();
+	}
+
+	/**
+	 * Load admin Javascript.
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  void
+	 */
+	public function admin_enqueue_scripts ( $hook = '' ) {
+
+		if( 'podcast_page_podcast_stats' == $hook ) {
+
+			// Include Google Charts scripts
+			wp_enqueue_script( 'google-charts', "//www.google.com/jsapi?autoload={
+										            'modules':[{
+										              'name':'visualization',
+										              'version':'1',
+										              'packages':['corechart','line']
+										            }]
+										          }", array(), $this->_version, false );
+
+			// Load custom scripts
+			wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
+			wp_enqueue_script( $this->_token . '-admin' );
+		}
+	} // End admin_enqueue_scripts ()
 
 	/**
 	 * Update the database to latest schema for stats storage
@@ -321,16 +546,6 @@ class SSP_Stats {
 		wp_enqueue_style( $this->_token . '-admin' );
 	} // End admin_enqueue_styles ()
 
-	/**
-	 * Load admin Javascript.
-	 * @access  public
-	 * @since   1.0.0
-	 * @return  void
-	 */
-	public function admin_enqueue_scripts ( $hook = '' ) {
-		wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
-		wp_enqueue_script( $this->_token . '-admin' );
-	} // End admin_enqueue_scripts ()
 
 	/**
 	 * Load plugin localisation

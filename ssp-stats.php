@@ -7,10 +7,9 @@
  * Author: Hugh Lashbrooke
  * Author URI: http://www.hughlashbrooke.com/
  * Requires at least: 4.0
- * Tested up to: 4.2.2
+ * Tested up to: 4.3.1
  *
  * Text Domain: ssp-stats
- * Domain Path: /lang/
  *
  * @package WordPress
  * @author Hugh Lashbrooke
@@ -25,7 +24,7 @@ if ( ! function_exists( 'is_ssp_active' ) ) {
 	require_once( 'ssp-includes/ssp-functions.php' );
 }
 
-if( is_ssp_active() ) {
+if( is_ssp_active( '1.14' ) ) {
 
 	// Load plugin class files
 	require_once( 'includes/class-ssp-stats.php' );
