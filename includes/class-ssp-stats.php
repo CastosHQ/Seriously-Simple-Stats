@@ -289,12 +289,20 @@ class SSP_Stats {
 
 	/**
 	 * Add stats page to menu
+	 * @access public
+	 * @since  1.0.0
 	 * @return  void
 	 */
 	public function add_menu_item() {
 		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Stats', 'ssp-stats' ) , __( 'Stats', 'ssp-stats' ), 'manage_podcast' , 'podcast_stats' , array( $this , 'stats_page' ) );
 	}
 
+	/**
+	 * Load content for stats page
+	 * @access public
+	 * @since  1.0.0
+	 * @return void
+	 */
 	public function stats_page () {
 		$html = '<div class="wrap" id="podcast_settings">' . "\n";
 			$html .= '<h1>' . __( 'Podcast Stats' , 'ssp-stats' ) . '</h1>' . "\n";
@@ -324,24 +332,50 @@ class SSP_Stats {
 		echo $html;
 	}
 
+	/**
+	 * Output data for generating charts
+	 * @access public
+	 * @since  1.0.0
+	 * @return void
+	 */
 	public function chart_data () {
-		global $wpdb;
 
 		$output = '';
 
 		$start_date = strtotime( '1 month ago' );
 		$end_date = time();
 
-		$listens_columns = array(
+		$output .= $this->daily_listens_chart( $start_date, $end_date );
+		$output .= $this->referrers_chart( $start_date, $end_date );
+
+		echo $output;
+	}
+
+	/**
+	 * Return data for Daily Listens chart
+	 * @access private
+	 * @since  1.0.0
+	 * @param  integer $start_date Start date of chart data
+	 * @param  integer $end_date   End date of chart data
+	 * @return string              Javascript for chart generation
+	 */
+	private function daily_listens_chart ( $start_date = 0, $end_date = 0 ) {
+		global $wpdb;
+
+		if( ! $end_date ) {
+			$end_date = time();
+		}
+
+		$columns = array(
 			__( 'Date', 'ssp-stats' ) => 'string',
 			__( 'Listens', 'ssp-stats' ) => 'number',
 		);
 
-		$listens_sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d", $start_date, $end_date );
-		$listens_results = $wpdb->get_results( $listens_sql );
+		$sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d", $start_date, $end_date );
+		$results = $wpdb->get_results( $sql );
 
 		$date_data = array();
-		foreach( $listens_results as $timestamp ) {
+		foreach( $results as $timestamp ) {
 			$date = date( get_option( 'date_format' ), $timestamp->date );
 			if( isset( $date_data[ $date ] ) ) {
 				++$date_data[ $date ];
@@ -350,23 +384,39 @@ class SSP_Stats {
 			}
 		}
 
-		$listens_data = array();
+		$data = array();
 		foreach( $date_data as $date => $listens ) {
-			$listens_data[] = array( $date, $listens );
+			$data[] = array( $date, $listens );
 		}
 
-		$output .= $this->generate_chart( 'LineChart', '', $listens_columns, $listens_data, 'daily_listens' );
+		return $this->generate_chart( 'LineChart', '', $columns, $data, 'daily_listens' );
+	}
 
-		$referrers_columns = array(
+	/**
+	 * Return data for Referrers chart
+	 * @access private
+	 * @since  1.0.0
+	 * @param  integer $start_date Start date of chart data
+	 * @param  integer $end_date   End date of chart data
+	 * @return string              Javascript for chart generation
+	 */
+	private function referrers_chart ( $start_date = 0, $end_date = 0 ) {
+		global $wpdb;
+
+		if( ! $end_date ) {
+			$end_date = time();
+		}
+
+		$columns = array(
 			__( 'Referrers', 'ssp-stats' ) => 'string',
 			__( 'Listens', 'ssp-stats' ) => 'number',
 		);
 
-		$referrers_sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d", $start_date, $end_date );
-		$referrers_results = $wpdb->get_results( $referrers_sql );
+		$sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d", $start_date, $end_date );
+		$results = $wpdb->get_results( $sql );
 
 		$referrer_data = array();
-		foreach( $referrers_results as $ref ) {
+		foreach( $results as $ref ) {
 			$referrer = $ref->referrer;
 			if( isset( $referrer_data[ $referrer ] ) ) {
 				++$referrer_data[ $referrer ];
@@ -384,21 +434,32 @@ class SSP_Stats {
 			'' => __( 'Other', 'ssp-stats' ),
 		);
 
-		$referrers_data = array();
+		$data = array();
 		foreach( $referrer_data as $ref => $listens ) {
 			$ref_label = '';
 			if( isset( $referrer_labels[ $ref ] ) ) {
 				$ref_label = $referrer_labels[ $ref ];
 			}
-			$referrers_data[] = array( $ref_label, $listens );
+			$data[] = array( $ref_label, $listens );
 		}
 
-		$output .= $this->generate_chart( 'PieChart', '', $referrers_columns, $referrers_data, 'referrers', 600 );
-
-		echo $output;
+		return $this->generate_chart( 'PieChart', '', $columns, $data, 'referrers', 500 );
 	}
 
-	public function generate_chart ( $type = '', $title = '', $columns = array(), $data = array(), $target = '', $height = 400, $width = '100%' ) {
+	/**
+	 * Return chart generation javascript
+	 * @access private
+	 * @since  1.0.0
+	 * @param  string  $type    Chart type
+	 * @param  string  $title   Chart title
+	 * @param  array   $columns Chart columns
+	 * @param  array   $data    Chart data
+	 * @param  string  $target  Target element in which to draw chart
+	 * @param  integer $height  Chart height
+	 * @param  string  $width   Chart width
+	 * @return string           Chart javascript
+	 */
+	private function generate_chart ( $type = '', $title = '', $columns = array(), $data = array(), $target = '', $height = 400, $width = '100%' ) {
 
 		if( ! $type || ! $target || ! is_array( $columns )  || ! is_array( $data ) ) {
 			return;
