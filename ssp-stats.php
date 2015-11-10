@@ -24,7 +24,7 @@ if ( ! function_exists( 'is_ssp_active' ) ) {
 	require_once( 'ssp-includes/ssp-functions.php' );
 }
 
-if( is_ssp_active( '1.14' ) ) {
+if( is_ssp_active( '1.13.1' ) ) {
 
 	// Load plugin class files
 	require_once( 'includes/class-ssp-stats.php' );

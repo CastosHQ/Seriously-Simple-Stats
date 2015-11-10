@@ -85,6 +85,22 @@ class SSP_Stats {
 	public $script_suffix;
 
 	/**
+	 * Chart start date.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $start_date;
+
+	/**
+	 * Chart end date.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $end_date;
+
+	/**
 	 * Constructor function.
 	 * @access  public
 	 * @since   1.0.0
@@ -104,6 +120,20 @@ class SSP_Stats {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
 		$this->script_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+		// Set start date for charts
+		if( isset( $_GET['start'] ) ) {
+			$this->start_date = strtotime( sanitize_text_field( $_GET['start'] ) );
+		} else {
+			$this->start_date = strtotime( '1 month ago' );
+		}
+
+		// Set end date for charts
+		if( isset( $_GET['end'] ) ) {
+			$this->end_date = strtotime( date("Y-m-d 23:59:59", strtotime( sanitize_text_field( $_GET['end'] ) ) ) );
+		} else {
+			$this->end_date = time();
+		}
 
 		register_activation_hook( $this->file, array( $this, 'install' ) );
 
@@ -304,9 +334,33 @@ class SSP_Stats {
 	 * @return void
 	 */
 	public function stats_page () {
+
 		$html = '<div class="wrap" id="podcast_settings">' . "\n";
 			$html .= '<h1>' . __( 'Podcast Stats' , 'ssp-stats' ) . '</h1>' . "\n";
 			$html .= '<div class="metabox-holder">' . "\n";
+
+				$html .= '<div class="wp-filter">' . "\n";
+					$html .= '<form action="" method="get" name="ssp-stats-date-filter" class="filter-items hasDatepicker">' . "\n";
+
+						$html .= '<input type="hidden" name="post_type" value="podcast" />' . "\n";
+						$html .= '<input type="hidden" name="page" value="podcast_stats" />' . "\n";
+
+						$html .= __( 'Select date range:', 'ssp-stats' ) . ' ' . "\n";
+
+						$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'Start date', 'ssp-stats' ) . '</label>' . "\n";
+						$html .= '<input type="text" id="start-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'Start date', 'ssp-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->start_date ) ) . '" />' . "\n";
+						$html .= '<input type="hidden" id="start-date-filter" name="start" value="' . esc_attr( date( 'd-m-Y', $this->start_date ) ) . '" />' . "\n";
+
+						$html .= ' ' . __( 'to', 'ssp-stats' ) . ' ' . "\n";
+
+						$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'End date', 'ssp-stats' ) . '</label>' . "\n";
+						$html .= '<input type="text" id="end-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'End date', 'ssp-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->end_date ) ) . '" />' . "\n";
+						$html .= '<input type="hidden" id="end-date-filter" name="end" value="' . esc_attr( date( 'd-m-Y', $this->end_date ) ) . '" />' . "\n";
+
+						$html .= '<input type="submit" class="button" value="' . __( 'Filter', 'ssp-stats' ) . '">' . "\n";
+
+					$html .= '</form>' . "\n";
+				$html .= '</div>' . "\n";
 
 				$html .= '<div class="postbox" id="daily-listens-container">' . "\n";
 					$html .= '<h2 class="hndle ui-sortable-handle">' . "\n";
@@ -342,11 +396,8 @@ class SSP_Stats {
 
 		$output = '';
 
-		$start_date = strtotime( '1 month ago' );
-		$end_date = time();
-
-		$output .= $this->daily_listens_chart( $start_date, $end_date );
-		$output .= $this->referrers_chart( $start_date, $end_date );
+		$output .= $this->daily_listens_chart();
+		$output .= $this->referrers_chart();
 
 		echo $output;
 	}
@@ -359,19 +410,15 @@ class SSP_Stats {
 	 * @param  integer $end_date   End date of chart data
 	 * @return string              Javascript for chart generation
 	 */
-	private function daily_listens_chart ( $start_date = 0, $end_date = 0 ) {
+	private function daily_listens_chart () {
 		global $wpdb;
-
-		if( ! $end_date ) {
-			$end_date = time();
-		}
 
 		$columns = array(
 			__( 'Date', 'ssp-stats' ) => 'string',
 			__( 'Listens', 'ssp-stats' ) => 'number',
 		);
 
-		$sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d", $start_date, $end_date );
+		$sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d", $this->start_date, $this->end_date );
 		$results = $wpdb->get_results( $sql );
 
 		$date_data = array();
@@ -400,19 +447,15 @@ class SSP_Stats {
 	 * @param  integer $end_date   End date of chart data
 	 * @return string              Javascript for chart generation
 	 */
-	private function referrers_chart ( $start_date = 0, $end_date = 0 ) {
+	private function referrers_chart () {
 		global $wpdb;
-
-		if( ! $end_date ) {
-			$end_date = time();
-		}
 
 		$columns = array(
 			__( 'Referrers', 'ssp-stats' ) => 'string',
 			__( 'Listens', 'ssp-stats' ) => 'number',
 		);
 
-		$sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d", $start_date, $end_date );
+		$sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d", $this->start_date, $this->end_date );
 		$results = $wpdb->get_results( $sql );
 
 		$referrer_data = array();
