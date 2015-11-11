@@ -383,10 +383,60 @@ class SSP_Stats {
 	 * @return void
 	 */
 	public function stats_page () {
-		global $wp_version;
+		global $wp_version, $wpdb;
+
+		$metabox_title = 'h2';
+		if( version_compare( $wp_version, '4.4', '<' ) ) {
+			$metabox_title = 'h3';
+		}
 
 		$html = '<div class="wrap" id="podcast_settings">' . "\n";
 			$html .= '<h1>' . __( 'Podcast Stats' , 'seriously-simple-stats' ) . '</h1>' . "\n";
+
+			$html .= '<div class="metabox-holder">' . "\n";
+				$html .= '<div class="postbox">' . "\n";
+					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
+				    	$html .= '<span>' . __( 'At a Glance', 'seriously-simple-stats' ) . '</span>' . "\n";
+					$html .= '</' . $metabox_title . '>' . "\n";
+					$html .= '<div class="inside">' . "\n";
+
+						// Listens today
+						$current_time = time();
+						$start_of_day = strtotime( date( 'Y-m-d 00:00:00', $current_time ) );
+						$listens_today = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d", $start_of_day, $current_time ) );
+						$html .= $this->daily_stat( $listens_today, __( 'Listens today', 'seriously-simple-stats' ) );
+
+						// Listens this week
+						$one_week_ago = strtotime( '-1 week', $current_time );
+						$listens_this_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d", $one_week_ago, $current_time ) );
+						$html .= $this->daily_stat( $listens_this_week, __( 'Listens this week', 'seriously-simple-stats' ) );
+
+						// Listens last week
+						$two_weeks_ago = strtotime( '-1 week', $one_week_ago );
+						$listens_last_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d", $two_weeks_ago, $one_week_ago ) );
+						$html .= $this->daily_stat( $listens_last_week, __( 'Listens last week', 'seriously-simple-stats' ) );
+
+						// Change from last week
+						if( ! $listens_last_week ) {
+							$week_diff = '-';
+						} else {
+							$week_diff = round( ( $listens_this_week / $listens_last_week * 100 ), 1 );
+							if( $week_diff < 100 ) {
+								$week_diff = '-' . ( 100 - $week_diff ) . '%';
+							} elseif( $week_diff > 100 ) {
+								$week_diff = ( $week_diff - 100 ) . '%';
+							} else {
+								$week_diff = '0%';
+							}
+						}
+						$html .= $this->daily_stat( $week_diff, __( 'Change from last week', 'seriously-simple-stats' ) );
+
+						$html .= '<br class="clear" />';
+
+					$html .= '</div>' . "\n";
+				$html .= '</div>' . "\n";
+			$html .= '</div>' . "\n";
+
 			$html .= '<div class="metabox-holder">' . "\n";
 
 				$html .= '<div class="wp-filter">' . "\n";
@@ -467,17 +517,12 @@ class SSP_Stats {
 					$html .= '</form>' . "\n";
 				$html .= '</div>' . "\n";
 
-				$metabox_title = 'h2';
-				if( version_compare( $wp_version, '4.4', '<' ) ) {
-					$metabox_title = 'h3';
-				}
-
 				$html .= '<div class="postbox" id="daily-listens-container">' . "\n";
 					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
 				    	$html .= '<span>' . __( 'Daily Listens', 'seriously-simple-stats' ) . '</span>' . "\n";
 					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
-						$html .= '<div id="daily_listens"></div>';
+						$html .= '<div id="daily_listens"></div>' . "\n";
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
 
@@ -486,7 +531,7 @@ class SSP_Stats {
 				    	$html .= '<span>' . __( 'Referrers', 'seriously-simple-stats' ) . '</span>' . "\n";
 					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
-						$html .= '<div id="referrers"></div>';
+						$html .= '<div id="referrers"></div>' . "\n";
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
 
@@ -494,6 +539,16 @@ class SSP_Stats {
 		$html .= '</div>' . "\n";
 
 		echo $html;
+	}
+
+	private function daily_stat ( $number = '', $description = '' ) {
+
+		$html = '<div class="overview-stat">' . "\n";
+			$html .= '<div class="stat-total">' . $number . '</div>' . "\n";
+			$html .= '<div class="stat-description">' . $description . '</div>' . "\n";
+		$html .= '</div>' . "\n";
+
+		return $html;
 	}
 
 	/**
