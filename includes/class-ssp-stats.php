@@ -290,7 +290,7 @@ class SSP_Stats {
 	}
 
 	public function post_meta_box ( $post ) {
-		add_meta_box( 'podcast-episode-stats', __( 'Episode Stats' , 'ssp-stats' ), array( $this, 'stats_meta_box_content' ), $post->post_type, 'side', 'default' );
+		add_meta_box( 'podcast-episode-stats', __( 'Episode Stats' , 'seriously-simple-stats' ), array( $this, 'stats_meta_box_content' ), $post->post_type, 'side', 'default' );
 	}
 
 	public function stats_meta_box_content ( $post ) {
@@ -303,7 +303,7 @@ class SSP_Stats {
 
 		$total_downloads = count( $stats );
 
-		$html = '<p class="episode-stat-data total-downloads">' . __( 'Total downloads', 'ssp-stats' ) . ': <b>' . $total_downloads . '</b></p>';
+		$html = '<p class="episode-stat-data total-downloads">' . __( 'Total downloads', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
 
 		if( $total_downloads ) {
 
@@ -337,26 +337,26 @@ class SSP_Stats {
 
 			$total_listeners = count( $listeners );
 
-			$html .= '<p class="episode-stat-data total-listeners">' . __( 'Total listeners', 'ssp-stats' ) . ': <b>' . $total_listeners . '</b></p>';
-			$html .= '<p class="episode-stat-data sources">' . __( 'Download sources', 'ssp-stats' ) . ':</p>';
+			$html .= '<p class="episode-stat-data total-listeners">' . __( 'Total listeners', 'seriously-simple-stats' ) . ': <b>' . $total_listeners . '</b></p>';
+			$html .= '<p class="episode-stat-data sources">' . __( 'Download sources', 'seriously-simple-stats' ) . ':</p>';
 			$html .= '<ul class="sources-list">';
 				if( $itunes ) {
-					$html .= '<li class="itunes">' . __( 'iTunes', 'ssp-stats' ) . ': <b>' . $itunes . '</b></li>';
+					$html .= '<li class="itunes">' . __( 'iTunes', 'seriously-simple-stats' ) . ': <b>' . $itunes . '</b></li>';
 				}
 				if( $stitcher ) {
-					$html .= '<li class="stitcher">' . __( 'Stitcher', 'ssp-stats' ) . ': <b>' . $stitcher . '</b></li>';
+					$html .= '<li class="stitcher">' . __( 'Stitcher', 'seriously-simple-stats' ) . ': <b>' . $stitcher . '</b></li>';
 				}
 				if( $direct ) {
-					$html .= '<li class="direct">' . __( 'Direct download', 'ssp-stats' ) . ': <b>' . $direct . '</b></li>';
+					$html .= '<li class="direct">' . __( 'Direct download', 'seriously-simple-stats' ) . ': <b>' . $direct . '</b></li>';
 				}
 				if( $new_window ) {
-					$html .= '<li class="new_window">' . __( 'Played in new window', 'ssp-stats' ) . ': <b>' . $new_window . '</b></li>';
+					$html .= '<li class="new_window">' . __( 'Played in new window', 'seriously-simple-stats' ) . ': <b>' . $new_window . '</b></li>';
 				}
 				if( $player ) {
-					$html .= '<li class="player">' . __( 'Audio player', 'ssp-stats' ) . ': <b>' . $player . '</b></li>';
+					$html .= '<li class="player">' . __( 'Audio player', 'seriously-simple-stats' ) . ': <b>' . $player . '</b></li>';
 				}
 				if( $unknown ) {
-					$html .= '<li class="unknown">' . __( 'Unknown', 'ssp-stats' ) . ': <b>' . $unknown . '</b></li>';
+					$html .= '<li class="unknown">' . __( 'Unknown', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
 				}
 			$html .= '</ul>';
 		}
@@ -371,7 +371,7 @@ class SSP_Stats {
 	 * @return  void
 	 */
 	public function add_menu_item() {
-		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Stats', 'ssp-stats' ) , __( 'Stats', 'ssp-stats' ), 'manage_podcast' , 'podcast_stats' , array( $this , 'stats_page' ) );
+		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Stats', 'seriously-simple-stats' ) , __( 'Stats', 'seriously-simple-stats' ), 'manage_podcast' , 'podcast_stats' , array( $this , 'stats_page' ) );
 	}
 
 	/**
@@ -384,7 +384,7 @@ class SSP_Stats {
 		global $wp_version;
 
 		$html = '<div class="wrap" id="podcast_settings">' . "\n";
-			$html .= '<h1>' . __( 'Podcast Stats' , 'ssp-stats' ) . '</h1>' . "\n";
+			$html .= '<h1>' . __( 'Podcast Stats' , 'seriously-simple-stats' ) . '</h1>' . "\n";
 			$html .= '<div class="metabox-holder">' . "\n";
 
 				$html .= '<div class="wp-filter">' . "\n";
@@ -396,16 +396,16 @@ class SSP_Stats {
 						// Date range selection
 						$html .= '<p>' . "\n";
 
-							$html .= __( 'Date range:', 'ssp-stats' ) . ' ' . "\n";
+							$html .= __( 'Date range:', 'seriously-simple-stats' ) . ' ' . "\n";
 
-							$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'Start date', 'ssp-stats' ) . '</label>' . "\n";
-							$html .= '<input type="text" id="start-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'Start date', 'ssp-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->start_date ) ) . '" />' . "\n";
+							$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'Start date', 'seriously-simple-stats' ) . '</label>' . "\n";
+							$html .= '<input type="text" id="start-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'Start date', 'seriously-simple-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->start_date ) ) . '" />' . "\n";
 							$html .= '<input type="hidden" id="start-date-filter" name="start" value="' . esc_attr( date( 'd-m-Y', $this->start_date ) ) . '" />' . "\n";
 
-							$html .= ' ' . __( 'to', 'ssp-stats' ) . ' ' . "\n";
+							$html .= ' ' . __( 'to', 'seriously-simple-stats' ) . ' ' . "\n";
 
-							$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'End date', 'ssp-stats' ) . '</label>' . "\n";
-							$html .= '<input type="text" id="end-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'End date', 'ssp-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->end_date ) ) . '" />' . "\n";
+							$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'End date', 'seriously-simple-stats' ) . '</label>' . "\n";
+							$html .= '<input type="text" id="end-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'End date', 'seriously-simple-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->end_date ) ) . '" />' . "\n";
 							$html .= '<input type="hidden" id="end-date-filter" name="end" value="' . esc_attr( date( 'd-m-Y', $this->end_date ) ) . '" />' . "\n";
 
 						$html .= '</p>' . "\n";
@@ -413,9 +413,9 @@ class SSP_Stats {
 						$html .= '<hr/>' . "\n";
 
 						$html .= '<p>' . "\n";
-							$html .= __( 'Filter by:', 'ssp-stats' ) . "\n";
-							$html .= '<input type="radio" name="filter" value="series" class="filter-option" id="by-series" ' . checked( 'series', $this->filter, false ) . ' /><label for="by-series">' . __( 'Series or', 'ssp-stats' ) . '</label>' . "\n";
-							$html .= '<input type="radio" name="filter" value="episode" class="filter-option" id="by-episode" ' . checked( 'episode', $this->filter, false ) . ' /><label for="by-episode">' . __( 'Episode', 'ssp-stats' ) . '</label>' . "\n";
+							$html .= __( 'Filter by:', 'seriously-simple-stats' ) . "\n";
+							$html .= '<input type="radio" name="filter" value="series" class="filter-option" id="by-series" ' . checked( 'series', $this->filter, false ) . ' /><label for="by-series">' . __( 'Series or', 'seriously-simple-stats' ) . '</label>' . "\n";
+							$html .= '<input type="radio" name="filter" value="episode" class="filter-option" id="by-episode" ' . checked( 'episode', $this->filter, false ) . ' /><label for="by-episode">' . __( 'Episode', 'seriously-simple-stats' ) . '</label>' . "\n";
 						$html .= '</p>' . "\n";
 
 						switch( $this->filter ) {
@@ -432,9 +432,9 @@ class SSP_Stats {
 						// Series selection
 						$html .= '<p id="by-series-selection" class="' . esc_attr( $series_class ) . '">' . "\n";
 							$series = get_terms( 'series' );
-							$html .= __( 'Select a series:', 'ssp-stats' ) . "\n";
+							$html .= __( 'Select a series:', 'seriously-simple-stats' ) . "\n";
 							$html .= '<select name="series">' . "\n";
-								$html .= '<option value="all">' . __( 'All series', 'ssp-stats' ) . '</option>' . "\n";
+								$html .= '<option value="all">' . __( 'All series', 'seriously-simple-stats' ) . '</option>' . "\n";
 								foreach( $series as $s ) {
 									$html .= '<option value="' . esc_attr( $s->slug ) . '" ' . selected( $this->series, $s->slug, false ) . '>' . esc_html( $s->name ) . '</option>' . "\n";
 								}
@@ -447,9 +447,9 @@ class SSP_Stats {
 							$episodes_args['orderby'] = 'title';
 							$episodes_args['order'] = 'ASC';
 							$episodes = get_posts( $episodes_args );
-							$html .= __( 'Select an episode:', 'ssp-stats' ) . "\n";
+							$html .= __( 'Select an episode:', 'seriously-simple-stats' ) . "\n";
 							$html .= '<select name="episode">' . "\n";
-								$html .= '<option value="all">' . __( 'All episodes', 'ssp-stats' ) . '</option>' . "\n";
+								$html .= '<option value="all">' . __( 'All episodes', 'seriously-simple-stats' ) . '</option>' . "\n";
 								foreach( $episodes as $episode ) {
 									$html .= '<option value="' . esc_attr( $episode->ID ) . '" ' . selected( $this->episode, $episode->ID, false ) . '>' . esc_html( $episode->post_title ) . '</option>' . "\n";
 								}
@@ -459,7 +459,7 @@ class SSP_Stats {
 						$html .= '<hr/>' . "\n";
 
 						$html .= '<p>' . "\n";
-							$html .= '<input type="submit" class="button" value="' . __( 'Filter', 'ssp-stats' ) . '">' . "\n";
+							$html .= '<input type="submit" class="button" value="' . __( 'Filter', 'seriously-simple-stats' ) . '">' . "\n";
 						$html .= '</p>' . "\n";
 
 					$html .= '</form>' . "\n";
@@ -472,7 +472,7 @@ class SSP_Stats {
 
 				$html .= '<div class="postbox" id="daily-listens-container">' . "\n";
 					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-				    	$html .= '<span>' . __( 'Daily Listens', 'ssp-stats' ) . '</span>' . "\n";
+				    	$html .= '<span>' . __( 'Daily Listens', 'seriously-simple-stats' ) . '</span>' . "\n";
 					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
 						$html .= '<div id="daily_listens"></div>';
@@ -481,7 +481,7 @@ class SSP_Stats {
 
 				$html .= '<div class="postbox" id="referrers-container">' . "\n";
 					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-				    	$html .= '<span>' . __( 'Referrers', 'ssp-stats' ) . '</span>' . "\n";
+				    	$html .= '<span>' . __( 'Referrers', 'seriously-simple-stats' ) . '</span>' . "\n";
 					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
 						$html .= '<div id="referrers"></div>';
@@ -542,8 +542,8 @@ class SSP_Stats {
 		global $wpdb;
 
 		$columns = array(
-			__( 'Date', 'ssp-stats' ) => 'string',
-			__( 'Listens', 'ssp-stats' ) => 'number',
+			__( 'Date', 'seriously-simple-stats' ) => 'string',
+			__( 'Listens', 'seriously-simple-stats' ) => 'number',
 		);
 
 		// Set up WHERE clause if episode/series is selected
@@ -585,8 +585,8 @@ class SSP_Stats {
 		global $wpdb;
 
 		$columns = array(
-			__( 'Referrers', 'ssp-stats' ) => 'string',
-			__( 'Listens', 'ssp-stats' ) => 'number',
+			__( 'Referrers', 'seriously-simple-stats' ) => 'string',
+			__( 'Listens', 'seriously-simple-stats' ) => 'number',
 		);
 
 		// Set up WHERE clause if episode/series is selected
@@ -609,12 +609,12 @@ class SSP_Stats {
 		}
 
 		$referrer_labels = array(
-			'download' => __( 'Direct download', 'ssp-stats' ),
-			'player' => __( 'Audio player', 'ssp-stats' ),
-			'new_window' => __( 'Played in new window', 'ssp-stats' ),
-			'itunes' => __( 'iTunes', 'ssp-stats' ),
-			'stitcher' => __( 'Stitcher', 'ssp-stats' ),
-			'' => __( 'Other', 'ssp-stats' ),
+			'download' => __( 'Direct download', 'seriously-simple-stats' ),
+			'player' => __( 'Audio player', 'seriously-simple-stats' ),
+			'new_window' => __( 'Played in new window', 'seriously-simple-stats' ),
+			'itunes' => __( 'iTunes', 'seriously-simple-stats' ),
+			'stitcher' => __( 'Stitcher', 'seriously-simple-stats' ),
+			'' => __( 'Other', 'seriously-simple-stats' ),
 		);
 
 		$data = array();

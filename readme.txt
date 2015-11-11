@@ -1,22 +1,22 @@
-=== SSP Stats ===
+=== Seriously Simple Stats ===
 Contributors: hlashbrooke
 Donate link: http://www.hughlashbrooke.com/donate
-Tags: wordpress, plugin, template
-Requires at least: 3.9
-Tested up to: 4.0
+Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
+Requires at least: 4.2
+Tested up to: 4.4
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This is where you craft a short, punchy description of your plugin
+Complete analytics and stats tracking for Seriously Simple Podcasting.
 
 == Description ==
 
-This is where you can give a much longer description of your plugin that you can use to explain just how it awesome it really is.
+Complete analytics and stats tracking for Seriously Simple Podcasting.
 
 == Installation ==
 
-Installing "SSP Stats" can be done either by searching for "SSP Stats" via the "Plugins > Add New" screen in your WordPress dashboard, or by using the following steps:
+Installing "Seriously Simple Stats" can be done either by searching for "Seriously Simple Stats" via the "Plugins > Add New" screen in your WordPress dashboard, or by using the following steps:
 
 1. Download the plugin via WordPress.org
 1. Upload the ZIP file through the 'Plugins > Add New > Upload' screen in your WordPress dashboard
@@ -24,9 +24,7 @@ Installing "SSP Stats" can be done either by searching for "SSP Stats" via the "
 
 == Screenshots ==
 
-1. Description of first screenshot named screenshot-1
-2. Description of second screenshot named screenshot-2
-3. Description of third screenshot named screenshot-3
+1. The type of stats you can expect to see.
 
 == Frequently Asked Questions ==
 
@@ -37,11 +35,10 @@ This plugin template is designed to help you get started with any new WordPress 
 == Changelog ==
 
 = 1.0 =
-* 2012-12-13
+* 2015-12-01
 * Initial release
 
 == Upgrade Notice ==
 
 = 1.0 =
-* 2012-12-13
 * Initial release

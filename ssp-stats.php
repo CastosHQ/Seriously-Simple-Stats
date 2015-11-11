@@ -1,7 +1,7 @@
 <?php
 /*
- * Plugin Name: SSP Stats
- * Version: 1.0-alpha
+ * Plugin Name: Seriously Simple Stats
+ * Version: 1.0-beta
  * Plugin URI: http://www.seriouslysimplepodcasting.com/
  * Description: Complete analytics and stats tracking for Seriously Simple Podcasting.
  * Author: Hugh Lashbrooke
@@ -9,7 +9,7 @@
  * Requires at least: 4.0
  * Tested up to: 4.3.1
  *
- * Text Domain: ssp-stats
+ * Text Domain: seriously-simple-stats
  *
  * @package WordPress
  * @author Hugh Lashbrooke
