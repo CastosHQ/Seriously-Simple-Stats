@@ -101,6 +101,38 @@ class SSP_Stats {
 	public $end_date;
 
 	/**
+	 * Chart series selection.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $series = 'all';
+
+	/**
+	 * Chart episode selection.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $episode = 'all';
+
+	/**
+	 * Chart filter selection.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $filter = 'series';
+
+	/**
+	 * Chart episode IDs for filtering.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $episode_ids = '';
+
+	/**
 	 * Constructor function.
 	 * @access  public
 	 * @since   1.0.0
@@ -130,9 +162,24 @@ class SSP_Stats {
 
 		// Set end date for charts
 		if( isset( $_GET['end'] ) ) {
-			$this->end_date = strtotime( date("Y-m-d 23:59:59", strtotime( sanitize_text_field( $_GET['end'] ) ) ) );
+			$this->end_date = strtotime( date( 'Y-m-d 23:59:59', strtotime( sanitize_text_field( $_GET['end'] ) ) ) );
 		} else {
 			$this->end_date = time();
+		}
+
+		// Set series selection for charts
+		if( isset( $_GET['series'] ) ) {
+			$this->series = sanitize_text_field( $_GET['series'] );
+		}
+
+		// Set episode selection for charts
+		if( isset( $_GET['episode'] ) ) {
+			$this->episode = sanitize_text_field( $_GET['episode'] );
+		}
+
+		// Set filter selection for charts
+		if( isset( $_GET['filter'] ) ) {
+			$this->filter = sanitize_text_field( $_GET['filter'] );
 		}
 
 		register_activation_hook( $this->file, array( $this, 'install' ) );
@@ -345,19 +392,71 @@ class SSP_Stats {
 						$html .= '<input type="hidden" name="post_type" value="podcast" />' . "\n";
 						$html .= '<input type="hidden" name="page" value="podcast_stats" />' . "\n";
 
-						$html .= __( 'Select date range:', 'ssp-stats' ) . ' ' . "\n";
+						// Date range selection
+						$html .= '<p>' . "\n";
 
-						$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'Start date', 'ssp-stats' ) . '</label>' . "\n";
-						$html .= '<input type="text" id="start-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'Start date', 'ssp-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->start_date ) ) . '" />' . "\n";
-						$html .= '<input type="hidden" id="start-date-filter" name="start" value="' . esc_attr( date( 'd-m-Y', $this->start_date ) ) . '" />' . "\n";
+							$html .= __( 'Date range:', 'ssp-stats' ) . ' ' . "\n";
 
-						$html .= ' ' . __( 'to', 'ssp-stats' ) . ' ' . "\n";
+							$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'Start date', 'ssp-stats' ) . '</label>' . "\n";
+							$html .= '<input type="text" id="start-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'Start date', 'ssp-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->start_date ) ) . '" />' . "\n";
+							$html .= '<input type="hidden" id="start-date-filter" name="start" value="' . esc_attr( date( 'd-m-Y', $this->start_date ) ) . '" />' . "\n";
 
-						$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'End date', 'ssp-stats' ) . '</label>' . "\n";
-						$html .= '<input type="text" id="end-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'End date', 'ssp-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->end_date ) ) . '" />' . "\n";
-						$html .= '<input type="hidden" id="end-date-filter" name="end" value="' . esc_attr( date( 'd-m-Y', $this->end_date ) ) . '" />' . "\n";
+							$html .= ' ' . __( 'to', 'ssp-stats' ) . ' ' . "\n";
 
-						$html .= '<input type="submit" class="button" value="' . __( 'Filter', 'ssp-stats' ) . '">' . "\n";
+							$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'End date', 'ssp-stats' ) . '</label>' . "\n";
+							$html .= '<input type="text" id="end-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'End date', 'ssp-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->end_date ) ) . '" />' . "\n";
+							$html .= '<input type="hidden" id="end-date-filter" name="end" value="' . esc_attr( date( 'd-m-Y', $this->end_date ) ) . '" />' . "\n";
+
+						$html .= '</p>' . "\n";
+
+						$html .= '<hr/>' . "\n";
+
+						$html .= '<p>' . "\n";
+							$html .= __( 'Filter by:', 'ssp-stats' ) . "\n";
+							$html .= '<input type="radio" name="filter" value="series" class="filter-option" id="by-series" ' . checked( 'series', $this->filter, false ) . ' /><label for="by-series">' . __( 'Series or', 'ssp-stats' ) . '</label>' . "\n";
+							$html .= '<input type="radio" name="filter" value="episode" class="filter-option" id="by-episode" ' . checked( 'episode', $this->filter, false ) . ' /><label for="by-episode">' . __( 'Episode', 'ssp-stats' ) . '</label>' . "\n";
+						$html .= '</p>' . "\n";
+
+						switch( $this->filter ) {
+							case 'series':
+								$series_class = '';
+								$episode_class = 'hidden';
+							break;
+							case 'episode':
+								$series_class = 'hidden';
+								$episode_class = '';
+							break;
+						}
+
+						// Series selection
+						$html .= '<p id="by-series-selection" class="' . esc_attr( $series_class ) . '">' . "\n";
+							$series = get_terms( 'series' );
+							$html .= __( 'Select a series:', 'ssp-stats' ) . "\n";
+							$html .= '<select name="series">' . "\n";
+								$html .= '<option value="all">' . __( 'All series', 'ssp-stats' ) . '</option>' . "\n";
+								foreach( $series as $s ) {
+									$html .= '<option value="' . esc_attr( $s->slug ) . '" ' . selected( $this->series, $s->slug, false ) . '>' . esc_html( $s->name ) . '</option>' . "\n";
+								}
+							$html .= '</select>' . "\n";
+						$html .= '</p>' . "\n";
+
+						// Episode selection
+						$html .= '<p id="by-episode-selection" class="' . esc_attr( $episode_class ) . '">' . "\n";
+							$episodes = ssp_episode_ids();
+							$html .= __( 'Select an episode:', 'ssp-stats' ) . "\n";
+							$html .= '<select name="episode">' . "\n";
+								$html .= '<option value="all">' . __( 'All episodes', 'ssp-stats' ) . '</option>' . "\n";
+								foreach( $episodes as $episode_id ) {
+									$html .= '<option value="' . esc_attr( $episode_id ) . '" ' . selected( $this->episode, $episode_id, false ) . '>' . get_the_title( $episode_id ) . '</option>' . "\n";
+								}
+							$html .= '</select>' . "\n";
+						$html .= '</p>' . "\n";
+
+						$html .= '<hr/>' . "\n";
+
+						$html .= '<p>' . "\n";
+							$html .= '<input type="submit" class="button" value="' . __( 'Filter', 'ssp-stats' ) . '">' . "\n";
+						$html .= '</p>' . "\n";
 
 					$html .= '</form>' . "\n";
 				$html .= '</div>' . "\n";
@@ -396,6 +495,26 @@ class SSP_Stats {
 
 		$output = '';
 
+		switch( $this->filter ) {
+			case 'series':
+				if( 'all' != $this->series ) {
+					$episodes = ssp_episodes( -1, $this->series, false, 'stats' );
+					foreach( $episodes as $episode ) {
+						if( $this->episode_ids ) {
+							$this->episode_ids .= ',';
+						}
+						$this->episode_ids .= $episode->ID;
+					}
+				}
+			break;
+
+			case 'episode':
+				if( 'all' != $this->episode ) {
+					$this->episode_ids = $this->episode;
+				}
+			break;
+		}
+
 		$output .= $this->daily_listens_chart();
 		$output .= $this->referrers_chart();
 
@@ -418,7 +537,13 @@ class SSP_Stats {
 			__( 'Listens', 'ssp-stats' ) => 'number',
 		);
 
-		$sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d", $this->start_date, $this->end_date );
+		// Set up WHERE clause if episode/series is selected
+		$episode_id_where = '';
+		if( $this->episode_ids ) {
+			$episode_id_where = 'AND post_id IN (' . $this->episode_ids . ')';
+		}
+
+		$sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $this->start_date, $this->end_date );
 		$results = $wpdb->get_results( $sql );
 
 		$date_data = array();
@@ -455,7 +580,13 @@ class SSP_Stats {
 			__( 'Listens', 'ssp-stats' ) => 'number',
 		);
 
-		$sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d", $this->start_date, $this->end_date );
+		// Set up WHERE clause if episode/series is selected
+		$episode_id_where = '';
+		if( $this->episode_ids ) {
+			$episode_id_where = 'AND post_id IN (' . $this->episode_ids . ')';
+		}
+
+		$sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $this->start_date, $this->end_date );
 		$results = $wpdb->get_results( $sql );
 
 		$referrer_data = array();
