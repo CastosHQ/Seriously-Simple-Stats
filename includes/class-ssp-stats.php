@@ -381,6 +381,7 @@ class SSP_Stats {
 	 * @return void
 	 */
 	public function stats_page () {
+		global $wp_version;
 
 		$html = '<div class="wrap" id="podcast_settings">' . "\n";
 			$html .= '<h1>' . __( 'Podcast Stats' , 'ssp-stats' ) . '</h1>' . "\n";
@@ -442,12 +443,15 @@ class SSP_Stats {
 
 						// Episode selection
 						$html .= '<p id="by-episode-selection" class="' . esc_attr( $episode_class ) . '">' . "\n";
-							$episodes = ssp_episode_ids();
+							$episodes_args = ssp_episodes( -1, '', true, 'stats' );
+							$episodes_args['orderby'] = 'title';
+							$episodes_args['order'] = 'ASC';
+							$episodes = get_posts( $episodes_args );
 							$html .= __( 'Select an episode:', 'ssp-stats' ) . "\n";
 							$html .= '<select name="episode">' . "\n";
 								$html .= '<option value="all">' . __( 'All episodes', 'ssp-stats' ) . '</option>' . "\n";
-								foreach( $episodes as $episode_id ) {
-									$html .= '<option value="' . esc_attr( $episode_id ) . '" ' . selected( $this->episode, $episode_id, false ) . '>' . get_the_title( $episode_id ) . '</option>' . "\n";
+								foreach( $episodes as $episode ) {
+									$html .= '<option value="' . esc_attr( $episode->ID ) . '" ' . selected( $this->episode, $episode->ID, false ) . '>' . esc_html( $episode->post_title ) . '</option>' . "\n";
 								}
 							$html .= '</select>' . "\n";
 						$html .= '</p>' . "\n";
@@ -461,19 +465,24 @@ class SSP_Stats {
 					$html .= '</form>' . "\n";
 				$html .= '</div>' . "\n";
 
+				$metabox_title = 'h2';
+				if( version_compare( $wp_version, '4.4', '<' ) ) {
+					$metabox_title = 'h3';
+				}
+
 				$html .= '<div class="postbox" id="daily-listens-container">' . "\n";
-					$html .= '<h2 class="hndle ui-sortable-handle">' . "\n";
+					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
 				    	$html .= '<span>' . __( 'Daily Listens', 'ssp-stats' ) . '</span>' . "\n";
-					$html .= '</h2>' . "\n";
+					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
 						$html .= '<div id="daily_listens"></div>';
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
 
 				$html .= '<div class="postbox" id="referrers-container">' . "\n";
-					$html .= '<h2 class="hndle ui-sortable-handle">' . "\n";
+					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
 				    	$html .= '<span>' . __( 'Referrers', 'ssp-stats' ) . '</span>' . "\n";
-					$html .= '</h2>' . "\n";
+					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
 						$html .= '<div id="referrers"></div>';
 					$html .= '</div>' . "\n";
@@ -725,7 +734,7 @@ class SSP_Stats {
 										            'modules':[{
 										              'name':'visualization',
 										              'version':'1',
-										              'packages':['corechart','line']
+										              'packages':['corechart']
 										            }]
 										          }", array(), $this->_version, false );
 
