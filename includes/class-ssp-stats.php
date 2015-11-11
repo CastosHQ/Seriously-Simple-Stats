@@ -290,7 +290,7 @@ class SSP_Stats {
 	}
 
 	public function post_meta_box ( $post ) {
-		add_meta_box( 'podcast-episode-stats', __( 'Episode Stats' , 'seriously-simple-stats' ), array( $this, 'stats_meta_box_content' ), $post->post_type, 'side', 'default' );
+		add_meta_box( 'podcast-episode-stats', __( 'Episode Stats' , 'seriously-simple-stats' ), array( $this, 'stats_meta_box_content' ), $post->post_type, 'side', 'low' );
 	}
 
 	public function stats_meta_box_content ( $post ) {
@@ -359,6 +359,8 @@ class SSP_Stats {
 					$html .= '<li class="unknown">' . __( 'Unknown', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
 				}
 			$html .= '</ul>';
+
+			$html .= '<p>' . sprintf( __( '%1$sSee more detail %2$s%3$s', 'seriously-simple-stats' ), '<a href="' . admin_url( 'edit.php?post_type=podcast&page=podcast_stats&filter=episode&episode=' . $post->ID ) . '">', '&raquo;', '</a>' ) . '<p>';
 		}
 
 		echo $html;
