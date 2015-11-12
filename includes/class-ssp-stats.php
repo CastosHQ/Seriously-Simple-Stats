@@ -101,7 +101,7 @@ class SSP_Stats {
 	public $end_date;
 
 	/**
-	 * Chart series selection.
+	 * Data series selection.
 	 * @var     string
 	 * @access  public
 	 * @since   1.0.0
@@ -109,7 +109,7 @@ class SSP_Stats {
 	public $series = 'all';
 
 	/**
-	 * Chart episode selection.
+	 * Data episode selection.
 	 * @var     string
 	 * @access  public
 	 * @since   1.0.0
@@ -117,20 +117,28 @@ class SSP_Stats {
 	public $episode = 'all';
 
 	/**
-	 * Chart filter selection.
+	 * Data filter selection.
 	 * @var     string
 	 * @access  public
 	 * @since   1.0.0
 	 */
-	public $filter = 'series';
+	public $filter = '';
 
 	/**
-	 * Chart episode IDs for filtering.
+	 * Episode IDs for data filtering.
 	 * @var     string
 	 * @access  public
 	 * @since   1.0.0
 	 */
-	public $episode_ids = '';
+	private $episode_ids = '';
+
+	/**
+	 * WHERE clause for data filtering
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	private $episode_id_where = '';
 
 	/**
 	 * Constructor function.
@@ -182,6 +190,8 @@ class SSP_Stats {
 			$this->filter = sanitize_text_field( $_GET['filter'] );
 		}
 
+		add_action( 'init', array( $this, 'load_episode_ids' ), 0 );
+
 		register_activation_hook( $this->file, array( $this, 'install' ) );
 
 		// Update database to latest schema
@@ -208,6 +218,33 @@ class SSP_Stats {
 		$this->load_plugin_textdomain();
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
 	} // End __construct ()
+
+	public function load_episode_ids () {
+		switch( $this->filter ) {
+			case 'series':
+				if( 'all' != $this->series ) {
+					$episodes = ssp_episodes( -1, $this->series, false, 'stats' );
+					foreach( $episodes as $episode ) {
+						if( $this->episode_ids ) {
+							$this->episode_ids .= ',';
+						}
+						$this->episode_ids .= $episode->ID;
+					}
+				}
+			break;
+
+			case 'episode':
+				if( 'all' != $this->episode ) {
+					$this->episode_ids = $this->episode;
+				}
+			break;
+		}
+
+		// Set up WHERE clause if episode/series is selected
+		if( $this->episode_ids ) {
+			$this->episode_id_where = 'post_id IN (' . $this->episode_ids . ')';
+		}
+	}
 
 	public function track_download ( $file = '', $episode = 0, $referrer = '' ) {
 		global $wpdb;
@@ -406,8 +443,31 @@ class SSP_Stats {
 			$metabox_title = 'h3';
 		}
 
+		$title_tail = '';
+		switch( $this->filter ) {
+			case 'series':
+				if( 'all' != $this->series ) {
+					$series_obj = get_term_by( 'slug', $this->series, 'series' );
+					$series_name = $series_obj->name;
+					if( $series_name ) {
+						$title_tail = sprintf( __( 'for Series: %s', 'seriously-simple-stats' ), '<u>' . $series_name . '</u>' );
+					}
+				}
+			break;
+			case 'episode':
+				if( 'all' != $this->episode ) {
+					$episode_name = get_the_title( $this->episode );
+					if( $episode_name ) {
+						$title_tail = sprintf( __( 'for Episode: %s', 'seriously-simple-stats' ), '<u>' . $episode_name . '</u>' );
+					}
+				}
+			break;
+		}
+
+		$page_title = sprintf( __( 'Podcast Stats %s' , 'seriously-simple-stats' ), $title_tail );
+
 		$html = '<div class="wrap" id="podcast_settings">' . "\n";
-			$html .= '<h1>' . __( 'Podcast Stats' , 'seriously-simple-stats' ) . '</h1>' . "\n";
+			$html .= '<h1>' . $page_title . '</h1>' . "\n";
 
 			$html .= '<div class="metabox-holder">' . "\n";
 				$html .= '<div class="postbox">' . "\n";
@@ -416,20 +476,25 @@ class SSP_Stats {
 					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
 
+						$episode_id_where = '';
+						if( $this->episode_id_where ) {
+							$episode_id_where = 'AND ' . $this->episode_id_where;
+						}
+
 						// Listens today
 						$current_time = time();
 						$start_of_day = strtotime( date( 'Y-m-d 00:00:00', $current_time ) );
-						$listens_today = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d", $start_of_day, $current_time ) );
+						$listens_today = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $start_of_day, $current_time ) );
 						$html .= $this->daily_stat( $listens_today, __( 'Listens today', 'seriously-simple-stats' ) );
 
 						// Listens this week
 						$one_week_ago = strtotime( '-1 week', $current_time );
-						$listens_this_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d", $one_week_ago, $current_time ) );
+						$listens_this_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $one_week_ago, $current_time ) );
 						$html .= $this->daily_stat( $listens_this_week, __( 'Listens this week', 'seriously-simple-stats' ) );
 
 						// Listens last week
 						$two_weeks_ago = strtotime( '-1 week', $one_week_ago );
-						$listens_last_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d", $two_weeks_ago, $one_week_ago ) );
+						$listens_last_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $two_weeks_ago, $one_week_ago ) );
 						$html .= $this->daily_stat( $listens_last_week, __( 'Listens last week', 'seriously-simple-stats' ) );
 
 						// Change from last week
@@ -451,11 +516,8 @@ class SSP_Stats {
 
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
-			$html .= '</div>' . "\n";
 
-			$html .= '<div class="metabox-holder">' . "\n";
-
-				$html .= '<div class="wp-filter postbox">' . "\n";
+				$html .= '<div class="postbox">' . "\n";
 					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
 				    	$html .= '<span>' . __( 'Filters', 'seriously-simple-stats' ) . '</span>' . "\n";
 					$html .= '</' . $metabox_title . '>' . "\n";
@@ -491,13 +553,17 @@ class SSP_Stats {
 							$html .= '</p>' . "\n";
 
 							switch( $this->filter ) {
+								case 'episode':
+									$series_class = 'hidden';
+									$episode_class = '';
+								break;
 								case 'series':
 									$series_class = '';
 									$episode_class = 'hidden';
 								break;
-								case 'episode':
+								default:
 									$series_class = 'hidden';
-									$episode_class = '';
+									$episode_class = 'hidden';
 								break;
 							}
 
@@ -535,6 +601,7 @@ class SSP_Stats {
 							$html .= '</p>' . "\n";
 
 						$html .= '</form>' . "\n";
+						$html .= '<br class="clear" />';
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
 
@@ -591,26 +658,6 @@ class SSP_Stats {
 
 		$output = '';
 
-		switch( $this->filter ) {
-			case 'series':
-				if( 'all' != $this->series ) {
-					$episodes = ssp_episodes( -1, $this->series, false, 'stats' );
-					foreach( $episodes as $episode ) {
-						if( $this->episode_ids ) {
-							$this->episode_ids .= ',';
-						}
-						$this->episode_ids .= $episode->ID;
-					}
-				}
-			break;
-
-			case 'episode':
-				if( 'all' != $this->episode ) {
-					$this->episode_ids = $this->episode;
-				}
-			break;
-		}
-
 		$output .= $this->daily_listens_chart();
 		$output .= $this->referrers_chart();
 
@@ -633,10 +680,9 @@ class SSP_Stats {
 			__( 'Listens', 'seriously-simple-stats' ) => 'number',
 		);
 
-		// Set up WHERE clause if episode/series is selected
 		$episode_id_where = '';
-		if( $this->episode_ids ) {
-			$episode_id_where = 'AND post_id IN (' . $this->episode_ids . ')';
+		if( $this->episode_id_where ) {
+			$episode_id_where = 'AND ' . $this->episode_id_where;
 		}
 
 		$sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $this->start_date, $this->end_date );
@@ -676,10 +722,9 @@ class SSP_Stats {
 			__( 'Listens', 'seriously-simple-stats' ) => 'number',
 		);
 
-		// Set up WHERE clause if episode/series is selected
 		$episode_id_where = '';
-		if( $this->episode_ids ) {
-			$episode_id_where = 'AND post_id IN (' . $this->episode_ids . ')';
+		if( $this->episode_id_where ) {
+			$episode_id_where = 'AND ' . $this->episode_id_where;
 		}
 
 		$sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $this->start_date, $this->end_date );
