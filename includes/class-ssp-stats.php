@@ -190,12 +190,13 @@ class SSP_Stats {
 			$this->filter = sanitize_text_field( $_GET['filter'] );
 		}
 
-		add_action( 'init', array( $this, 'load_episode_ids' ), 10 );
-
 		register_activation_hook( $this->file, array( $this, 'install' ) );
 
 		// Update database to latest schema
 		add_action( 'init', array( $this, 'update_database' ), 1 );
+
+		// Get required episode IDs for stats
+		add_action( 'init', array( $this, 'load_episode_ids' ), 10 );
 
 		// Track episode download
 		add_action( 'ssp_file_download', array( $this, 'track_download' ), 10, 3 );
@@ -203,8 +204,7 @@ class SSP_Stats {
 		// Add stats meta box to episodes edit screen
 		add_action( 'ssp_meta_boxes', array( $this, 'post_meta_box' ), 10, 1 );
 
-		// Load admin JS & CSS
-
+		// Add menu item
 		add_action( 'admin_menu', array( $this , 'add_menu_item' ) );
 
 		// Load necessary javascript for charts
@@ -476,7 +476,7 @@ class SSP_Stats {
 				$html .= '<div class="postbox" id="content-filter-container">' . "\n";
 					$html .= '<div class="inside">' . "\n";
 						$html .= '<form action="" method="get" name="ssp-stats-content-filter">' . "\n";
-
+							$html .= '<strong>' . "\n";
 							foreach( $_GET as $param => $value ) {
 								if( in_array( $param, array( 'post_type', 'page', 'start', 'end' ) ) ) {
 									$html .= '<input type="hidden" name="' . esc_attr( $param ) . '" value="' . esc_attr( $value ) . '" />';
@@ -530,8 +530,8 @@ class SSP_Stats {
 								$html .= '</select>' . "\n";
 							$html .= '</span>' . "\n";
 
-							$html .= '<input type="submit" id="content-filter-button" class="hidden button" value="' . __( 'Filter', 'seriously-simple-stats' ) . '" />' . "\n";
-
+							$html .= '<input type="submit" id="content-filter-button" class="hidden button" value="' . __( 'Apply', 'seriously-simple-stats' ) . '" />' . "\n";
+							$html .= '</strong>' . "\n";
 						$html .= '</form>' . "\n";
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
@@ -588,7 +588,7 @@ class SSP_Stats {
 					// Date range selection
 					$start_date_select = '<input type="text" id="start-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'Start date', 'seriously-simple-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->start_date ) ) . '" /><input type="hidden" id="start-date-filter" name="start" value="' . esc_attr( date( 'd-m-Y', $this->start_date ) ) . '" />';
 					$end_date_select = '<input type="text" id="end-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'End date', 'seriously-simple-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->end_date ) ) . '" /><input type="hidden" id="end-date-filter" name="end" value="' . esc_attr( date( 'd-m-Y', $this->end_date ) ) . '" />';
-					$date_select_submit = '<input id="date_select_submit" class="hidden button" type="submit" value="' . __( 'Filter', 'seriously-simple-stats' ) . '" />';
+					$date_select_submit = '<input id="date_select_submit" class="hidden button" type="submit" value="' . __( 'Apply', 'seriously-simple-stats' ) . '" />';
 					$date_select_hidden = '';
 					foreach( $_GET as $param => $value ) {
 						if( in_array( $param, array( 'post_type', 'page', 'filter', 'episode', 'series' ) ) ) {
