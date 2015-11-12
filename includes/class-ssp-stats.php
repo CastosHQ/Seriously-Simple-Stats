@@ -470,52 +470,6 @@ class SSP_Stats {
 			$html .= '<h1>' . $page_title . '</h1>' . "\n";
 
 			$html .= '<div class="metabox-holder">' . "\n";
-				$html .= '<div class="postbox">' . "\n";
-					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-				    	$html .= '<span>' . __( 'At a Glance', 'seriously-simple-stats' ) . '</span>' . "\n";
-					$html .= '</' . $metabox_title . '>' . "\n";
-					$html .= '<div class="inside">' . "\n";
-
-						$episode_id_where = '';
-						if( $this->episode_id_where ) {
-							$episode_id_where = 'AND ' . $this->episode_id_where;
-						}
-
-						// Listens today
-						$current_time = time();
-						$start_of_day = strtotime( date( 'Y-m-d 00:00:00', $current_time ) );
-						$listens_today = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $start_of_day, $current_time ) );
-						$html .= $this->daily_stat( $listens_today, __( 'Listens today', 'seriously-simple-stats' ) );
-
-						// Listens this week
-						$one_week_ago = strtotime( '-1 week', $current_time );
-						$listens_this_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $one_week_ago, $current_time ) );
-						$html .= $this->daily_stat( $listens_this_week, __( 'Listens this week', 'seriously-simple-stats' ) );
-
-						// Listens last week
-						$two_weeks_ago = strtotime( '-1 week', $one_week_ago );
-						$listens_last_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $two_weeks_ago, $one_week_ago ) );
-						$html .= $this->daily_stat( $listens_last_week, __( 'Listens last week', 'seriously-simple-stats' ) );
-
-						// Change from last week
-						if( ! $listens_last_week ) {
-							$week_diff = '-';
-						} else {
-							$week_diff = round( ( $listens_this_week / $listens_last_week * 100 ), 1 );
-							if( $week_diff < 100 ) {
-								$week_diff = '-' . ( 100 - $week_diff ) . '%';
-							} elseif( $week_diff > 100 ) {
-								$week_diff = ( $week_diff - 100 ) . '%';
-							} else {
-								$week_diff = '0%';
-							}
-						}
-						$html .= $this->daily_stat( $week_diff, __( 'Change from last week', 'seriously-simple-stats' ) );
-
-						$html .= '<br class="clear" />';
-
-					$html .= '</div>' . "\n";
-				$html .= '</div>' . "\n";
 
 				$html .= '<div class="postbox">' . "\n";
 					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
@@ -526,25 +480,6 @@ class SSP_Stats {
 
 							$html .= '<input type="hidden" name="post_type" value="podcast" />' . "\n";
 							$html .= '<input type="hidden" name="page" value="podcast_stats" />' . "\n";
-
-							// Date range selection
-							$html .= '<p>' . "\n";
-
-								$html .= __( 'Date range:', 'seriously-simple-stats' ) . ' ' . "\n";
-
-								$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'Start date', 'seriously-simple-stats' ) . '</label>' . "\n";
-								$html .= '<input type="text" id="start-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'Start date', 'seriously-simple-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->start_date ) ) . '" />' . "\n";
-								$html .= '<input type="hidden" id="start-date-filter" name="start" value="' . esc_attr( date( 'd-m-Y', $this->start_date ) ) . '" />' . "\n";
-
-								$html .= ' ' . __( 'to', 'seriously-simple-stats' ) . ' ' . "\n";
-
-								$html .= '<label for="start-date-filter" class="screen-reader-text">' . __( 'End date', 'seriously-simple-stats' ) . '</label>' . "\n";
-								$html .= '<input type="text" id="end-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'End date', 'seriously-simple-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->end_date ) ) . '" />' . "\n";
-								$html .= '<input type="hidden" id="end-date-filter" name="end" value="' . esc_attr( date( 'd-m-Y', $this->end_date ) ) . '" />' . "\n";
-
-							$html .= '</p>' . "\n";
-
-							$html .= '<hr/>' . "\n";
 
 							$html .= '<p>' . "\n";
 								$html .= __( 'Filter by:', 'seriously-simple-stats' ) . "\n";
@@ -605,30 +540,111 @@ class SSP_Stats {
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
 
-				$html .= '<div class="postbox" id="daily-listens-container">' . "\n";
+				$html .= '<div class="postbox">' . "\n";
 					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-				    	$html .= '<span>' . __( 'Daily Listens', 'seriously-simple-stats' ) . '</span>' . "\n";
+				    	$html .= '<span>' . __( 'At a Glance', 'seriously-simple-stats' ) . '</span>' . "\n";
 					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
+
+						$episode_id_where = '';
+						if( $this->episode_id_where ) {
+							$episode_id_where = 'AND ' . $this->episode_id_where;
+						}
+
+						// Listens today
+						$current_time = time();
+						$start_of_day = strtotime( date( 'Y-m-d 00:00:00', $current_time ) );
+						$listens_today = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $start_of_day, $current_time ) );
+						$html .= $this->daily_stat( $listens_today, __( 'Listens today', 'seriously-simple-stats' ) );
+
+						// Listens this week
+						$one_week_ago = strtotime( '-1 week', $current_time );
+						$listens_this_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $one_week_ago, $current_time ) );
+						$html .= $this->daily_stat( $listens_this_week, __( 'Listens this week', 'seriously-simple-stats' ) );
+
+						// Listens last week
+						$two_weeks_ago = strtotime( '-1 week', $one_week_ago );
+						$listens_last_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $two_weeks_ago, $one_week_ago ) );
+						$html .= $this->daily_stat( $listens_last_week, __( 'Listens last week', 'seriously-simple-stats' ) );
+
+						// Change from last week
+						if( ! $listens_last_week ) {
+							$week_diff = '-';
+						} else {
+							$week_diff = round( ( $listens_this_week / $listens_last_week * 100 ), 1 );
+							if( $week_diff < 100 ) {
+								$week_diff = '-' . ( 100 - $week_diff ) . '%';
+							} elseif( $week_diff > 100 ) {
+								$week_diff = '+' . ( $week_diff - 100 ) . '%';
+							} else {
+								$week_diff = '0%';
+							}
+						}
+						$html .= $this->daily_stat( $week_diff, __( 'Change from last week', 'seriously-simple-stats' ) );
+
+						$html .= '<br class="clear" />';
+
+					$html .= '</div>' . "\n";
+				$html .= '</div>' . "\n";
+
+				$html .= '<div class="postbox" id="daily-listens-container">' . "\n";
+
+					// Date range selection
+					$start_date_select = '<input type="text" id="start-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'Start date', 'seriously-simple-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->start_date ) ) . '" /><input type="hidden" id="start-date-filter" name="start" value="' . esc_attr( date( 'd-m-Y', $this->start_date ) ) . '" />';
+					$end_date_select = '<input type="text" id="end-date-filter_display" class="ssp-datepicker" placeholder="' . __( 'End date', 'seriously-simple-stats' ) . '" value="' . esc_attr( date( 'j F, Y', $this->end_date ) ) . '" /><input type="hidden" id="end-date-filter" name="end" value="' . esc_attr( date( 'd-m-Y', $this->end_date ) ) . '" />';
+					$date_select_submit = '<input id="date_select_submit" class="hidden button" type="submit" value="' . __( 'Filter', 'seriously-simple-stats' ) . '" />';
+					$date_select_hidden = '';
+					foreach( $_GET as $param => $value ) {
+						if( in_array( $param, array( 'post_type', 'page', 'filter', 'episode', 'series' ) ) ) {
+							$date_select_hidden .= '<input type="hidden" name="' . esc_attr( $param ) . '" value="' . esc_attr( $value ) . '" />';
+						}
+					}
+
+						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
+							$html .= '<form action="" method="get" name="ssp-stats-date-filter" class="hasDatepicker">' . "\n";
+								$html .= $date_select_hidden;
+					    		$html .= '<span>' . sprintf( __( 'Stats for %s to %s %s', 'seriously-simple-stats' ), $start_date_select, $end_date_select, $date_select_submit ) . '</span>' . "\n";
+					    	$html .= '</form>' . "\n";
+						$html .= '</' . $metabox_title . '>' . "\n";
+
+					$html .= '<div class="inside">' . "\n";
+
+						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
+					    	$html .= '<span>' . __( 'Daily Listens', 'seriously-simple-stats' ) . '</span>' . "\n";
+						$html .= '</' . $metabox_title . '>' . "\n";
 						$html .= '<div id="daily_listens"></div>' . "\n";
+
+						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
+					    	$html .= '<span>' . __( 'Referrers', 'seriously-simple-stats' ) . '</span>' . "\n";
+						$html .= '</' . $metabox_title . '>' . "\n";
+						$html .= '<div id="referrers"></div>' . "\n";
+
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
 
 				$html .= '<div class="postbox" id="top-ten-container">' . "\n";
 					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-				    	$html .= '<span>' . __( 'Top Ten Episodes', 'seriously-simple-stats' ) . '</span>' . "\n";
+				    	$html .= '<span>' . __( 'Top Ten Episodes of All Time', 'seriously-simple-stats' ) . '</span>' . "\n";
 					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
-						$html .= '<div></div>' . "\n";
-					$html .= '</div>' . "\n";
-				$html .= '</div>' . "\n";
 
-				$html .= '<div class="postbox" id="referrers-container">' . "\n";
-					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-				    	$html .= '<span>' . __( 'Referrers', 'seriously-simple-stats' ) . '</span>' . "\n";
-					$html .= '</' . $metabox_title . '>' . "\n";
-					$html .= '<div class="inside">' . "\n";
-						$html .= '<div id="referrers"></div>' . "\n";
+						$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id LIMIT 10";
+						$results = $wpdb->get_results( $sql );
+
+						$html .= '<ul>' . "\n";
+							// $html .= '<li class="headers"><span class="first-col">' . __( 'Listens', 'seriously-simple-stats' ) . '</span> <span>' . __( 'Episode Title', 'seriously-simple-stats' ) . '</span></li>' . "\n";
+							$li_class = 'alternate';
+							foreach( $results as $result ) {
+								$episode = get_post( $result->post_id );
+								$html .= '<li class="' . esc_attr( $li_class ) . '"><span class="first-col top-ten-count">' . sprintf( _n( '%d %slisten%s', '%d %slistens%s', $result->listens, 'seriously-simple-stats' ), $result->listens, '<span>', '</span>' ) . '</span> <span class="top-ten-title">' . esc_html( $episode->post_title ) . '</span></li>' . "\n";
+								if( '' == $li_class ) {
+									$li_class = 'alternate';
+								} else {
+									$li_class = '';
+								}
+							}
+						$html .= '</ul>' . "\n";
+
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
 

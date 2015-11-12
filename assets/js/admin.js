@@ -10,4 +10,7 @@ jQuery( document ).ready( function ( e ) {
 			jQuery( '#by-series-selection' ).addClass( 'hidden' );
 		}
 	});
+	jQuery( '#podcast_settings .ssp-datepicker').change( function() {
+		jQuery( '#date_select_submit' ).removeClass( 'hidden' );
+	});
 });

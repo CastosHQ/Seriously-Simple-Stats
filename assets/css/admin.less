@@ -85,6 +85,9 @@
 		clear: both;
 		float: none;
 	}
+	.hndle {
+		cursor: default !important;
+	}
 	.overview-stat {
 		width: 25%;
 		float: left;
@@ -97,6 +100,36 @@
 		}
 		.stat-description {
 			font-style: italic;
+		}
+	}
+	#top-ten-container {
+		.inside {
+			margin: 0;
+			padding: 0;
+			ul {
+				list-style: none;
+				margin: 0;
+				li {
+					&.headers {
+						font-weight: bold;
+					}
+					margin: 0;
+					padding: 10px;
+					.first-col {
+						display: inline-block;
+						width: 100px;
+						&.top-ten-count {
+							font-size: 150%;
+							span {
+								font-size: 60%;
+							}
+						}
+					}
+					.top-ten-title {
+						font-size: 135%;
+					}
+				}
+			}
 		}
 	}
 }
