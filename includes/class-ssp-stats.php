@@ -130,7 +130,7 @@ class SSP_Stats {
 	 * @access  public
 	 * @since   1.0.0
 	 */
-	private $episode_ids = '';
+	public $episode_ids = '';
 
 	/**
 	 * WHERE clause for data filtering
@@ -138,7 +138,7 @@ class SSP_Stats {
 	 * @access  public
 	 * @since   1.0.0
 	 */
-	private $episode_id_where = '';
+	public $episode_id_where = '';
 
 	/**
 	 * Constructor function.
@@ -190,12 +190,12 @@ class SSP_Stats {
 			$this->filter = sanitize_text_field( $_GET['filter'] );
 		}
 
-		add_action( 'init', array( $this, 'load_episode_ids' ), 0 );
+		add_action( 'init', array( $this, 'load_episode_ids' ), 10 );
 
 		register_activation_hook( $this->file, array( $this, 'install' ) );
 
 		// Update database to latest schema
-		add_action( 'init', array( $this, 'update_database' ), 0 );
+		add_action( 'init', array( $this, 'update_database' ), 1 );
 
 		// Track episode download
 		add_action( 'ssp_file_download', array( $this, 'track_download' ), 10, 3 );
@@ -220,9 +220,11 @@ class SSP_Stats {
 	} // End __construct ()
 
 	public function load_episode_ids () {
+
 		switch( $this->filter ) {
 			case 'series':
 				if( 'all' != $this->series ) {
+
 					$episodes = ssp_episodes( -1, $this->series, false, 'stats' );
 					foreach( $episodes as $episode ) {
 						if( $this->episode_ids ) {
@@ -498,7 +500,7 @@ class SSP_Stats {
 
 							$html .= __( 'View stats for', 'seriously-simple-stats' ) . "\n";
 							$html .= ' <select name="filter" id="content-filter-select">' . "\n";
-								$html .= '<option value="" ' . selected( '', $this->filter, false ) . '>' . __( 'All series & episodes', 'seriously-simple-stats' ) . '</option>' . "\n";
+								$html .= '<option value="" ' . selected( '', $this->filter, false ) . '>' . __( 'All episodes', 'seriously-simple-stats' ) . '</option>' . "\n";
 								$html .= '<option value="series" ' . selected( 'series', $this->filter, false ) . '>' . __( 'An individual series', 'seriously-simple-stats' ) . '</option>' . "\n";
 								$html .= '<option value="episode" ' . selected( 'episode', $this->filter, false ) . '>' . __( 'An individual episode', 'seriously-simple-stats' ) . '</option>' . "\n";
 							$html .= '</select>' . "\n";
@@ -622,14 +624,15 @@ class SSP_Stats {
 					$html .= '</' . $metabox_title . '>' . "\n";
 					$html .= '<div class="inside">' . "\n";
 
-						$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id LIMIT 10";
+						$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id ORDER BY listens DESC LIMIT 10";
 						$results = $wpdb->get_results( $sql );
 
 						$html .= '<ul>' . "\n";
 							$li_class = 'alternate';
 							foreach( $results as $result ) {
 								$episode = get_post( $result->post_id );
-								$html .= '<li class="' . esc_attr( $li_class ) . '"><span class="first-col top-ten-count">' . sprintf( _n( '%d %slisten%s', '%d %slistens%s', $result->listens, 'seriously-simple-stats' ), $result->listens, '<span>', '</span>' ) . '</span> <span class="top-ten-title">' . esc_html( $episode->post_title ) . '</span></li>' . "\n";
+								$episode_link = admin_url( 'post.php?post=' . $episode->ID . '&action=edit' );
+								$html .= '<li class="' . esc_attr( $li_class ) . '"><span class="first-col top-ten-count">' . sprintf( _n( '%d %slisten%s', '%d %slistens%s', $result->listens, 'seriously-simple-stats' ), $result->listens, '<span>', '</span>' ) . '</span> <span class="top-ten-title"><a href="' . $episode_link . '">' . esc_html( $episode->post_title ) . '</a></span></li>' . "\n";
 								if( '' == $li_class ) {
 									$li_class = 'alternate';
 								} else {
@@ -643,6 +646,8 @@ class SSP_Stats {
 
 			$html .= '</div>' . "\n";
 		$html .= '</div>' . "\n";
+
+		$wpdb->flush();
 
 		echo $html;
 	}
