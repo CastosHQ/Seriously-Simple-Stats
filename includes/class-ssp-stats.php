@@ -471,21 +471,15 @@ class SSP_Stats {
 
 			$html .= '<div class="metabox-holder">' . "\n";
 
-				$html .= '<div class="postbox">' . "\n";
-					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-				    	$html .= '<span>' . __( 'Filters', 'seriously-simple-stats' ) . '</span>' . "\n";
-					$html .= '</' . $metabox_title . '>' . "\n";
+				$html .= '<div class="postbox" id="content-filter-container">' . "\n";
 					$html .= '<div class="inside">' . "\n";
-						$html .= '<form action="" method="get" name="ssp-stats-date-filter" class="filter-items hasDatepicker">' . "\n";
+						$html .= '<form action="" method="get" name="ssp-stats-content-filter">' . "\n";
 
-							$html .= '<input type="hidden" name="post_type" value="podcast" />' . "\n";
-							$html .= '<input type="hidden" name="page" value="podcast_stats" />' . "\n";
-
-							$html .= '<p>' . "\n";
-								$html .= __( 'Filter by:', 'seriously-simple-stats' ) . "\n";
-								$html .= '<input type="radio" name="filter" value="series" class="filter-option" id="by-series" ' . checked( 'series', $this->filter, false ) . ' /><label for="by-series">' . __( 'Series or', 'seriously-simple-stats' ) . '</label>' . "\n";
-								$html .= '<input type="radio" name="filter" value="episode" class="filter-option" id="by-episode" ' . checked( 'episode', $this->filter, false ) . ' /><label for="by-episode">' . __( 'Episode', 'seriously-simple-stats' ) . '</label>' . "\n";
-							$html .= '</p>' . "\n";
+							foreach( $_GET as $param => $value ) {
+								if( in_array( $param, array( 'post_type', 'page', 'start', 'end' ) ) ) {
+									$html .= '<input type="hidden" name="' . esc_attr( $param ) . '" value="' . esc_attr( $value ) . '" />';
+								}
+							}
 
 							switch( $this->filter ) {
 								case 'episode':
@@ -502,41 +496,41 @@ class SSP_Stats {
 								break;
 							}
 
+							$html .= __( 'View stats for', 'seriously-simple-stats' ) . "\n";
+							$html .= ' <select name="filter" id="content-filter-select">' . "\n";
+								$html .= '<option value="" ' . selected( '', $this->filter, false ) . '>' . __( 'All series & episodes', 'seriously-simple-stats' ) . '</option>' . "\n";
+								$html .= '<option value="series" ' . selected( 'series', $this->filter, false ) . '>' . __( 'An individual series', 'seriously-simple-stats' ) . '</option>' . "\n";
+								$html .= '<option value="episode" ' . selected( 'episode', $this->filter, false ) . '>' . __( 'An individual episode', 'seriously-simple-stats' ) . '</option>' . "\n";
+							$html .= '</select>' . "\n";
+
 							// Series selection
-							$html .= '<p id="by-series-selection" class="' . esc_attr( $series_class ) . '">' . "\n";
+							$html .= '<span id="by-series-selection" class="' . esc_attr( $series_class ) . '">' . "\n";
 								$series = get_terms( 'series' );
-								$html .= __( 'Select a series:', 'seriously-simple-stats' ) . "\n";
+								$html .= '&raquo;' . "\n";
 								$html .= '<select name="series">' . "\n";
-									$html .= '<option value="all">' . __( 'All series', 'seriously-simple-stats' ) . '</option>' . "\n";
 									foreach( $series as $s ) {
 										$html .= '<option value="' . esc_attr( $s->slug ) . '" ' . selected( $this->series, $s->slug, false ) . '>' . esc_html( $s->name ) . '</option>' . "\n";
 									}
 								$html .= '</select>' . "\n";
-							$html .= '</p>' . "\n";
+							$html .= '</span>' . "\n";
 
 							// Episode selection
-							$html .= '<p id="by-episode-selection" class="' . esc_attr( $episode_class ) . '">' . "\n";
+							$html .= '<span id="by-episode-selection" class="' . esc_attr( $episode_class ) . '">' . "\n";
 								$episodes_args = ssp_episodes( -1, '', true, 'stats' );
 								$episodes_args['orderby'] = 'title';
 								$episodes_args['order'] = 'ASC';
 								$episodes = get_posts( $episodes_args );
-								$html .= __( 'Select an episode:', 'seriously-simple-stats' ) . "\n";
+								$html .= '&raquo;' . "\n";
 								$html .= '<select name="episode">' . "\n";
-									$html .= '<option value="all">' . __( 'All episodes', 'seriously-simple-stats' ) . '</option>' . "\n";
 									foreach( $episodes as $episode ) {
 										$html .= '<option value="' . esc_attr( $episode->ID ) . '" ' . selected( $this->episode, $episode->ID, false ) . '>' . esc_html( $episode->post_title ) . '</option>' . "\n";
 									}
 								$html .= '</select>' . "\n";
-							$html .= '</p>' . "\n";
+							$html .= '</span>' . "\n";
 
-							$html .= '<hr/>' . "\n";
-
-							$html .= '<p>' . "\n";
-								$html .= '<input type="submit" class="button" value="' . __( 'Filter', 'seriously-simple-stats' ) . '">' . "\n";
-							$html .= '</p>' . "\n";
+							$html .= '<input type="submit" id="content-filter-button" class="hidden button" value="' . __( 'Filter', 'seriously-simple-stats' ) . '" />' . "\n";
 
 						$html .= '</form>' . "\n";
-						$html .= '<br class="clear" />';
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
 
@@ -600,12 +594,12 @@ class SSP_Stats {
 						}
 					}
 
-						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-							$html .= '<form action="" method="get" name="ssp-stats-date-filter" class="hasDatepicker">' . "\n";
-								$html .= $date_select_hidden;
-					    		$html .= '<span>' . sprintf( __( 'Stats for %s to %s %s', 'seriously-simple-stats' ), $start_date_select, $end_date_select, $date_select_submit ) . '</span>' . "\n";
-					    	$html .= '</form>' . "\n";
-						$html .= '</' . $metabox_title . '>' . "\n";
+					$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
+						$html .= '<form action="" method="get" name="ssp-stats-date-filter" class="hasDatepicker">' . "\n";
+							$html .= $date_select_hidden;
+				    		$html .= '<span>' . sprintf( __( 'Stats for %s to %s %s', 'seriously-simple-stats' ), $start_date_select, $end_date_select, $date_select_submit ) . '</span>' . "\n";
+				    	$html .= '</form>' . "\n";
+					$html .= '</' . $metabox_title . '>' . "\n";
 
 					$html .= '<div class="inside">' . "\n";
 
@@ -632,7 +626,6 @@ class SSP_Stats {
 						$results = $wpdb->get_results( $sql );
 
 						$html .= '<ul>' . "\n";
-							// $html .= '<li class="headers"><span class="first-col">' . __( 'Listens', 'seriously-simple-stats' ) . '</span> <span>' . __( 'Episode Title', 'seriously-simple-stats' ) . '</span></li>' . "\n";
 							$li_class = 'alternate';
 							foreach( $results as $result ) {
 								$episode = get_post( $result->post_id );
