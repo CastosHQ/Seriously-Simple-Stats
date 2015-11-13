@@ -346,7 +346,7 @@ class SSP_Stats {
 
 		$total_downloads = count( $stats );
 
-		$html = '<p class="episode-stat-data total-downloads">' . __( 'Total downloads', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
+		$html = '<p class="episode-stat-data total-downloads">' . __( 'Total listens', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
 
 		if( $total_downloads ) {
 
@@ -387,7 +387,7 @@ class SSP_Stats {
 			$total_listeners = count( $listeners );
 
 			$html .= '<p class="episode-stat-data total-listeners">' . __( 'Total listeners', 'seriously-simple-stats' ) . ': <b>' . $total_listeners . '</b></p>';
-			$html .= '<p class="episode-stat-data sources">' . __( 'Download sources', 'seriously-simple-stats' ) . ':</p>';
+			$html .= '<p class="episode-stat-data sources">' . __( 'Listening sources', 'seriously-simple-stats' ) . ':</p>';
 			$html .= '<ul class="sources-list">';
 				if( $itunes ) {
 					$html .= '<li class="itunes">' . __( 'iTunes', 'seriously-simple-stats' ) . ': <b>' . $itunes . '</b></li>';
@@ -611,9 +611,9 @@ class SSP_Stats {
 						$html .= '<div id="daily_listens"></div>' . "\n";
 
 						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-					    	$html .= '<span>' . __( 'Referrers', 'seriously-simple-stats' ) . '</span>' . "\n";
+					    	$html .= '<span>' . __( 'Listening Sources', 'seriously-simple-stats' ) . '</span>' . "\n";
 						$html .= '</' . $metabox_title . '>' . "\n";
-						$html .= '<div id="referrers"></div>' . "\n";
+						$html .= '<div id="listening-sources"></div>' . "\n";
 
 					$html .= '</div>' . "\n";
 				$html .= '</div>' . "\n";
@@ -732,7 +732,7 @@ class SSP_Stats {
 		global $wpdb;
 
 		$columns = array(
-			__( 'Referrers', 'seriously-simple-stats' ) => 'string',
+			__( 'Sources', 'seriously-simple-stats' ) => 'string',
 			__( 'Listens', 'seriously-simple-stats' ) => 'number',
 		);
 
@@ -774,7 +774,7 @@ class SSP_Stats {
 			$data[] = array( $ref_label, $listens );
 		}
 
-		return $this->generate_chart( 'PieChart', '', $columns, $data, 'referrers', 500 );
+		return $this->generate_chart( 'PieChart', '', $columns, $data, 'listening-sources', 500 );
 	}
 
 	/**
