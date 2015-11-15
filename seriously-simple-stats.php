@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: Seriously Simple Stats
- * Version: 1.0-RC1
+ * Version: 1.0
  * Plugin URI: https://wordpress.org/plugins/seriously-simple-stats
  * Description: Integrated analytics and stats tracking for Seriously Simple Podcasting.
  * Author: Hugh Lashbrooke
