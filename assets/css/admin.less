@@ -78,6 +78,31 @@
 			}
 		}
 	}
+	.no-activity {
+		overflow: hidden;
+		padding: 0 0 12px;
+		text-align: center;
+		p {
+			color: #999;
+			font-size: 16px;
+			&.smiley {
+				margin-top: 0;
+				&:before {
+					content: "\f328";
+					font: normal 120px/1 dashicons;
+					speak: none;
+					display: block;
+					margin: 0 5px 0 0;
+					padding: 0;
+					text-indent: 0;
+					text-align: center;
+					position: relative;
+					-webkit-font-smoothing: antialiased;
+					text-decoration: none !important;
+				}
+			}
+		}
+	}
 }
 
 #podcast_settings {
@@ -87,6 +112,33 @@
 	}
 	.hndle {
 		cursor: default !important;
+	}
+	#no-stats-container {
+		.no-activity {
+			overflow: hidden;
+			padding: 0 0 12px;
+			text-align: center;
+			p {
+				color: #999;
+				font-size: 16px;
+				&.smiley {
+					margin-top: 0;
+					&:before {
+						content: "\f328";
+						font: normal 120px/1 dashicons;
+						speak: none;
+						display: block;
+						margin: 0 5px 0 0;
+						padding: 0;
+						text-indent: 0;
+						text-align: center;
+						position: relative;
+						-webkit-font-smoothing: antialiased;
+						text-decoration: none !important;
+					}
+				}
+			}
+		}
 	}
 	#content-filter-container {
 		.inside {
