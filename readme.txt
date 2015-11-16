@@ -44,13 +44,13 @@ Installing "Seriously Simple Stats" can be done either by searching for "Serious
 == Screenshots ==
 
 1. An example of the stats page showing all the available information.
-2. The Episode Stats meta bxo on the episode edit screen
+2. The Episode Stats meta box on the episode edit screen.
 
 == Frequently Asked Questions ==
 
 = What version of Seriously Simple Podcasting does this plugin require? =
 
-In order to use this plugin you need to have at least v1.13.1 of Seriously Simple Podcasting.
+In order to use this plugin you need to have at least v1.13.1 of Seriously Simple Podcasting. If you do not have Seriously Simple Podcasting active or you are using a version older than v1.13.1 then this plugin will do nothing.
 
 = I just installed this plugin, but I don't see any stats. What gives? =
 
@@ -73,7 +73,7 @@ Any other listening sources will simply appear grouped as 'Other' in your stats.
 == Changelog ==
 
 = 1.0 =
-* 2015-12-01
+* 2015-11-16
 * Initial release
 
 == Upgrade Notice ==
