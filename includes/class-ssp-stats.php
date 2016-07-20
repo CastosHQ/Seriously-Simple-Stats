@@ -264,15 +264,21 @@ class SSP_Stats {
 		$user_agent = (string) $_SERVER['HTTP_USER_AGENT'];
 
 		// Check for specific podcasting services in user agent
-		if ( stripos( 'itunes', $user_agent ) !== false ) {
-			$referrer = 'itunes';
-		} elseif ( stripos( 'stitcher', $user_agent ) !== false ) {
-			$referrer = 'stitcher';
-		} elseif ( stripos( 'overcast', $user_agent ) !== false ) {
-			$referrer = 'overcast';
-		} elseif ( stripos( 'Pocket Casts', $user_agent ) !== false ) {
-			$referrer = 'pocketcasts';
+		// If it's the iOS Podcasts app, just return to prevent double counting
+		// The podcasts app makes a HEAD request with user agent Podcasts/2.4
+		// and then a GET request with user agent AppleCoreMedia
+		if(stripos( $user_agent,'podcasts/' ) !== false ) {
+			return;
 		}
+		if ( stripos( $user_agent,'itunes' ) !== false || stripos( $user_agent,'AppleCoreMedia' ) !== false ) {
+			$referrer = 'itunes';
+		} elseif ( stripos( $user_agent , 'stitcher' ) !== false ) {
+			$referrer = 'stitcher';
+		} elseif ( stripos(  $user_agent , 'overcast' ) !== false ) {
+			$referrer = 'overcast';
+		} elseif ( stripos( $user_agent , 'Pocket Casts' ) !== false ) {
+			$referrer = 'pocketcasts';
+		} 
 
 		// Get additional values for database insert
 		$episode_id = $episode->ID;
