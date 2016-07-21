@@ -85,6 +85,14 @@ class SSP_Stats {
 	public $script_suffix;
 
 	/**
+	 * Current time.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.1
+	 */
+	public $current_time;
+
+	/**
 	 * Chart start date.
 	 * @var     string
 	 * @access  public
@@ -161,18 +169,21 @@ class SSP_Stats {
 		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
 		$this->script_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
+		// Set current time based on WordPress time zone settings
+		$this->current_time = current_time( 'timestamp' );
+
 		// Set start date for charts
 		if( isset( $_GET['start'] ) ) {
 			$this->start_date = strtotime( sanitize_text_field( $_GET['start'] ) );
 		} else {
-			$this->start_date = strtotime( '1 month ago' );
+			$this->start_date = strtotime( '1 month ago', $this->current_time );
 		}
 
 		// Set end date for charts
 		if( isset( $_GET['end'] ) ) {
 			$this->end_date = strtotime( date( 'Y-m-d 23:59:59', strtotime( sanitize_text_field( $_GET['end'] ) ) ) );
 		} else {
-			$this->end_date = time();
+			$this->end_date = $this->current_time;
 		}
 
 		// Set series selection for charts
@@ -215,8 +226,7 @@ class SSP_Stats {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_styles' ), 10, 1 );
 
 		// Handle localisation
-		$this->load_plugin_textdomain();
-		add_action( 'init', array( $this, 'load_localisation' ), 0 );
+		add_action( 'plugins_loaded', array( $this, 'load_localisation' ) );
 	} // End __construct ()
 
 	public function load_episode_ids () {
@@ -264,21 +274,21 @@ class SSP_Stats {
 		$user_agent = (string) $_SERVER['HTTP_USER_AGENT'];
 
 		// Check for specific podcasting services in user agent
-		// If it's the iOS Podcasts app, just return to prevent double counting
-		// The podcasts app makes a HEAD request with user agent Podcasts/2.4
-		// and then a GET request with user agent AppleCoreMedia
-		if(stripos( $user_agent,'podcasts/' ) !== false ) {
+		// The iOS Podcasts app makes a HEAD request with user agent Podcasts/2.4 and then a GET request with user agent AppleCoreMedia
+		// This conditional will prevent double tracking from that app
+		if( stripos( $user_agent, 'podcasts/' ) !== false ) {
 			return;
 		}
-		if ( stripos( $user_agent,'itunes' ) !== false || stripos( $user_agent,'AppleCoreMedia' ) !== false ) {
+
+		if ( stripos( $user_agent, 'itunes' ) !== false || stripos( $user_agent, 'AppleCoreMedia' ) !== false ) {
 			$referrer = 'itunes';
-		} elseif ( stripos( $user_agent , 'stitcher' ) !== false ) {
+		} elseif ( stripos( $user_agent, 'stitcher' ) !== false ) {
 			$referrer = 'stitcher';
-		} elseif ( stripos(  $user_agent , 'overcast' ) !== false ) {
+		} elseif ( stripos(  $user_agent, 'overcast' ) !== false ) {
 			$referrer = 'overcast';
-		} elseif ( stripos( $user_agent , 'Pocket Casts' ) !== false ) {
+		} elseif ( stripos( $user_agent, 'Pocket Casts' ) !== false ) {
 			$referrer = 'pocketcasts';
-		} 
+		}
 
 		// Get additional values for database insert
 		$episode_id = $episode->ID;
@@ -295,7 +305,7 @@ class SSP_Stats {
 
 		// Check trasnient to prevent excessive tracking
 		if ( get_transient( $transient ) ) {
-			// return;
+			return;
 		}
 
 		// Insert data into database
@@ -418,7 +428,7 @@ class SSP_Stats {
 					$html .= '<li class="player">' . __( 'Audio player', 'seriously-simple-stats' ) . ': <b>' . $player . '</b></li>';
 				}
 				if( $unknown ) {
-					$html .= '<li class="unknown">' . __( 'Unknown', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
+					$html .= '<li class="unknown">' . __( 'Other', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
 				}
 			$html .= '</ul>';
 
@@ -579,14 +589,13 @@ class SSP_Stats {
 							}
 
 							// Listens today
-							$current_time = time();
-							$start_of_day = strtotime( date( 'Y-m-d 00:00:00', $current_time ) );
-							$listens_today = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $start_of_day, $current_time ) );
+							$start_of_day = strtotime( date( 'Y-m-d 00:00:00', $this->current_time ) );
+							$listens_today = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $start_of_day, $this->current_time ) );
 							$html .= $this->daily_stat( $listens_today, __( 'Listens today', 'seriously-simple-stats' ) );
 
 							// Listens this week
-							$one_week_ago = strtotime( '-1 week', $current_time );
-							$listens_this_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $one_week_ago, $current_time ) );
+							$one_week_ago = strtotime( '-1 week', $this->current_time );
+							$listens_this_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $one_week_ago, $this->current_time ) );
 							$html .= $this->daily_stat( $listens_this_week, __( 'Listens this week', 'seriously-simple-stats' ) );
 
 							// Listens last week
@@ -773,19 +782,29 @@ class SSP_Stats {
 			$episode_id_where = 'AND ' . $this->episode_id_where;
 		}
 
+		// Get all tracked data fro selected criteria
 		$sql = $wpdb->prepare( "SELECT referrer FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $this->start_date, $this->end_date );
 		$results = $wpdb->get_results( $sql );
 
 		$referrer_data = array();
 		foreach( $results as $ref ) {
+
 			$referrer = $ref->referrer;
+
+			// Label empty referrer as 'other'
+			if( '' == $referrer ) {
+				$referrer = 'other';
+			}
+
 			if( isset( $referrer_data[ $referrer ] ) ) {
 				++$referrer_data[ $referrer ];
 			} else {
 				$referrer_data[ $referrer ] = 1;
 			}
+
 		}
 
+		// Give human readable labels to referrers
 		$referrer_labels = array(
 			'download' => __( 'Direct download', 'seriously-simple-stats' ),
 			'player' => __( 'Audio player', 'seriously-simple-stats' ),
@@ -794,18 +813,25 @@ class SSP_Stats {
 			'stitcher' => __( 'Stitcher', 'seriously-simple-stats' ),
 			'overcast' => __( 'Overcast', 'seriously-simple-stats' ),
 			'pocketcasts' => __( 'Pocket Casts', 'seriously-simple-stats' ),
-			'' => __( 'Other', 'seriously-simple-stats' ),
+			'other' => __( 'Other', 'seriously-simple-stats' ),
 		);
 
 		$data = array();
 		foreach( $referrer_data as $ref => $listens ) {
 			$ref_label = '';
+
+			// Set values and labels for pie chart
 			if( isset( $referrer_labels[ $ref ] ) ) {
 				$ref_label = $referrer_labels[ $ref ];
+			} else {
+				// Allow 'Unknown' label as a backup, even though this probably won't ever get used
+				$ref_label = __( 'Unknown', 'seriously-simple-stats' );
 			}
+
 			$data[] = array( $ref_label, $listens );
 		}
 
+		// Generate pie chart
 		return $this->generate_chart( 'PieChart', '', $columns, $data, 'listening-sources', 500 );
 	}
 
@@ -978,23 +1004,8 @@ class SSP_Stats {
 	 * @return  void
 	 */
 	public function load_localisation () {
-		load_plugin_textdomain( 'ssp-stats', false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
+		load_plugin_textdomain( 'seriously-simple-stats', false, basename( $this->dir ) . '/languages/' );
 	} // End load_localisation ()
-
-	/**
-	 * Load plugin textdomain
-	 * @access  public
-	 * @since   1.0.0
-	 * @return  void
-	 */
-	public function load_plugin_textdomain () {
-	    $domain = 'ssp-stats';
-
-	    $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
-
-	    load_textdomain( $domain, WP_LANG_DIR . '/' . $domain . '/' . $domain . '-' . $locale . '.mo' );
-	    load_plugin_textdomain( $domain, false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
-	} // End load_plugin_textdomain ()
 
 	/**
 	 * Main SSP_Stats Instance

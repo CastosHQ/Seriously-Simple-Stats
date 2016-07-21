@@ -1,9 +1,9 @@
 === Seriously Simple Stats ===
 Contributors: hlashbrooke
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
-Requires at least: 4.2
-Tested up to: 4.4
-Stable tag: 1.0
+Requires at least: 4.4
+Tested up to: 4.5.3
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,7 +60,7 @@ Your podcast stats will only be gathered while this plugin is active, so if you 
 
 Seriously Simple Stats tracks the following listening sources for your podcast:
 
-- iTunes
+- iTunes / iOS Podcasts
 - Stitcher
 - Overcast
 - Pocket Casts
@@ -68,9 +68,17 @@ Seriously Simple Stats tracks the following listening sources for your podcast:
 - Audio player listens
 - 'Play in new window' clicks
 
-Any other listening sources will simply appear grouped as 'Other' in your stats.
+Any other listening sources will simply appear grouped as 'Other' in your stats. If there is another service that you think would be valuable to have tracked, then please [create a new issue on GitHub](https://github.com/hlashbrooke/Seriously-Simple-Stats/issues/new) to suggest it.
 
 == Changelog ==
+
+= 1.0.1 =
+* 2016-07-21
+* [FIX] Making sure that time-based stats respect WordPress' saved time zone instead of basing everything on UTC
+* [FIX] Improving tracking of iTunes/iOS Podcasts app referrer (props [tbibby](https://github.com/tbibby))
+* [FIX] Making sure that stats never show without labels
+* [TWEAK] Improving localisation support
+* [TWEAK] Generally improving referrer detection (props [tbibby](https://github.com/tbibby))
 
 = 1.0 =
 * 2015-11-16
@@ -78,5 +86,5 @@ Any other listening sources will simply appear grouped as 'Other' in your stats.
 
 == Upgrade Notice ==
 
-= 1.0 =
-* Initial release
+= 1.0.1 =
+* Improving referrer checks & displays, making sure that iTunes/iOS Podcasts listens are tracked correctly, and using the site's correct time zone for time-based stats.
