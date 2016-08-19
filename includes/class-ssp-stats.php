@@ -292,10 +292,25 @@ class SSP_Stats {
 
 		// Get additional values for database insert
 		$episode_id = $episode->ID;
-		$ip_address = $_SERVER['REMOTE_ADDR'];
+		// Get remote client ip address
+		//   If your WordPress webserver is behind a reverse proxy such as Cloudflare or Nginx,
+		//     we need to get the real client ip address from http headers
+		//   Cloudflare headers: https://support.cloudflare.com/hc/en-us/articles/200170986
+		//   The order of precedence here being Cloudflare, then other reverse proxies such as Nginx, then remote_addr
+		if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
+			$ip_address = $_SERVER['HTTP_CF_CONNECTING_IP'];
+		} elseif ( isset( $_SERVER['CF-Connecting-IP'] ) ) {
+			$ip_address = $_SERVER['CF-Connecting-IP'];
+		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} elseif ( isset( $_SERVER['X-Forwarded-For'] ) ) {
+			$ip_address = $_SERVER['X-Forwarded-For'];
+		} else { // None of the above headers are present (meaning we're not behind a reverse proxy) so fallback to using REMOTE_ADDR
+			$ip_address = $_SERVER['REMOTE_ADDR'];
+		}
 		$time = $_SERVER['REQUEST_TIME'];
 
-		// Create transiet name from episode ID, IP address and referrer
+		// Create transient name from episode ID, IP address and referrer
 		$transient = 'sspdl_' . $episode_id . '_' . str_replace( '.', '', $ip_address ) . '_' . $referrer;
 
 		// Allow forced transient refresh
@@ -303,7 +318,7 @@ class SSP_Stats {
 			delete_transient( $transient );
 		}
 
-		// Check trasnient to prevent excessive tracking
+		// Check transient to prevent excessive tracking
 		if ( get_transient( $transient ) ) {
 			return;
 		}
