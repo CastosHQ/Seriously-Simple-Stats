@@ -2,8 +2,8 @@
 Contributors: hlashbrooke
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
 Requires at least: 4.4
-Tested up to: 4.5.3
-Stable tag: 1.0.1
+Tested up to: 4.6
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,7 @@ Seriously Simple Stats offers integrated analytics for your podcast, giving you 
 - Access stats for any selected date range
 - Find out exactly which of your episodes are the most popular
 - Find out how people are listening to your content
+- Automatically detect crawlers/bots to prevent false stats
 
 Check out the [screenshots](https://wordpress.org/plugins/seriously-simple-stats/screenshots/) for a better idea of what stats you can expect.
 
@@ -69,9 +70,19 @@ Seriously Simple Stats tracks the following listening sources for your podcast:
 
 Any other listening sources will simply appear grouped as 'Other' in your stats. If there is another service that you think would be valuable to have tracked, then please [create a new issue on GitHub](https://github.com/hlashbrooke/Seriously-Simple-Stats/issues/new) to suggest it.
 
-Note that Stitcher download stats are not currently possible to gather due to the way that Stitcher offers up episode downloads to users.
+Note that Stitcher download stats are not currently possible to gather accurately due to the way that Stitcher offers up episode downloads to users.
+
+= Does this plugin block crawlers or bots? =
+
+Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-Detect) library to make sure that crawlers/bots are not recorded as listens.
 
 == Changelog ==
+
+= 1.1 =
+* 2016-09-07
+* [NEW] Including Crawler Detect library to prevent crawlers/bots from bring recorded as actual listens
+* [NEW] Checking for reverse proxies when fetching user's IP address for more accurate listenership stats (props [cgill27](https://github.com/cgill27))
+* [TWEAK] Recording correct time for all stats (based on WordPress settings)
 
 = 1.0.1 =
 * 2016-07-21
@@ -87,5 +98,5 @@ Note that Stitcher download stats are not currently possible to gather due to th
 
 == Upgrade Notice ==
 
-= 1.0.1 =
-* Improving referrer checks & displays, making sure that iTunes/iOS Podcasts listens are tracked correctly, and using the site's correct time zone for time-based stats.
+= 1.1 =
+* This version includes crawler/bot detection to prevent false stats, as well as a few additional tweaks to make stats tracking more reliable and accurate.

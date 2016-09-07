@@ -273,6 +273,15 @@ class SSP_Stats {
 		// Get request user agent
 		$user_agent = (string) $_SERVER['HTTP_USER_AGENT'];
 
+		// Include Crawler Detect library
+		require_once( 'lib/CrawlerDetect/CrawlerDetect.php' );
+
+		// Check if this user agent is a crawler/bot to prevent false stats
+		$CrawlerDetect = new CrawlerDetect();
+		if( $CrawlerDetect->isCrawler( $user_agent ) ) {
+		    return;
+		}
+
 		// Check for specific podcasting services in user agent
 		// The iOS Podcasts app makes a HEAD request with user agent Podcasts/2.4 and then a GET request with user agent AppleCoreMedia
 		// This conditional will prevent double tracking from that app
@@ -290,13 +299,14 @@ class SSP_Stats {
 			$referrer = 'pocketcasts';
 		}
 
-		// Get additional values for database insert
+		// Get episode ID for database insert
 		$episode_id = $episode->ID;
 
 		// Get remote client IP address
 		// If server is behind a reverse proxy (e.g. Cloudflare or Nginx), we need to get the client's IP address from HTTP headers
 		// Cloudflare headers reference: https://support.cloudflare.com/hc/en-us/articles/200170986
 		// The order of precedence here being Cloudflare, then other reverse proxies such as Nginx, then remote_addr
+		$ip_address = '';
 		if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
 			$ip_address = $_SERVER['HTTP_CF_CONNECTING_IP'];
 		} elseif ( isset( $_SERVER['CF-Connecting-IP'] ) ) {
@@ -308,6 +318,11 @@ class SSP_Stats {
 		} else {
 			// None of the above headers are present (meaning we're not behind a reverse proxy) so fallback to using REMOTE_ADDR
 			$ip_address = $_SERVER['REMOTE_ADDR'];
+		}
+
+		// Exit if there is no detectable IP address
+		if( ! $ip_address ) {
+			return;
 		}
 
 		// Create transient name from episode ID, IP address and referrer

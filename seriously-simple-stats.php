@@ -1,13 +1,13 @@
 <?php
 /*
  * Plugin Name: Seriously Simple Stats
- * Version: 1.0.1
+ * Version: 1.1
  * Plugin URI: https://wordpress.org/plugins/seriously-simple-stats
  * Description: Integrated analytics and stats tracking for Seriously Simple Podcasting.
  * Author: Hugh Lashbrooke
  * Author URI: https://hughlashbrooke.com/
  * Requires at least: 4.4
- * Tested up to: 4.5.3
+ * Tested up to: 4.6
  *
  * Text Domain: seriously-simple-stats
  * Domain Path: /languages
@@ -37,7 +37,7 @@ if( is_ssp_active( '1.13.1' ) ) {
 	 * @return object SSP_Stats
 	 */
 	function SSP_Stats () {
-		$instance = SSP_Stats::instance( __FILE__, '1.0.1', '1.0.0' );
+		$instance = SSP_Stats::instance( __FILE__, '1.1', '1.0.0' );
 		return $instance;
 	}
 
