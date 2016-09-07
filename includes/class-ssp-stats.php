@@ -292,11 +292,11 @@ class SSP_Stats {
 
 		// Get additional values for database insert
 		$episode_id = $episode->ID;
-		// Get remote client ip address
-		//   If your WordPress webserver is behind a reverse proxy such as Cloudflare or Nginx,
-		//     we need to get the real client ip address from http headers
-		//   Cloudflare headers: https://support.cloudflare.com/hc/en-us/articles/200170986
-		//   The order of precedence here being Cloudflare, then other reverse proxies such as Nginx, then remote_addr
+
+		// Get remote client IP address
+		// If server is behind a reverse proxy (e.g. Cloudflare or Nginx), we need to get the client's IP address from HTTP headers
+		// Cloudflare headers reference: https://support.cloudflare.com/hc/en-us/articles/200170986
+		// The order of precedence here being Cloudflare, then other reverse proxies such as Nginx, then remote_addr
 		if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
 			$ip_address = $_SERVER['HTTP_CF_CONNECTING_IP'];
 		} elseif ( isset( $_SERVER['CF-Connecting-IP'] ) ) {
@@ -305,10 +305,10 @@ class SSP_Stats {
 			$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		} elseif ( isset( $_SERVER['X-Forwarded-For'] ) ) {
 			$ip_address = $_SERVER['X-Forwarded-For'];
-		} else { // None of the above headers are present (meaning we're not behind a reverse proxy) so fallback to using REMOTE_ADDR
+		} else {
+			// None of the above headers are present (meaning we're not behind a reverse proxy) so fallback to using REMOTE_ADDR
 			$ip_address = $_SERVER['REMOTE_ADDR'];
 		}
-		$time = $_SERVER['REQUEST_TIME'];
 
 		// Create transient name from episode ID, IP address and referrer
 		$transient = 'sspdl_' . $episode_id . '_' . str_replace( '.', '', $ip_address ) . '_' . $referrer;
@@ -330,7 +330,7 @@ class SSP_Stats {
 				'post_id' => $episode_id,
 				'ip_address' => $ip_address,
 				'referrer' => $referrer,
-				'date' => $time,
+				'date' => $this->current_time,
 			),
 			array(
 				'%d',
@@ -342,7 +342,7 @@ class SSP_Stats {
 
 		// Set transient if successful to prevent excessive tracking
 		if ( $insert_row ) {
-			set_transient( $transient, $time, HOUR_IN_SECONDS );
+			set_transient( $transient, $this->current_time, HOUR_IN_SECONDS );
 		}
 
 	}
