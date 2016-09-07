@@ -61,7 +61,6 @@ Your podcast stats will only be gathered while this plugin is active, so if you 
 Seriously Simple Stats tracks the following listening sources for your podcast:
 
 - iTunes / iOS Podcasts
-- Stitcher
 - Overcast
 - Pocket Casts
 - Direct downloads
@@ -69,6 +68,8 @@ Seriously Simple Stats tracks the following listening sources for your podcast:
 - 'Play in new window' clicks
 
 Any other listening sources will simply appear grouped as 'Other' in your stats. If there is another service that you think would be valuable to have tracked, then please [create a new issue on GitHub](https://github.com/hlashbrooke/Seriously-Simple-Stats/issues/new) to suggest it.
+
+Note that Stitcher download stats are not currently possible to gather due to the way that Stitcher offers up episode downloads to users.
 
 == Changelog ==
 
