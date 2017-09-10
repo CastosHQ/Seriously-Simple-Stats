@@ -901,7 +901,7 @@ class SSP_Stats {
 							if( !empty( $all_episodes_stats ) && is_array( $all_episodes_stats ) ){
 
 								//Sorting by total listens
-								if( isset( $_GET['orderby'] ) && $_GET['orderby'] == 'listens' ){
+								if( isset( $_GET['orderby'] ) && ( $_GET['orderby'] == 'listens' || $_GET['orderby'] == 'title' ) ){
 
 									if( isset( $_GET['order'] ) ){
 
@@ -916,11 +916,18 @@ class SSP_Stats {
 									}
 
 									$listen_sorting = array();
+									
+									if( $_GET['orderby'] == 'listens' ){
+										$order_type = 'order_listens';
+									} else {
+										$order_type = 'episode_name';
+									}
+
 									foreach( $all_episodes_stats as $listen ){
-										$listen_sorting[] = $listen['order_listens'];
+										$listen_sorting[] = $listen[$order_type];
 									}
 									
-									array_multisort( $listen_sorting, SORT_NUMERIC, $order_flag, $all_episodes_stats );
+									array_multisort( $listen_sorting, $order_flag, $all_episodes_stats );
 
 								}
 
