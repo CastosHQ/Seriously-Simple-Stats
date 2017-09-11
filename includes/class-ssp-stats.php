@@ -739,14 +739,17 @@ class SSP_Stats {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function chart_data () {
+	public function chart_data ( $hook = '' ) {
 
-		$output = '';
+		if( 'podcast_page_podcast_stats' == $hook ) {
 
-		$output .= $this->daily_listens_chart();
-		$output .= $this->referrers_chart();
+			$output = '';
 
-		echo $output;
+			$output .= $this->daily_listens_chart();
+			$output .= $this->referrers_chart();
+
+			echo $output;
+		}
 	}
 
 	/**
