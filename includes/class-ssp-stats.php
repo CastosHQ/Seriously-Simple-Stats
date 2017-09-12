@@ -301,8 +301,14 @@ class SSP_Stats {
 			$referrer = 'overcast';
 		} elseif ( stripos( $user_agent, 'Pocket Casts' ) !== false ) {
 			$referrer = 'pocketcasts';
-		} elseif( stripos( $user_agent, 'Android' ) !== false || stripos( $user_agent, 'PodcastAddict' ) !== false || stripos( $user_agent, 'Player FM' ) !== false || stripos( $user_agent, 'Google-Play' ) !== false ){
+		} elseif( stripos( $user_agent, 'Android' ) !== false ){
 			$referrer = 'android';
+		} elseif( stripos( $user_agent, 'PodcastAddict' ) !== false ){
+			$referrer = 'podcast_addict';
+		} elseif( stripos( $user_agent, 'Player FM' ) !== false ){
+			$referrer = 'playerfm';
+		} elseif( stripos( $user_agent, 'Google-Play' ) !== false ){
+			$referrer = 'google_play';
 		}
 
 		// Get episode ID for database insert
@@ -433,6 +439,12 @@ class SSP_Stats {
 					break;
 					case 'android':
 						++$android;
+					case 'podcast_addict':
+						++$podcast_addict;
+					case 'playerfm':
+						++$playerfm;
+					case 'google_play':
+						++$google_play;
 					default:
 						++$unknown;
 					break;
@@ -467,6 +479,15 @@ class SSP_Stats {
 				}
 				if( $android ){
 					$html .= '<li class="android">' . __( 'Android App', 'seriously-simple-stats' ) . ': <b>' . $android . '</b></li>';
+				}
+				if( $podcast_addict ){
+					$html .= '<li class="podcast_addict">' . __( 'Podcast Addict', 'seriously-simple-stats' ) . ': <b>' . $podcast_addict . '</b></li>';
+				}
+				if( $playerfm ){
+					$html .= '<li class="playerfm">' . __( 'Player FM', 'seriously-simple-stats' ) . ': <b>' . $playerfm . '</b></li>';
+				}
+				if( $google_play ){
+					$html .= '<li class="google_play">' . __( 'Google Play', 'seriously-simple-stats' ) . ': <b>' . $google_play . '</b></li>';
 				}
 				if( $unknown ) {
 					$html .= '<li class="unknown">' . __( 'Other', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
@@ -746,7 +767,10 @@ class SSP_Stats {
 								'overcast' => __( 'Overcast', 'seriously-simple-stats' ),
 								'pocketcasts' => __( 'Pocket Casts', 'seriously-simple-stats' ),
 								'other' => __( 'Other', 'seriously-simple-stats' ),
-								'android' => __('Android App', 'seriously-simple-stats')
+								'android' => __('Android App', 'seriously-simple-stats'),
+								'podcast_addict' => __( 'Podcast Addict', 'seriously-simple-stats' ),
+								'playerfm' => __( 'Player FM', 'seriously-simple-stats' ),
+								'google_play' => __( 'Google Play', 'seriously-simple-stats' )
 							);
 
 							$this->start_date = strtotime( current_time('Y-m-d').' -2 MONTH' );
@@ -1199,7 +1223,10 @@ class SSP_Stats {
 			'overcast' => __( 'Overcast', 'seriously-simple-stats' ),
 			'pocketcasts' => __( 'Pocket Casts', 'seriously-simple-stats' ),
 			'other' => __( 'Other', 'seriously-simple-stats' ),
-			'android' => __('Android App', 'seriously-simple-stats')
+			'android' => __('Android App', 'seriously-simple-stats'),
+			'podcast_addict' => __( 'Podcast Addict', 'seriously-simple-stats' ),
+			'playerfm' => __( 'Player FM', 'seriously-simple-stats' ),
+			'google_play' => __( 'Google Play', 'seriously-simple-stats' )
 		);
 
 		$data = array();
