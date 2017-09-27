@@ -734,7 +734,7 @@ class SSP_Stats {
 					$html .= '<div class="postbox" id="last-three-months-container">' . "\n";
 						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
 
-		    				$html .= '<span>' . __( 'All Episodes for the Last Three Months', 'seriously-simple-stats' ) . '</span>' . "\n";
+			    			$html .= '<span>' . __( 'All Episodes for the Last Three Months', 'seriously-simple-stats' ) . '</span>' . "\n";
 						$html .= '</' . $metabox_title . '>' . "\n";
 						$html .= '<div class="inside">' . "\n";
 
@@ -761,25 +761,23 @@ class SSP_Stats {
 
 									$post = get_post( intval( $result->post_id ) );
 
-									$sql = "SELECT `date` FROM $this->_table WHERE `post_id` = '".$result->post_id."' AND `date` >= ".$this->start_date;
+									$sql = "SELECT `date` FROM $this->_table WHERE `post_id` = '".$result->post_id."'";
 
 									$episode_results = $wpdb->get_results( $sql );
 
-									$listens = 0;
+									$lifetime_count = count( $episode_results );
 
 									foreach( $episode_results as $ref ) {
-
 										//Increase the count of listens per month
-										++$total_listens_array[intval( date('m', intval( $ref->date ) ) )];
-										$listens++;
-
+										if( isset( $total_listens_array[intval( date('m', intval( $ref->date ) ) )] ) )
+											++$total_listens_array[intval( date('m', intval( $ref->date ) ) )];
 									}
 
 									$all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
 										'episode_name' => $post->post_title,
 										'date' => date( 'm-d-Y', strtotime( $post->post_date ) ),
 										'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
-										'listens' => $listens,
+										'listens' => $lifetime_count,
 										'listens_array' => $total_listens_array,
 									) );
 
@@ -1196,7 +1194,7 @@ class SSP_Stats {
 		$options = '';
 
 		if( $column_date > 0 ){
-			$options .= "hAxis:{ format: 'MMM d' }, chartArea:{ width: '100%', top: '25' }, ". "\n";
+			$options .= "hAxis:{ format: 'MMM d' }, chartArea:{ width: '80%', top: '25' }, ". "\n";
 		}
 
 		switch( $type ) {
