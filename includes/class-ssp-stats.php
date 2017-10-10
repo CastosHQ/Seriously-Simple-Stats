@@ -284,40 +284,33 @@ class SSP_Stats {
 		$CrawlerDetect = new CrawlerDetect();
 		if( $CrawlerDetect->isCrawler( $user_agent ) ) {
 		    return;
-		}
+		}		
 
 		// Check for specific podcasting services in user agent
 		// The iOS Podcasts app makes a HEAD request with user agent Podcasts/2.4 and then a GET request with user agent AppleCoreMedia
 		
-		switch( $user_agent ){
-			case stripos( $user_agent, 'podcasts/' ) !== false:
-				// This conditional will prevent double tracking from that app
-				break;
-			case ( stripos( $user_agent, 'itunes' ) !== false || stripos( $user_agent, 'AppleCoreMedia' ) !== false ):
-				$referrer = 'itunes';
-				break;
-			case stripos( $user_agent, 'stitcher' ) !== false:
-				$referrer = 'stitcher';
-				break;
-			case stripos(  $user_agent, 'overcast' ) !== false:
-				$referrer = 'overcast';
-				break;
-			case stripos( $user_agent, 'Pocket Casts' ) !== false:
-				$referrer = 'pocketcasts';
-				break;
-			case stripos( $user_agent, 'Android' ) !== false:
-				$referrer = 'android';
-				break;
-			case stripos( $user_agent, 'PodcastAddict' ) !== false:
-				$referrer = 'podcast_addict';
-				break;
-			case stripos( $user_agent, 'Player FM' ) !== false:
-				$referrer = 'playerfm';
-				break;
-			case stripos( $user_agent, 'Google-Play' ) !== false:
-				$referrer = 'google_play';
-				break;
+		if( stripos( $user_agent, 'podcasts/' ) !== false ){
+			// This conditional will prevent double tracking from that app
+			return;
 		}
+
+		if ( stripos( $user_agent, 'itunes' ) !== false || stripos( $user_agent, 'AppleCoreMedia' ) !== false ){
+			$referrer = 'itunes';
+		} else if ( stripos( $user_agent, 'stitcher' ) !== false ) {
+			$referrer = 'stitcher';
+		} else if ( stripos(  $user_agent, 'overcast' ) !== false ) {
+			$referrer = 'overcast';
+		} else if ( stripos( $user_agent, 'Pocket Casts' ) !== false ) {
+			$referrer = 'pocketcasts';
+		} else if ( stripos( $user_agent, 'Android' ) !== false ) {
+			$referrer = 'android';
+		} else if ( stripos( $user_agent, 'PodcastAddict' ) !== false ) {
+			$referrer = 'podcast_addict';
+		} else if ( stripos( $user_agent, 'Player FM' ) !== false ) {
+			$referrer = 'playerfm';
+		} else if ( stripos( $user_agent, 'Google-Play' ) !== false ) {
+			$referrer = 'google_play';
+		} 
 
 		// Get episode ID for database insert
 		$episode_id = $episode->ID;
