@@ -1418,7 +1418,7 @@ class SSP_Stats {
 			$html .= '<div class="" id="no-stats-container">' . "\n";
 				$html .= '<div class="inside no-activity">' . "\n";
 					$html .= '<p class="smiley"></p>' . "\n";
-					$html .= '<p>' . sprintf( __( 'No stats %s yet!', 'seriously-simple-stats' ), $no_stats_filler ) . '</p>' . "\n";
+					$html .= '<p>' . __( 'No stats yet!', 'seriously-simple-stats' ) . '</p>' . "\n";
 				$html .= '</div>' . "\n";
 			$html .= '</div>' . "\n";
 		} else {			
