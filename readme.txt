@@ -80,7 +80,6 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 
 = 1.2.0 =
 * 2017-10-11
-* [FIX] Only generate charts on stats page (props [mattsims](https://github.com/mattsims))
 * [NEW] Added stats widget to WordPress dashboard
 * [NEW] Added new listening sources (PodcastAddict, Player FM, Google-Play)
 * [NEW] Added new stats view for all episodes for the past three months
