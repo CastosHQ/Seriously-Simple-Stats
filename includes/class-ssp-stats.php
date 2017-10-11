@@ -409,8 +409,7 @@ class SSP_Stats {
 		if( $total_downloads ) {
 
 			$html .= '<p class="episode-stat-data total-downloads">' . __( 'Total listens', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
-
-			$users = array();
+			
 			$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $unknown = 0;
 
 			foreach( $stats as $stat ) {
@@ -478,20 +477,20 @@ class SSP_Stats {
 				if( $player ) {
 					$html .= '<li class="player">' . __( 'Audio player', 'seriously-simple-stats' ) . ': <b>' . $player . '</b></li>';
 				}
-				// Hidden but keeping for possible future use as per instruction
-				// if( $android ){
-				// 	$html .= '<li class="android">' . __( 'Android App', 'seriously-simple-stats' ) . ': <b>' . $android . '</b></li>';
-				// }
+				// Commented out for now, could be included in the future
+				/*if( $android ){
+					$html .= '<li class="android">' . __( 'Android App', 'seriously-simple-stats' ) . ': <b>' . $android . '</b></li>';
+				}*/
 				if( $podcast_addict ){
 					$html .= '<li class="podcast_addict">' . __( 'Podcast Addict', 'seriously-simple-stats' ) . ': <b>' . $podcast_addict . '</b></li>';
 				}
 				if( $playerfm ){
 					$html .= '<li class="playerfm">' . __( 'Player FM', 'seriously-simple-stats' ) . ': <b>' . $playerfm . '</b></li>';
 				}
-				// Hidden but keeping for possible future use as per instruction
-				// if( $google_play ){
-				// 	$html .= '<li class="google_play">' . __( 'Google Play', 'seriously-simple-stats' ) . ': <b>' . $google_play . '</b></li>';
-				// }
+				// Commented out for now, could be used in the future
+				/*if( $google_play ){
+					$html .= '<li class="google_play">' . __( 'Google Play', 'seriously-simple-stats' ) . ': <b>' . $google_play . '</b></li>';
+				}*/
 				if( $unknown ) {
 					$html .= '<li class="unknown">' . __( 'Other', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
 				}
@@ -780,18 +779,7 @@ class SSP_Stats {
 									
 							//24 because we're counting an array
 							$total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 ); 
-
-							$month_num_cur = current_time('m');
-							$month_num_prev = date('m', strtotime( current_time("Y-m-d")." -1 MONTH" ) );
-							$month_num_prior = date('m', strtotime( current_time("Y-m-d")." -2 MONTH" ) );
-
-							//Get the current page number
-							if( isset( $_GET['pagenum'] ) ){
-								$page_num = "&pagenum=".intval( $_GET['pagenum'] );
-							} else {
-								$page_num = "";
-							}
-
+					
 							$html .= "<table class='form-table striped'>" . "\n";
 							$html .= "	<thead>" . "\n";
 							$html .= "		<tr>" . "\n";
@@ -1107,10 +1095,10 @@ class SSP_Stats {
 			'overcast' => __( 'Overcast', 'seriously-simple-stats' ),
 			'pocketcasts' => __( 'Pocket Casts', 'seriously-simple-stats' ),
 			'other' => __( 'Other', 'seriously-simple-stats' ),
-			// 'android' => __('Android App', 'seriously-simple-stats'), //Removed but kept for potential future use
+			// 'android' => __('Android App', 'seriously-simple-stats'), //Commented out for now
 			'podcast_addict' => __( 'Podcast Addict', 'seriously-simple-stats' ),
 			'playerfm' => __( 'Player FM', 'seriously-simple-stats' ),
-			// 'google_play' => __( 'Google Play', 'seriously-simple-stats' ) //Removed but kept for potential future use
+			// 'google_play' => __( 'Google Play', 'seriously-simple-stats' ) //Commented out for now
 		);
 
 		$data = array();
