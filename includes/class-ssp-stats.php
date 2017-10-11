@@ -1244,13 +1244,7 @@ class SSP_Stats {
 		if( 'podcast_page_podcast_stats' == $hook || 'index.php' == $hook ) {
 
 			// Include Google Charts scripts
-			wp_enqueue_script( 'google-charts', "//www.google.com/jsapi?autoload={
-										            'modules':[{
-										              'name':'visualization',
-										              'version':'1',
-										              'packages':['corechart']
-										            }]
-										          }", array(), $this->_version, false );
+			wp_enqueue_script( 'google-charts', "//www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}", array(), $this->_version, false );
 
 			// Load custom scripts
 			wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
