@@ -4,10 +4,10 @@
  * Version: 1.2.0
  * Plugin URI: https://wordpress.org/plugins/seriously-simple-stats
  * Description: Integrated analytics and stats tracking for Seriously Simple Podcasting.
- * Author: Hugh Lashbrooke
- * Author URI: https://hughlashbrooke.com/
+ * Author: PodcastMotor
+ * Author URI: https://www.podcastmotor.com/
  * Requires at least: 4.4
- * Tested up to: 4.6
+ * Tested up to: 4.8.2
  *
  * Text Domain: seriously-simple-stats
  * Domain Path: /languages
@@ -15,6 +15,10 @@
  * @package WordPress
  * @author Hugh Lashbrooke
  * @since 1.0.0
+ *
+ * @author PodcastMotor
+ * @since 1.2.0
+ *
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
