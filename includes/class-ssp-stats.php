@@ -214,6 +214,9 @@ class SSP_Stats {
 
 		// Add stats meta box to episodes edit screen
 		add_action( 'ssp_meta_boxes', array( $this, 'post_meta_box' ), 10, 1 );
+        
+        // Filter download url for Podtrac logging
+        add_filter( 'ssp_episode_download_link', 'podtrac_download_url_filter', 10, 3 );
 
 		// Add menu item
 		add_action( 'admin_menu', array( $this , 'add_menu_item' ) );
@@ -401,6 +404,24 @@ class SSP_Stats {
 		}
 
 	}
+    
+    /**
+     * If we have the option enabled for the measurement service, filter that onto the URL.
+     * from https://github.com/whyisjake/Podtrac-with-Seriously-Simple-Podcasting (v 0.5.1)
+     *
+     * @param  string     $link          The URL pointing to the file download.
+     * @param  integer    $episode_id    The post ID of the podcast episode.
+     * @param  string     $file          The full path to the episode audio file.
+     * @return string                    The URL pointing to the file download.
+     */
+    function podtrac_download_url_filter( $link, $episode_id, $file ) {
+        $redirect = get_option( 'ss_podcasting_podtrac_episode_measurement_service', 'off' );
+        if ( $redirect === 'on' ) {
+            $parsed = parse_url( $link );
+            $link = esc_url( 'https://www.podtrac.com/pts/redirect.mp3/' . $parsed['host'] . $parsed['path'] );
+        }
+        return $link;
+    }
 
 	public function get_episode_stats ( $episode_id = 0, $fields = '*' ) {
 		global $wpdb;
@@ -568,6 +589,13 @@ class SSP_Stats {
                     'description' => 'Enter your Google Analytics Tracker ID here. Change the prefix from \'UA\' to \'MO\' for full functionality.',
                     'type'        => 'text',
                     'placeholder' => __( 'MO-XXXXXXX-Y', 'seriously-simple-stats' ),
+                    'default'     => '',
+                ),
+                array(
+                    'id'          => 'podtrac_episode_measurement_service',
+                    'label'       => __( 'Podtrac Episode Measurement Service', 'podtrac-podtrac-ss-podcasting' ),
+                    'description' => 'Podtrac\'s Measurement Service is free to most publishers. It provides third-party measurement data not available anywhere else. When using this, all enclosure URLs will be prefixed, and do not need to be updated by the user.',
+                    'type'        => 'checkbox',
                     'default'     => '',
                 ),
             )
