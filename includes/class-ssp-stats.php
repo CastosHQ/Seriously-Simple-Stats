@@ -218,10 +218,7 @@ class SSP_Stats {
 		// Add menu item
 		add_action( 'admin_menu', array( $this , 'add_menu_item' ) );
 
-        // Add settings tab to SSP settings page
-        add_filter( 'ssp_settings_fields', array( $this, 'ssp_stats_add_settings' ) );
-        
-        // Load necessary javascript for charts
+		// Load necessary javascript for charts
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
 		add_action( 'admin_print_scripts', array( $this, 'chart_data' ), 30 );
 
@@ -353,30 +350,6 @@ class SSP_Stats {
 		if ( get_transient( $transient ) ) {
 			return;
 		}
-        
-        // Check for Google Analytics and send event if active
-        if ( get_option( 'ssp_stats_google_analytics' ) and get_option( 'ssp_stats_google_analytics_tracker' ) ) {
-            // Load Server-side Google Analytics helper library
-            require_once( __DIR__ . 'lib/ss-ga.class.php' );
-
-            $ssga = new ssga( get_option( 'ssp_stats_google_analytics_tracker' ), site_url() );
-
-            $category = 'Podcast Download';
-
-            // Use event action to log download source
-            if(is_user_logged_in()) {
-                $action = 'Internal';
-            }
-            else {
-                $action = $referrer;
-            }
-
-            $label = str_replace(" ", "_", get_the_title($episode_id));
-
-            $ssga->set_event($category, $action, $label, true);
-            $ssga->send();
-            $ssga->reset();
-        }
 
 		// Insert data into database
 		$insert_row = $wpdb->insert(
@@ -543,37 +516,6 @@ class SSP_Stats {
 	public function add_menu_item() {
 		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Stats', 'seriously-simple-stats' ) , __( 'Stats', 'seriously-simple-stats' ), 'manage_podcast' , 'podcast_stats' , array( $this , 'stats_page' ) );
 	}
-    
-    /**
-     * Add new settings with a new tab to Seriously Simple Podcasting.
-     *
-     * @param  array    $settings    Array of fields to pass into the main array of settings options of Seriously Simple Podcasting
-     * @return array                 The full array.
-     */
-    public function ssp_stats_add_settings( $settings ) {
-        $settings['stats'] = array(
-            'title'       => __( 'Stats', 'seriously-simple-stats' ),
-            'description' => __( 'If you are using Seriously Simple Stats, your options appear here.', 'seriously-simple-stats' ),
-            'fields'      => array(
-                array(
-                    'id'          => 'ssp_stats_google_analytics',
-                    'label'       => __( 'Google Analytics', 'seriously-simple-stats' ),
-                    'description' => 'If you want to track podcast downloads with Google Analytics events, check here.',
-                    'type'        => 'checkbox',
-                    'default'     => '',
-                ),
-                array(
-                    'id'          => 'ssp_stats_google_analytics_tracker',
-                    'label'       => __( 'Google Analytics Tracker ID', 'seriously-simple-stats' ),
-                    'description' => 'Enter your Google Analytics Tracker ID here. Change the prefix from \'UA\' to \'MO\' for full functionality.',
-                    'type'        => 'text',
-                    'placeholder' => __( 'MO-XXXXXXX-Y', 'seriously-simple-stats' ),
-                    'default'     => '',
-                ),
-            )
-        );
-        return $settings;
-    }
 
 	/**
 	 * Load content for stats page
