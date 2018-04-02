@@ -236,8 +236,19 @@ class SSP_Stats {
 
 		// Add dashboard widget
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget' ), 1 );
+        
+        // Handle permanent deletion of episodes
+        add_action( 'delete_post', array( $this, 'ssp_delete_episode_stats' ) );
 
 	} // End __construct ()
+    
+    public function ssp_delete_episode_stats ( $post_id ) {
+        
+        global $wpdb;
+        if ( $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $this->_table WHERE `post_id` = %d", $post_id ) ) ) {
+            $wpdb->query( $wpdb->prepare( "DELETE FROM $this->_table WHERE `post_id` = %d", $post_id ) );
+        } 
+    }
 
 	public function load_episode_ids () {
 
@@ -855,6 +866,10 @@ class SSP_Stats {
                                             'listens' => $lifetime_count,
                                             'listens_array' => $total_listens_array,
                                         ) );
+                                    }
+                                    else {
+                                        // Clean up table
+                                        $this->ssp_delete_episode_stats( $result->post_id );
                                     }
 
 								}
