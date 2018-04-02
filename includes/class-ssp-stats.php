@@ -849,7 +849,7 @@ class SSP_Stats {
 
 									$all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
 										'episode_name' => $post->post_title,
-										'date' => date( 'm-d-Y', strtotime( $post->post_date ) ),
+										'date' => strtotime( $post->post_date ),
 										'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
 										'listens' => $lifetime_count,
 										'listens_array' => $total_listens_array,
@@ -878,7 +878,7 @@ class SSP_Stats {
 
 								//Sort list by episode name
 								foreach( $all_episodes_stats as $listen ){
-									$listen_sorting[] = $listen['episode_name'];
+									$listen_sorting[] = $listen['date'];
 								}
 								
 								array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
@@ -905,7 +905,7 @@ class SSP_Stats {
 								foreach( $all_episodes_stats as $ep ){
 
 									$html .= "<tr>" . "\n";
-									$html .= "	<td>".$ep['date']."</td>" . "\n";
+									$html .= "	<td>".date( 'm-d-Y', $ep['date'] )."</td>" . "\n";
 									$html .= "	<td><a href='".$ep['slug']."'>".$ep['episode_name']."</a></td>" . "\n";
 									if( isset( $ep['listens_array'] ) ){
 										foreach( $ep['listens_array'] as $listen ){
