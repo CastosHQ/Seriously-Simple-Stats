@@ -216,10 +216,10 @@ class SSP_Stats {
 		add_action( 'ssp_meta_boxes', array( $this, 'post_meta_box' ), 10, 1 );
         
         // Filter download url for Podtrac logging
-        add_filter( 'ssp_episode_download_link', 'podtrac_download_url_filter', 10, 3 );
+        add_filter( 'ssp_episode_download_link', array( $this, 'podtrac_download_url_filter' ), 10, 3 );
 
 		// Add menu item
-		add_action( 'admin_menu', array( $this , 'add_menu_item' ) );
+		add_action( 'admin_menu', array( $this, 'add_menu_item' ) );
 
         // Add settings tab to SSP settings page
         add_filter( 'ssp_settings_fields', array( $this, 'ssp_stats_add_settings' ) );
@@ -410,7 +410,7 @@ class SSP_Stats {
      * @param  string     $file          The full path to the episode audio file.
      * @return string                    The URL pointing to the file download.
      */
-    function podtrac_download_url_filter( $link, $episode_id, $file ) {
+    public function podtrac_download_url_filter( $link, $episode_id, $file ) {
         $redirect = get_option( 'ss_podcasting_podtrac_episode_measurement_service', 'off' );
         if ( $redirect === 'on' ) {
             $parsed = parse_url( $link );
