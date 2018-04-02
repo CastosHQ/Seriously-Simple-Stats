@@ -847,13 +847,15 @@ class SSP_Stats {
 											++$total_listens_array[intval( date('m', intval( $ref->date ) ) )];
 									}
 
-									$all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
-										'episode_name' => $post->post_title,
-										'date' => strtotime( $post->post_date ),
-										'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
-										'listens' => $lifetime_count,
-										'listens_array' => $total_listens_array,
-									) );
+									if( (boolean) get_post_status($result->post_id) ) {
+                                        $all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
+                                            'episode_name' => $post->post_title,
+                                            'date' => date( 'm-d-Y', strtotime( $post->post_date ) ),
+                                            'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
+                                            'listens' => $lifetime_count,
+                                            'listens_array' => $total_listens_array,
+                                        ) );
+                                    }
 
 								}
 
@@ -1452,7 +1454,7 @@ class SSP_Stats {
 	 */
 	public function add_dashboard_widget(){
 
-		add_meta_box( 'ssp_stats_dashboard_widget', __('Seriously Simple Stats - Overview', 'seriously-simple-stats' ), array( $this, 'dashboard_widget_callback' ), 'dashboard', 'normal', 'high' );
+		add_meta_box( 'ssp_stats_dashboard_widget', __('Seriously Simple Stats Summary', 'seriously-simple-stats' ), array( $this, 'dashboard_widget_callback' ), 'dashboard', 'normal', 'high' );
 
 	}
 
@@ -1487,8 +1489,6 @@ class SSP_Stats {
 			$html .= '</div>' . "\n";
 		} else {			
 
-			$html .= "<p class='ssps_last_30_days_graph_text'>".__('Last 30 Days', 'seriously-simple-stats')." <a href='".admin_url("edit.php?post_type=podcast&page=podcast_stats")."'>".__('View All Data', 'seriously-simple-stats')."</a>"."</p>";
-
 			$html .= "<div id='weekly_listens'></div>";
 
 			$this->start_date = strtotime( current_time( 'Y-m-d H:i:s' ) . ' -30 DAY' );
@@ -1522,6 +1522,8 @@ class SSP_Stats {
 
 				$html .= '</div>' . "\n";
 			$html .= '</div>' . "\n";
+            
+            $html .= '<p class="ssp_dashboard_more"><a class="button" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats").'">'.__('View All Data', 'seriously-simple-stats')."</a></p>";
 
 		}
 
