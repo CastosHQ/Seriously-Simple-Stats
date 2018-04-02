@@ -358,27 +358,23 @@ class SSP_Stats {
 		}
         
         // Check for Google Analytics and send event if active
-        if ( get_option( 'ssp_stats_google_analytics' ) and get_option( 'ssp_stats_google_analytics_tracker' ) ) {
+        $use_ga = get_option( 'ss_podcasting_ssp_stats_google_analytics', 'off' );
+        if ( ($use_ga == 'on') and ! empty( get_option( 'ss_podcasting_ssp_stats_google_analytics_tracker' ) ) ) {
             // Load Server-side Google Analytics helper library
-            require_once( __DIR__ . 'lib/ss-ga.class.php' );
+            require_once( __DIR__ . '/lib/ss-ga.class.php' );
+            
+            $ssga = new ssga( get_option( 'ss_podcasting_ssp_stats_google_analytics_tracker' ), site_url() );
 
-            $ssga = new ssga( get_option( 'ssp_stats_google_analytics_tracker' ), site_url() );
+            $action = 'Download';
 
-            $category = 'Podcast Download';
-
-            // Use event action to log download source
-            if(is_user_logged_in()) {
-                $action = 'Internal';
-            }
-            else {
-                $action = $referrer;
-            }
+            $category = (is_user_logged_in() ? "Internal:_" : "") . ($referrer ? $referrer : "referrer_not_set");
 
             $label = str_replace(" ", "_", get_the_title($episode_id));
-
+            
             $ssga->set_event($category, $action, $label, true);
             $ssga->send();
             $ssga->reset();
+                        
         }
 
 		// Insert data into database
