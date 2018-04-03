@@ -377,6 +377,10 @@ class SSP_Stats {
             $ssga = new ssga( get_option( 'ss_podcasting_ssp_stats_google_analytics_tracker' ), site_url() );
 
             $action = 'Download';
+            
+            if( 'player' == $referrer ) {
+                $action = 'Listen_on_site';
+            }
 
             $category = (is_user_logged_in() ? "Internal:_" : "") . ($referrer ? $referrer : "referrer_not_set");
 
