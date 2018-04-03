@@ -808,14 +808,14 @@ class SSP_Stats {
 					$html .= '<div class="postbox" id="last-three-months-container">' . "\n";
 						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
 
-			    			$html .= '<span>' . __( 'All Episodes for the Last Three Months', 'seriously-simple-stats' ) . '</span>' . "\n";
+			    			$html .= '<span>' . __( 'All Published Episodes', 'seriously-simple-stats' ) . '</span>' . "\n";
 						$html .= '</' . $metabox_title . '>' . "\n";
 						$html .= '<div class="inside">' . "\n";
 
 							$all_episodes_stats = array();
 
 							$this->start_date = strtotime( current_time('Y-m-d').' -2 MONTH' );
-							
+                                        							
 							$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id";
 
 							$results = $wpdb->get_results( $sql );
@@ -849,9 +849,10 @@ class SSP_Stats {
 
 									if( (boolean) get_post_status($result->post_id) ) {
                                         $all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
-                                            'episode_name' => $post->post_title,
-                                            'date' => date( 'm-d-Y', strtotime( $post->post_date ) ),
+                                            'episode_name' => get_the_title( $post ),
+                                            'date' => date( 'Y-m-d', strtotime( $post->post_date ) ),
                                             'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
+                                            'status' => $post->post_status,
                                             'listens' => $lifetime_count,
                                             'listens_array' => $total_listens_array,
                                         ) );
@@ -860,9 +861,6 @@ class SSP_Stats {
 								}
 
 							}
-									
-							//24 because we're counting an array
-							$total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 ); 
 					
 							$html .= "<table class='form-table striped'>" . "\n";
 							$html .= "	<thead>" . "\n";
@@ -878,12 +876,22 @@ class SSP_Stats {
 
 							if( !empty( $all_episodes_stats ) && is_array( $all_episodes_stats ) ){
 
-								//Sort list by episode name
+								//Sort list by episode date
 								foreach( $all_episodes_stats as $listen ){
 									$listen_sorting[] = $listen['date'];
 								}
 								
 								array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
+                                
+                                //Remove episodes that have not been published
+                                foreach( $all_episodes_stats as $key => $listen ) {
+                                    if( 'publish' != $listen['status'] ) {
+                                        unset( $all_episodes_stats[$key] );
+                                    }
+                                }
+                                
+                                $total_posts = count( $all_episodes_stats );
+                                $total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 ); 
 
 								if( isset( $_GET['pagenum'] ) ){
 									
@@ -907,7 +915,7 @@ class SSP_Stats {
 								foreach( $all_episodes_stats as $ep ){
 
 									$html .= "<tr>" . "\n";
-									$html .= "	<td>".date( 'm-d-Y', $ep['date'] )."</td>" . "\n";
+									$html .= "	<td>".date( 'Y/m/d', strtotime($ep['date']) )."</td>" . "\n";
 									$html .= "	<td><a href='".$ep['slug']."'>".$ep['episode_name']."</a></td>" . "\n";
 									if( isset( $ep['listens_array'] ) ){
 										foreach( $ep['listens_array'] as $listen ){
@@ -982,10 +990,11 @@ class SSP_Stats {
 
 							$html .= '<ul>' . "\n";
 								$li_class = 'alternate';
+                                $n = 1;
 								foreach( $results as $result ) {
 									$episode = get_post( $result->post_id );
 									$episode_link = admin_url( 'post.php?post=' . $episode->ID . '&action=edit' );
-									$html .= '<li class="' . esc_attr( $li_class ) . '"><span class="first-col top-ten-count">' . sprintf( _n( '%d %slisten%s', '%d %slistens%s', $result->listens, 'seriously-simple-stats' ), $result->listens, '<span>', '</span>' ) . '</span> <span class="top-ten-title"><a href="' . $episode_link . '">' . esc_html( $episode->post_title ) . '</a></span></li>' . "\n";
+									$html .= '<li class="' . esc_attr( $li_class ) . '"><span class="rank-col top-ten-count">#'.$n++.'</span><span class="first-col top-ten-count">' . sprintf( _n( '%d %slisten%s', '%d %slistens%s', $result->listens, 'seriously-simple-stats' ), $result->listens, '<span>', '</span>' ) . '</span> <span class="top-ten-title"><a href="' . $episode_link . '">' . esc_html( $episode->post_title ) . '</a></span></li>' . "\n";
 									if( '' == $li_class ) {
 										$li_class = 'alternate';
 									} else {
