@@ -310,6 +310,20 @@ class SSP_Stats {
 			// This conditional will prevent double tracking from that app
 			return;
 		}
+        
+        // Google Play makes requests with user agent 'Mozilla/5.0 (compatible; Google-Podcast)' to retrieve feed information
+        
+        if( stripos( $user_agent, 'Google-Podcast' ) !== false ){
+			// This conditional will prevent Google Play bot pings from registering in stats
+			return;
+		}
+        
+        // iTunes Music Store makes requests with user agent 'iTMS' to retrieve feed information
+        
+        if( stripos( $user_agent, 'iTMS' ) !== false ){
+			// This conditional will prevent iTunes Music Store bot pings from registering in stats
+			return;
+		}
 
 		if ( stripos( $user_agent, 'itunes' ) !== false || stripos( $user_agent, 'AppleCoreMedia' ) !== false ){
 			$referrer = 'itunes';
@@ -382,7 +396,7 @@ class SSP_Stats {
                 $action = 'Listen_on_site';
             }
 
-            $category = (is_user_logged_in() ? "Internal:_" : "") . ($referrer ? $referrer : "referrer_not_set");
+            $category = (is_user_logged_in() ? "Internal:_" : "") . ($referrer ? $referrer : ($user_agent ? "[referrer_not_set]_UA:_{$user_agent}" : "[referrer_not_set]_UA:_not_set") );
 
             $label = str_replace(" ", "_", get_the_title($episode_id));
             
