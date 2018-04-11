@@ -227,6 +227,10 @@ class SSP_Stats {
 
 		// Handle localisation
 		add_action( 'plugins_loaded', array( $this, 'load_localisation' ) );
+
+		// Add dashboard widget
+		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget' ), 1 );
+
 	} // End __construct ()
 
 	public function load_episode_ids () {
@@ -280,24 +284,33 @@ class SSP_Stats {
 		$CrawlerDetect = new CrawlerDetect();
 		if( $CrawlerDetect->isCrawler( $user_agent ) ) {
 		    return;
-		}
+		}		
 
 		// Check for specific podcasting services in user agent
 		// The iOS Podcasts app makes a HEAD request with user agent Podcasts/2.4 and then a GET request with user agent AppleCoreMedia
-		// This conditional will prevent double tracking from that app
-		if( stripos( $user_agent, 'podcasts/' ) !== false ) {
+		
+		if( stripos( $user_agent, 'podcasts/' ) !== false ){
+			// This conditional will prevent double tracking from that app
 			return;
 		}
 
-		if ( stripos( $user_agent, 'itunes' ) !== false || stripos( $user_agent, 'AppleCoreMedia' ) !== false ) {
+		if ( stripos( $user_agent, 'itunes' ) !== false || stripos( $user_agent, 'AppleCoreMedia' ) !== false ){
 			$referrer = 'itunes';
-		} elseif ( stripos( $user_agent, 'stitcher' ) !== false ) {
+		} else if ( stripos( $user_agent, 'stitcher' ) !== false ) {
 			$referrer = 'stitcher';
-		} elseif ( stripos(  $user_agent, 'overcast' ) !== false ) {
+		} else if ( stripos(  $user_agent, 'overcast' ) !== false ) {
 			$referrer = 'overcast';
-		} elseif ( stripos( $user_agent, 'Pocket Casts' ) !== false ) {
+		} else if ( stripos( $user_agent, 'Pocket Casts' ) !== false ) {
 			$referrer = 'pocketcasts';
-		}
+		} else if ( stripos( $user_agent, 'Android' ) !== false ) {
+			$referrer = 'android';
+		} else if ( stripos( $user_agent, 'PodcastAddict' ) !== false ) {
+			$referrer = 'podcast_addict';
+		} else if ( stripos( $user_agent, 'Player FM' ) !== false ) {
+			$referrer = 'playerfm';
+		} else if ( stripos( $user_agent, 'Google-Play' ) !== false ) {
+			$referrer = 'google_play';
+		} 
 
 		// Get episode ID for database insert
 		$episode_id = $episode->ID;
@@ -396,9 +409,8 @@ class SSP_Stats {
 		if( $total_downloads ) {
 
 			$html .= '<p class="episode-stat-data total-downloads">' . __( 'Total listens', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
-
-			$users = array();
-			$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $unknown = 0;
+			
+			$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $unknown = 0;
 
 			foreach( $stats as $stat ) {
 				$listeners[ $stat->ip_address ] = $stat->ip_address;
@@ -425,6 +437,14 @@ class SSP_Stats {
 					case 'player':
 						++$player;
 					break;
+					case 'android':
+						++$android;
+					case 'podcast_addict':
+						++$podcast_addict;
+					case 'playerfm':
+						++$playerfm;
+					case 'google_play':
+						++$google_play;
 					default:
 						++$unknown;
 					break;
@@ -457,6 +477,20 @@ class SSP_Stats {
 				if( $player ) {
 					$html .= '<li class="player">' . __( 'Audio player', 'seriously-simple-stats' ) . ': <b>' . $player . '</b></li>';
 				}
+				// Commented out for now, could be included in the future
+				/*if( $android ){
+					$html .= '<li class="android">' . __( 'Android App', 'seriously-simple-stats' ) . ': <b>' . $android . '</b></li>';
+				}*/
+				if( $podcast_addict ){
+					$html .= '<li class="podcast_addict">' . __( 'Podcast Addict', 'seriously-simple-stats' ) . ': <b>' . $podcast_addict . '</b></li>';
+				}
+				if( $playerfm ){
+					$html .= '<li class="playerfm">' . __( 'Player FM', 'seriously-simple-stats' ) . ': <b>' . $playerfm . '</b></li>';
+				}
+				// Commented out for now, could be used in the future
+				/*if( $google_play ){
+					$html .= '<li class="google_play">' . __( 'Google Play', 'seriously-simple-stats' ) . ': <b>' . $google_play . '</b></li>';
+				}*/
 				if( $unknown ) {
 					$html .= '<li class="unknown">' . __( 'Other', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
 				}
@@ -688,6 +722,171 @@ class SSP_Stats {
 						$html .= '</div>' . "\n";
 					$html .= '</div>' . "\n";
 
+					//Displays all episodes, 25 per page
+					$html .= '<div class="postbox" id="last-three-months-container">' . "\n";
+						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
+
+			    			$html .= '<span>' . __( 'All Episodes for the Last Three Months', 'seriously-simple-stats' ) . '</span>' . "\n";
+						$html .= '</' . $metabox_title . '>' . "\n";
+						$html .= '<div class="inside">' . "\n";
+
+							$all_episodes_stats = array();
+
+							$this->start_date = strtotime( current_time('Y-m-d').' -2 MONTH' );
+							
+							$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id";
+
+							$results = $wpdb->get_results( $sql );
+
+							$total_posts = count( $results );
+
+							if( is_array( $results ) ){
+
+								foreach( $results as $result ){
+
+									// Define the previous three months array keys
+									$total_listens_array = array(
+										intval( current_time( 'm' ) ) => 0, 
+										intval( date( 'm', strtotime( current_time('Y-m-d').' -1 MONTH' ) ) ) => 0, 
+										intval( date( 'm', strtotime( current_time('Y-m-d').' -2 MONTH' ) ) ) => 0 
+									);
+
+									$post = get_post( intval( $result->post_id ) );
+
+									$sql = "SELECT `date` FROM $this->_table WHERE `post_id` = '".$result->post_id."'";
+
+									$episode_results = $wpdb->get_results( $sql );
+
+									$lifetime_count = count( $episode_results );
+
+									foreach( $episode_results as $ref ) {
+										//Increase the count of listens per month
+										if( isset( $total_listens_array[intval( date('m', intval( $ref->date ) ) )] ) )
+											++$total_listens_array[intval( date('m', intval( $ref->date ) ) )];
+									}
+
+									$all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
+										'episode_name' => $post->post_title,
+										'date' => date( 'm-d-Y', strtotime( $post->post_date ) ),
+										'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
+										'listens' => $lifetime_count,
+										'listens_array' => $total_listens_array,
+									) );
+
+								}
+
+							}
+									
+							//24 because we're counting an array
+							$total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 ); 
+					
+							$html .= "<table class='form-table striped'>" . "\n";
+							$html .= "	<thead>" . "\n";
+							$html .= "		<tr>" . "\n";
+							$html .= "			<td>".__('Publish Date', 'seriously-simple-stats')."</td>" . "\n";
+							$html .= "			<td>".__('Episode Name', 'seriously-simple-stats')."</td>" . "\n";
+							$html .= "			<td style='text-align: center;'>".current_time('F')."</a></td>" . "\n";			
+							$html .= "			<td style='text-align: center;'>".date('F', strtotime( current_time("Y-m-d")." -1 MONTH" ) )."</td>" . "\n";
+							$html .= "			<td style='text-align: center;'>".date('F', strtotime( current_time("Y-m-d")." -2 MONTH" ) )."</td>" . "\n";
+							$html .= "			<td style='text-align: center;' class='ssp_stats_3m_total'>".__('Lifetime', 'seriously-simple-stats')."</td>" . "\n";
+							$html .= "		</tr>" . "\n";
+							$html .= "	</thead>" . "\n";
+
+							if( !empty( $all_episodes_stats ) && is_array( $all_episodes_stats ) ){
+
+								//Sort list by episode name
+								foreach( $all_episodes_stats as $listen ){
+									$listen_sorting[] = $listen['episode_name'];
+								}
+								
+								array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
+
+								if( isset( $_GET['pagenum'] ) ){
+									
+									$pagenum = intval( $_GET['pagenum'] );
+
+									if( $pagenum <= 1){
+										$current_cursor = 0;
+									} else {
+										$current_cursor = ($pagenum - 1)* $total_per_page;
+									}
+
+									$all_episodes_stats = array_slice( $all_episodes_stats, $current_cursor, $total_per_page , true );	
+
+								} else {
+
+									$all_episodes_stats = array_slice( $all_episodes_stats, 0, $total_per_page, true );	
+
+								}								
+
+								//Display the data
+								foreach( $all_episodes_stats as $ep ){
+
+									$html .= "<tr>" . "\n";
+									$html .= "	<td>".$ep['date']."</td>" . "\n";
+									$html .= "	<td><a href='".$ep['slug']."'>".$ep['episode_name']."</a></td>" . "\n";
+									if( isset( $ep['listens_array'] ) ){
+										foreach( $ep['listens_array'] as $listen ){
+											//Each months total listens
+											$html .= "<td style='text-align: center;'>".$listen."</td>" . "\n";
+										}
+									}
+									//Total Listen Count
+									$html .= "	<td style='text-align: center;' class='ssp_stats_3m_total'>".$ep['listens']."</td>" . "\n";
+									$html .= "</tr>" . "\n";
+
+								}
+
+							}
+
+							$html .= "</table>";
+
+							//Only show page links if there's more than 25 episodes in the table
+							$pagination_html = "";
+							if( $total_posts >= $total_per_page ){
+								
+								if( isset( $_GET['pagenum'] ) ){
+									$pagenum = intval( $_GET['pagenum'] );
+								} else {
+									$pagenum = 1;
+								}
+
+								$total_pages = ceil($total_posts/$total_per_page);
+
+								$pagination_html .= "<div class='tablenav bottom'>" . "\n";
+								$pagination_html .= '	<div class="tablenav-pages">' . "\n";
+								$pagination_html .= '		<span class="displaying-num">'.$total_posts.' '.__('items', 'seriously-simple-stats').'</span>' . "\n";
+
+								$prev_page = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
+
+								$order_by = isset( $_GET['orderby'] ) ? '&orderby='.sanitize_text_field( $_GET['orderby'] ) : "";
+
+								$order = isset( $_GET['order'] ) ? '&order='.sanitize_text_field( $_GET['order'] ) : "";
+
+								$month_num = isset( $_GET['month_num'] ) ? '&month_num='.sanitize_text_field( $_GET['month_num'] ) : "";
+
+								$pagination_html .= "		<span class='pagination-links'>";
+								if( $pagenum != 1 ){
+									$pagination_html .= '		<a class="next-page" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$prev_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Previous page', 'seriously-simple-stats').'</span><span aria-hidden="true">«</span></a>';
+								}
+
+								$pagination_html .= '			<span id="table-paging" class="paging-input"><span class="tablenav-paging-text">'.$pagenum.' of <span class="total-pages">'.$total_pages.'</span> </span>';
+
+								$next_page = $pagenum + 1;
+								
+								if( $next_page <= $total_pages ){
+									$pagination_html .= '		<a class="next-page table-paging"" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$next_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Next page', 'seriously-simple-stats').'</span><span aria-hidden="true">»</span></a>';	
+								}
+								$pagination_html .= "		</span>&nbsp;" . "\n";
+								$pagination_html .= "	</div>" . "\n";	
+								$pagination_html .= "</div>" . "\n";
+							}
+
+							$html .= $pagination_html;
+
+						$html .= '</div>' . "\n";
+					$html .= '</div>' . "\n";
+
 					$html .= '<div class="postbox" id="top-ten-container">' . "\n";
 						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
 					    	$html .= '<span>' . __( 'Top Ten Episodes of All Time', 'seriously-simple-stats' ) . '</span>' . "\n";
@@ -713,6 +912,7 @@ class SSP_Stats {
 
 						$html .= '</div>' . "\n";
 					$html .= '</div>' . "\n";
+
 				}
 
 			$html .= '</div>' . "\n";
@@ -739,7 +939,7 @@ class SSP_Stats {
 	 * @since  1.0.0
 	 * @return void
 	 */
-	public function chart_data () {
+	public function chart_data ( ) {
 
 		$output = '';
 
@@ -789,6 +989,54 @@ class SSP_Stats {
 		}
 
 		return $this->generate_chart( 'LineChart', '', $columns, $data, 'daily_listens' );
+	}
+
+	/**
+	 * Return data for weekly Listens chart
+	 * @access private
+	 * @since  1.0.0
+	 * @param  integer $start_date Start date of chart data
+	 * @param  integer $end_date   End date of chart data
+	 * @return string              Javascript for chart generation
+	 */
+	private function weekly_listens_chart () {
+
+		global $wpdb;
+
+		$columns = array(
+			__( 'Week', 'seriously-simple-stats' ) => 'date',
+			__( 'Listens', 'seriously-simple-stats' ) => 'number',
+		);
+
+		$episode_id_where = '';
+		if( $this->episode_id_where ) {
+			$episode_id_where = 'AND ' . $this->episode_id_where;
+		}
+
+		$sql = $wpdb->prepare( "SELECT date FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $this->start_date, $this->end_date );
+		$results = $wpdb->get_results( $sql );
+
+		$date_data = array();
+		foreach( $results as $timestamp ) {
+			$date = date( 'Y-m-d', $timestamp->date );
+
+			if( isset( $date_data[ $date ] ) ) {
+				++$date_data[ $date ];
+			} else {
+				$date_data[ $date ] = 1;
+			}
+		}
+
+		ksort( $date_data );
+
+		$data = array();
+
+		foreach( $date_data as $date => $listens ){
+			$data[] = array( $date, $listens );	
+		}
+
+		return $this->generate_chart( 'LineChart', '', $columns, $data, 'weekly_listens', 250 );
+
 	}
 
 	/**
@@ -844,6 +1092,10 @@ class SSP_Stats {
 			'overcast' => __( 'Overcast', 'seriously-simple-stats' ),
 			'pocketcasts' => __( 'Pocket Casts', 'seriously-simple-stats' ),
 			'other' => __( 'Other', 'seriously-simple-stats' ),
+			// 'android' => __('Android App', 'seriously-simple-stats'), //Commented out for now
+			'podcast_addict' => __( 'Podcast Addict', 'seriously-simple-stats' ),
+			'playerfm' => __( 'Player FM', 'seriously-simple-stats' ),
+			// 'google_play' => __( 'Google Play', 'seriously-simple-stats' ) //Commented out for now
 		);
 
 		$data = array();
@@ -855,7 +1107,12 @@ class SSP_Stats {
 				$ref_label = $referrer_labels[ $ref ];
 			} else {
 				// Allow 'Unknown' label as a backup, even though this probably won't ever get used
-				$ref_label = __( 'Unknown', 'seriously-simple-stats' );
+				if( $ref == 'android' || $ref == 'google_play' ){
+					// Ignoring this count in the mean time until we can track these counts correctly
+					continue;
+				} else {
+					$ref_label = __( 'Unknown', 'seriously-simple-stats' );
+				}
 			}
 
 			$data[] = array( $ref_label, $listens );
@@ -885,18 +1142,28 @@ class SSP_Stats {
 		}
 
 		$column_data = '';
+		$column_date = 0;
 		foreach( $columns as $column_label => $column_type ) {
 			$column_data .= "data.addColumn('$column_type', '$column_label');" . "\n";
+			//Added to ensure a unix timestamp is created for this column types data
+			if( $column_type === 'date' ){
+				$column_date++;
+			}
 		}
 
 		$chart_data = '';
+
 		foreach( $data as $data_set ) {
 			$chart_data .= "[";
 			foreach( $data_set as $item ) {
 				if( is_numeric( $item ) ) {
 					$chart_data .= "$item,";
 				} else {
-					$chart_data .= "'$item',";
+					if( $column_date > 0 ){
+						$chart_data .= "new Date('$item'),";
+					} else {
+						$chart_data .= "'$item',";
+					}
 				}
 			}
 			$chart_data .= "]," . "\n";
@@ -906,10 +1173,15 @@ class SSP_Stats {
 		$chartid = uniqid() . '_' . mt_rand( 0, 9999 );
 
 		$options = '';
+
+		if( $column_date > 0 ){
+			$options .= "hAxis:{ format: 'MMM d' }, chartArea:{ width: '80%', top: '25' }, ". "\n";
+		}
+
 		switch( $type ) {
 			case 'LineChart':
 				$options .= "legend: 'none'," . "\n";
-				$options .= "vAxis: { minValue: 0 }" . "\n";
+				$options .= "vAxis: { minValue: 0 } " . "\n";
 			break;
 			case 'PieChart':
 				$options .= "is3D: true" . "\n";
@@ -944,8 +1216,10 @@ class SSP_Stats {
 				};
 
 				// Instantiate and draw the chart
-				var chart = new google.visualization.<?php echo $type; ?>( document.getElementById( '<?php echo $target; ?>' ) );
-				chart.draw( data, options );
+				if( jQuery( '#'+'<?php echo $target; ?>' ).length > 0 ){
+					var chart = new google.visualization.<?php echo $type; ?>( document.getElementById( '<?php echo $target; ?>' ) );
+					chart.draw( data, options );
+				}
 				// chart.draw( data, google.charts.Line.convertOptions(options) );
 			}
 
@@ -963,16 +1237,11 @@ class SSP_Stats {
 	 */
 	public function admin_enqueue_scripts ( $hook = '' ) {
 
-		if( 'podcast_page_podcast_stats' == $hook ) {
+		//index.php added to accommodate dashboard widget chart
+		if( 'podcast_page_podcast_stats' == $hook || 'index.php' == $hook ) {
 
 			// Include Google Charts scripts
-			wp_enqueue_script( 'google-charts', "//www.google.com/jsapi?autoload={
-										            'modules':[{
-										              'name':'visualization',
-										              'version':'1',
-										              'packages':['corechart']
-										            }]
-										          }", array(), $this->_version, false );
+			wp_enqueue_script( 'google-charts', "//www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}", array(), $this->_version, false );
 
 			// Load custom scripts
 			wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
@@ -1092,4 +1361,91 @@ class SSP_Stats {
 		update_option( $this->_token . '_version', $this->_version );
 	} // End _log_version_number ()
 
+
+	/**
+	 * Adds a widget to the dashboard to show relevant stats
+	 * @access public
+	 * @since  1.2
+	 * @return  void
+	 */
+	public function add_dashboard_widget(){
+
+		add_meta_box( 'ssp_stats_dashboard_widget', __('Seriously Simple Stats - Overview', 'seriously-simple-stats' ), array( $this, 'dashboard_widget_callback' ), 'dashboard', 'normal', 'high' );
+
+	}
+
+	/**
+	 * Callback for the dashboard widget
+	 * @access public
+	 * @since 1.2
+	 * @return string
+	 */
+	public function dashboard_widget_callback(){
+
+		global $wpdb;
+
+		$html = "";
+
+		$html .= "<div class='wrap dashboard_widget_podcast_settings' id='podcast_settings'>";		
+
+		// Count total entries for episode selection
+		$count_entries_sql = "SELECT COUNT(id) FROM $this->_table";
+		if( $this->episode_id_where ) {
+			$count_stats_episode_id_where = 'WHERE ' . $this->episode_id_where;
+			$count_entries_sql = $count_entries_sql . " $count_stats_episode_id_where";
+		}
+		$total_entries = $wpdb->get_var( $count_entries_sql );
+
+		if( ! $total_entries ) {
+			$html .= '<div class="" id="no-stats-container">' . "\n";
+				$html .= '<div class="inside no-activity">' . "\n";
+					$html .= '<p class="smiley"></p>' . "\n";
+					$html .= '<p>' . __( 'No stats yet!', 'seriously-simple-stats' ) . '</p>' . "\n";
+				$html .= '</div>' . "\n";
+			$html .= '</div>' . "\n";
+		} else {			
+
+			$html .= "<p class='ssps_last_30_days_graph_text'>".__('Last 30 Days', 'seriously-simple-stats')." <a href='".admin_url("edit.php?post_type=podcast&page=podcast_stats")."'>".__('View All Data', 'seriously-simple-stats')."</a>"."</p>";
+
+			$html .= "<div id='weekly_listens'></div>";
+
+			$this->start_date = strtotime( current_time( 'Y-m-d H:i:s' ) . ' -30 DAY' );
+
+			$html .= $this->weekly_listens_chart();
+
+			$html .= '<div class="postbox">' . "\n";
+				$html .= '<div class="inside">' . "\n";
+
+					$episode_id_where = '';
+					if( $this->episode_id_where ) {
+						$episode_id_where = 'AND ' . $this->episode_id_where;
+					}
+
+					// Listens today
+					$start_of_day = strtotime( date( 'Y-m-d 00:00:00', $this->current_time ) );
+					$listens_today = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $start_of_day, $this->current_time ) );
+					$html .= $this->daily_stat( $listens_today, __( 'Listens today', 'seriously-simple-stats' ) );
+
+					// Listens this week
+					$one_week_ago = strtotime( '-1 week', $this->current_time );
+					$listens_this_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $one_week_ago, $this->current_time ) );
+					$html .= $this->daily_stat( $listens_this_week, __( 'Listens this week', 'seriously-simple-stats' ) );
+
+					// Listens last week
+					$two_weeks_ago = strtotime( '-1 week', $one_week_ago );
+					$listens_last_week = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM $this->_table WHERE date BETWEEN %d AND %d $episode_id_where", $two_weeks_ago, $one_week_ago ) );
+					$html .= $this->daily_stat( $listens_last_week, __( 'Listens last week', 'seriously-simple-stats' ) );
+
+					$html .= '<br class="clear" />';
+
+				$html .= '</div>' . "\n";
+			$html .= '</div>' . "\n";
+
+		}
+
+		$html .= "</div>";
+
+		echo $html;
+
+	}
 }
