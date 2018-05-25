@@ -762,6 +762,10 @@ class SSP_Stats {
 
 									$post = get_post( intval( $result->post_id ) );
 
+									if ( ! $post ) {
+										continue;
+									}
+
 									$sql = "SELECT `date` FROM $this->_table WHERE `post_id` = '".$result->post_id."'";
 
 									$episode_results = $wpdb->get_results( $sql );
