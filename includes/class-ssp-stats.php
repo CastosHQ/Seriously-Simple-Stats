@@ -344,6 +344,9 @@ class SSP_Stats {
 			return;
 		}
 
+		// Anonymise the ip address
+		$ip_address = ss_stats_anonymise_ip($ip_address);
+
 		// Create transient name from episode ID, IP address and referrer
 		$transient = 'sspdl_' . $episode_id . '_' . str_replace( '.', '', $ip_address ) . '_' . $referrer;
 

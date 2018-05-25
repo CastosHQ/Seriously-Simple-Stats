@@ -78,6 +78,10 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 
 == Changelog ==
 
+= 1.2.1 =
+* 2018-05-25
+* [NEW] Included a stats table upgrade to anonymise IP addresses stored
+
 = 1.2.0 =
 * 2017-10-11
 * [NEW] Added stats widget to WordPress dashboard

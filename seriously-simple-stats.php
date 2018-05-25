@@ -1,11 +1,11 @@
 <?php
 /*
  * Plugin Name: Seriously Simple Stats
- * Version: 1.2.0
+ * Version: 1.2.1
  * Plugin URI: https://wordpress.org/plugins/seriously-simple-stats
  * Description: Integrated analytics and stats tracking for Seriously Simple Podcasting.
- * Author: PodcastMotor
- * Author URI: https://www.podcastmotor.com/
+ * Author: Castos
+ * Author URI: https://www.castos.com/
  * Requires at least: 4.4
  * Tested up to: 4.8.2
  *
@@ -16,7 +16,7 @@
  * @author Hugh Lashbrooke
  * @since 1.0.0
  *
- * @author PodcastMotor
+ * @author Castos
  * @since 1.2.0
  *
  */
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SSP_STATS_VERSION', '1.2.0' );
+define( 'SSP_STATS_VERSION', '1.2.1' );
 
 if ( ! function_exists( 'is_ssp_active' ) ) {
 	require_once( 'ssp-includes/ssp-functions.php' );
