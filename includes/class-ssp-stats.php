@@ -209,6 +209,12 @@ class SSP_Stats {
 		// Get required episode IDs for stats
 		add_action( 'init', array( $this, 'load_episode_ids' ), 10 );
 
+		// Add admin notice to upgrade stats table
+		add_action( 'admin_notices', array( $this, 'maybe_notify_stats_update' ) );
+
+		// Anonymise the IP address details stored in the database
+		add_action( 'admin_init', array( $this, 'maybe_update_stats_data' ), 11 );
+
 		// Track episode download
 		add_action( 'ssp_file_download', array( $this, 'track_download' ), 10, 3 );
 
@@ -1448,4 +1454,65 @@ class SSP_Stats {
 		echo $html;
 
 	}
+
+	/**
+	 * Checks if the ssp_stats_ips_updated option is set, if not shows a message to the user.
+	 */
+	public function maybe_notify_stats_update(){
+		$ssp_stats_ips_updated = get_option( 'ssp_stats_ips_updated', 'no' );
+		if ( 'yes' === $ssp_stats_ips_updated ) {
+			return;
+		}
+		$data_upgrade_url = add_query_arg( array( 'upgrade_stats_table' => 'anonymise_ip' ) );
+		?>
+		<div class="notice notice-warning">
+			<p><?php _e( 'Seriously Simple Stats needs to perform an update to the stats database table. Click below to perform this one-time update.', 'seriously-simple-stats' ); ?></p>
+			<p><a href="<?php echo $data_upgrade_url ?>"><?php _e( 'Upgrade stats table.', 'seriously-simple-stats' ); ?></a></p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Attempt to update the stats table
+	 */
+	public function maybe_update_stats_data(){
+
+		if ( ! isset( $_GET['upgrade_stats_table'] ) ) {
+			return;
+		}
+
+		$upgrade_stats_table = filter_var( $_GET['upgrade_stats_table'], FILTER_SANITIZE_STRING );
+		if ( ! 'anonymise_ip' === $upgrade_stats_table ) {
+			return;
+		}
+
+		global $wpdb;
+		$query = "UPDATE {$wpdb->prefix}ssp_stats SET ip_address = REPLACE(ip_address, SUBSTRING_INDEX(ip_address,'.',-1), '0')";
+		$affected_rows = $wpdb->query($query);
+
+		if (false === $affected_rows){
+			add_action( 'admin_notices', array( $this, 'update_stats_data_failed' ) );
+		}else {
+			update_option( 'ssp_stats_ips_updated', 'yes' );
+			add_action( 'admin_notices', array( $this, 'update_stats_data_succeeded' ) );
+		}
+
+	}
+
+	public function update_stats_data_failed(){
+		?>
+		<div class="notice notice-warning is-dismissible">
+			<p><?php _e( 'An error occurred updating the stats database table, please try again or contact support.', 'seriously-simple-stats' ); ?></p>
+		</div>
+		<?php
+	}
+
+	public function update_stats_data_succeeded(){
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php _e( 'Updating the stats database table completed successfully.', 'seriously-simple-stats' ); ?></p>
+		</div>
+		<?php
+	}
+
 }
