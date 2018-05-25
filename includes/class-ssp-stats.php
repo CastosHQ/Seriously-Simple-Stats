@@ -1490,7 +1490,7 @@ class SSP_Stats {
 		}
 
 		global $wpdb;
-		$query = "UPDATE {$wpdb->prefix}ssp_stats SET ip_address = REPLACE(ip_address, SUBSTRING_INDEX(ip_address,'.',-1), '0')";
+		$query = "UPDATE {$wpdb->prefix}ssp_stats SET ip_address = CONCAT( SUBSTRING_INDEX( ip_address, '.', 3 ) , '.0' )";
 		$affected_rows = $wpdb->query($query);
 
 		if (false === $affected_rows){
