@@ -1,3 +1,8 @@
+/bin
+/tests
 .git
 .gitignore
 .idea
+travis.yml
+phpcs.xml.dist
+phpunit.xml.dist

@@ -31,7 +31,7 @@ if ( ! function_exists( 'is_ssp_active' ) ) {
 	require_once( 'ssp-includes/ssp-functions.php' );
 }
 
-if( is_ssp_active( '1.13.1' ) ) {
+if ( is_ssp_active( '1.13.1' ) ) {
 
 	// Load plugin class files
 	require_once( 'includes/class-ssp-stats.php' );
@@ -42,8 +42,9 @@ if( is_ssp_active( '1.13.1' ) ) {
 	 * @since  1.0.0
 	 * @return object SSP_Stats
 	 */
-	function SSP_Stats () {
+	function SSP_Stats() {
 		$instance = SSP_Stats::instance( __FILE__, SSP_STATS_VERSION, '1.0.0' );
+
 		return $instance;
 	}
 
