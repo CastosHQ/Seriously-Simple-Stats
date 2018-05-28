@@ -268,6 +268,19 @@ class SSP_Stats {
 		}
 	}
 
+	/**
+	 * Anonymises IP address data by replacing the last octet with 0 (zero)
+	 */
+	public function anonymise_ip( $ip = '' ) {
+		if ( empty( $ip ) ) {
+			return $ip;
+		}
+		$ip_octets    = explode( '.', $ip );
+		$ip_octets[3] = '0';
+		$ip           = implode( '.', $ip_octets );
+		return $ip;
+	}
+
 	public function track_download ( $file = '', $episode = 0, $referrer = '' ) {
 		global $wpdb;
 
@@ -345,7 +358,7 @@ class SSP_Stats {
 		}
 
 		// Anonymise the ip address
-		$ip_address = ss_stats_anonymise_ip($ip_address);
+		$ip_address = $this->anonymise_ip( $ip_address );
 
 		// Create transient name from episode ID, IP address and referrer
 		$transient = 'sspdl_' . $episode_id . '_' . str_replace( '.', '', $ip_address ) . '_' . $referrer;

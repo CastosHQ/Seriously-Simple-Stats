@@ -17,7 +17,9 @@ class FunctionsTest extends WP_UnitTestCase {
 	 */
 	public function test_ss_stats_anonymise_ip() {
 		$ip     = '192.168.0.233';
-		$new_ip = ss_stats_anonymise_ip( $ip );
+		$ssp_stats = SSP_Stats();
+
+		$new_ip = $ssp_stats->anonymise_ip( $ip );
 		// check that the string still resembles an ip address
 		$this->assertStringMatchesFormat( '%x.%x.%x.%x', $new_ip, 'The address does not match a valid ip address format.' );
 		// assert that the string ends with .0
