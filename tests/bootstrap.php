@@ -19,10 +19,25 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 require_once $_tests_dir . '/includes/functions.php';
 
 /**
+ * Recreated the SSP_Stats function from the main plugin file
+ * This is because the plugin file checks to ensure that a verion of SSP is installed
+ * and for unit tests that check would fail
+ *
+ * @return Main
+ */
+function SSP_Stats() {
+	$instance = SSP_Stats::instance( __FILE__, SSP_STATS_VERSION, '1.0.0' );
+
+	return $instance;
+}
+
+/**
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
 	require dirname( dirname( __FILE__ ) ) . '/seriously-simple-stats.php';
+	// Manually include the class-ssp-stats.php file
+	require_once( 'includes/class-ssp-stats.php' );
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
