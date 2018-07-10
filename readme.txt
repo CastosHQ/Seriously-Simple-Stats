@@ -2,8 +2,8 @@
 Contributors: PodcastMotor, psykro, simondowdles, hlashbrooke, seriouspodcaster, lajala
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
 Requires at least: 4.4
-Tested up to: 4.8.2
-Stable tag: 1.2.1
+Tested up to: 4.9.4
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,9 +79,15 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 == Changelog ==
 
 = 1.2.1 =
-* 2018-04-01
+* 2018-05-25
+* [NEW] Included a stats table upgrade to anonymise IP addresses stored
 * [NEW] Added support for download tracking through Google Analytics events
 * [NEW] Added support for Podtrac download tracking
+* [NEW] Added stats tab on the Seriously Simple Podcasting options page
+* [FIX] Addressed errors in logging Podtrac and Google Analytics tracking
+* [FIX] Addressed errors on stats overview page due to changes in episode status
+* [TWEAK] Improved logging of downloads by catching and eliminating Google Podcast and iTunes Music Store bots
+* [TWEAK] Smoothed display of the dashboard widget styles
 
 = 1.2.0 =
 * 2017-10-11
