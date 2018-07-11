@@ -1,5 +1,5 @@
 === Seriously Simple Stats ===
-Contributors: PodcastMotor, psykro, simondowdles, hlashbrooke, seriouspodcaster
+Contributors: PodcastMotor, psykro, simondowdles, hlashbrooke, seriouspodcaster, lajala
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
 Requires at least: 4.4
 Tested up to: 4.8.2
