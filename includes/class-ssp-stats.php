@@ -220,7 +220,7 @@ class SSP_Stats {
 
 		// Add stats meta box to episodes edit screen
 		add_action( 'ssp_meta_boxes', array( $this, 'post_meta_box' ), 10, 1 );
-        
+
         // Filter download url for Podtrac logging
         add_filter( 'ssp_episode_download_link', array( $this, 'podtrac_download_url_filter' ), 10, 3 );
 
@@ -229,7 +229,7 @@ class SSP_Stats {
 
         // Add settings tab to SSP settings page
         add_filter( 'ssp_settings_fields', array( $this, 'ssp_stats_add_settings' ) );
-        
+
         // Load necessary javascript for charts
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
 		add_action( 'admin_print_scripts', array( $this, 'chart_data' ), 30 );
@@ -242,18 +242,18 @@ class SSP_Stats {
 
 		// Add dashboard widget
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget' ), 1 );
-        
+
         // Handle permanent deletion of episodes
         add_action( 'delete_post', array( $this, 'ssp_delete_episode_stats' ) );
 
 	} // End __construct ()
-    
+
     public function ssp_delete_episode_stats ( $post_id ) {
-        
+
         global $wpdb;
         if ( $wpdb->get_var( $wpdb->prepare( "SELECT `id` FROM $this->_table WHERE `post_id` = %d", $post_id ) ) ) {
             $wpdb->query( $wpdb->prepare( "DELETE FROM $this->_table WHERE `post_id` = %d", $post_id ) );
-        } 
+        }
     }
 
 	public function load_episode_ids () {
@@ -307,25 +307,25 @@ class SSP_Stats {
 		$CrawlerDetect = new CrawlerDetect();
 		if( $CrawlerDetect->isCrawler( $user_agent ) ) {
 		    return;
-		}		
+		}
 
 		// Check for specific podcasting services in user agent
 		// The iOS Podcasts app makes a HEAD request with user agent Podcasts/2.4 and then a GET request with user agent AppleCoreMedia
-		
+
 		if( stripos( $user_agent, 'podcasts/' ) !== false ){
 			// This conditional will prevent double tracking from that app
 			return;
 		}
-        
+
         // Google Play makes requests with user agent 'Mozilla/5.0 (compatible; Google-Podcast)' to retrieve feed information
-        
+
         if( stripos( $user_agent, 'Google-Podcast' ) !== false ){
 			// This conditional will prevent Google Play bot pings from registering in stats
 			return;
 		}
-        
+
         // iTunes Music Store makes requests with user agent 'iTMS' to retrieve feed information
-        
+
         if( stripos( $user_agent, 'iTMS' ) !== false ){
 			// This conditional will prevent iTunes Music Store bot pings from registering in stats
 			return;
@@ -347,7 +347,7 @@ class SSP_Stats {
 			$referrer = 'playerfm';
 		} else if ( stripos( $user_agent, 'Google-Play' ) !== false ) {
 			$referrer = 'google_play';
-		} 
+		}
 
 		// Get episode ID for database insert
 		$episode_id = $episode->ID;
@@ -390,17 +390,17 @@ class SSP_Stats {
 		if ( get_transient( $transient ) ) {
 			return;
 		}
-        
+
         // Check for Google Analytics and send event if active
         $use_ga = get_option( 'ss_podcasting_ssp_stats_google_analytics', 'off' );
         if ( ($use_ga == 'on') and ! empty( get_option( 'ss_podcasting_ssp_stats_google_analytics_tracker' ) ) ) {
             // Load Server-side Google Analytics helper library
             require_once( __DIR__ . '/lib/ss-ga.class.php' );
-            
+
             $ssga = new ssga( get_option( 'ss_podcasting_ssp_stats_google_analytics_tracker' ), site_url() );
 
             $action = 'Download';
-            
+
             if( 'player' == $referrer ) {
                 $action = 'Listen_on_site';
             }
@@ -408,11 +408,11 @@ class SSP_Stats {
             $category = (is_user_logged_in() ? "Internal:_" : "") . ($referrer ? $referrer : ($user_agent ? "[referrer_not_set]_UA:_{$user_agent}" : "[referrer_not_set]_UA:_not_set") );
 
             $label = str_replace(" ", "_", get_the_title($episode_id));
-            
+
             $ssga->set_event($category, $action, $label, true);
             $ssga->send();
             $ssga->reset();
-                        
+
         }
 
 		// Insert data into database
@@ -438,7 +438,7 @@ class SSP_Stats {
 		}
 
 	}
-    
+
     /**
      * If we have the option enabled for the measurement service, filter that onto the URL.
      * from https://github.com/whyisjake/Podtrac-with-Seriously-Simple-Podcasting (v 0.5.1)
@@ -491,7 +491,7 @@ class SSP_Stats {
 		if( $total_downloads ) {
 
 			$html .= '<p class="episode-stat-data total-downloads">' . __( 'Total listens', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
-			
+
 			$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $unknown = 0;
 
 			foreach( $stats as $stat ) {
@@ -598,7 +598,7 @@ class SSP_Stats {
 	public function add_menu_item() {
 		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Stats', 'seriously-simple-stats' ) , __( 'Stats', 'seriously-simple-stats' ), 'manage_podcast' , 'podcast_stats' , array( $this , 'stats_page' ) );
 	}
-    
+
     /**
      * Add new settings with a new tab to Seriously Simple Podcasting.
      *
@@ -791,7 +791,8 @@ class SSP_Stats {
 							if( ! $listens_last_week ) {
 								$week_diff = '-';
 							} else {
-								$week_diff = round( ( $listens_this_week / $listens_last_week * 100 ), 1 );
+								$week_diff = ( $listens_this_week / $listens_last_week ) * 100;
+								$week_diff = round( $week_diff, 1 );
 								if( $week_diff < 100 ) {
 									$week_diff = '-' . ( 100 - $week_diff ) . '%';
 								} elseif( $week_diff > 100 ) {
@@ -853,7 +854,7 @@ class SSP_Stats {
 							$all_episodes_stats = array();
 
 							$this->start_date = strtotime( current_time('Y-m-d').' -2 MONTH' );
-                                        							
+
 							$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id";
 
 							$results = $wpdb->get_results( $sql );
@@ -866,9 +867,9 @@ class SSP_Stats {
 
 									// Define the previous three months array keys
 									$total_listens_array = array(
-										intval( current_time( 'm' ) ) => 0, 
-										intval( date( 'm', strtotime( current_time('Y-m-d').' -1 MONTH' ) ) ) => 0, 
-										intval( date( 'm', strtotime( current_time('Y-m-d').' -2 MONTH' ) ) ) => 0 
+										intval( current_time( 'm' ) ) => 0,
+										intval( date( 'm', strtotime( current_time('Y-m-d').' -1 MONTH' ) ) ) => 0,
+										intval( date( 'm', strtotime( current_time('Y-m-d').' -2 MONTH' ) ) ) => 0
 									);
 
 									$post = get_post( intval( $result->post_id ) );
@@ -907,13 +908,13 @@ class SSP_Stats {
 								}
 
 							}
-					
+
 							$html .= "<table class='form-table striped'>" . "\n";
 							$html .= "	<thead>" . "\n";
 							$html .= "		<tr>" . "\n";
 							$html .= "			<td>".__('Publish Date', 'seriously-simple-stats')."</td>" . "\n";
 							$html .= "			<td>".__('Episode Name', 'seriously-simple-stats')."</td>" . "\n";
-							$html .= "			<td style='text-align: center;'>".current_time('F')."</a></td>" . "\n";			
+							$html .= "			<td style='text-align: center;'>".current_time('F')."</a></td>" . "\n";
 							$html .= "			<td style='text-align: center;'>".date('F', strtotime( current_time("Y-m-d")." -1 MONTH" ) )."</td>" . "\n";
 							$html .= "			<td style='text-align: center;'>".date('F', strtotime( current_time("Y-m-d")." -2 MONTH" ) )."</td>" . "\n";
 							$html .= "			<td style='text-align: center;' class='ssp_stats_3m_total'>".__('Lifetime', 'seriously-simple-stats')."</td>" . "\n";
@@ -926,21 +927,21 @@ class SSP_Stats {
 								foreach( $all_episodes_stats as $listen ){
 									$listen_sorting[] = $listen['date'];
 								}
-								
+
 								array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
-                                
+
                                 //Remove episodes that have not been published
                                 foreach( $all_episodes_stats as $key => $listen ) {
                                     if( 'publish' != $listen['status'] ) {
                                         unset( $all_episodes_stats[$key] );
                                     }
                                 }
-                                
+
                                 $total_posts = count( $all_episodes_stats );
-                                $total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 ); 
+                                $total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 );
 
 								if( isset( $_GET['pagenum'] ) ){
-									
+
 									$pagenum = intval( $_GET['pagenum'] );
 
 									if( $pagenum <= 1){
@@ -949,13 +950,13 @@ class SSP_Stats {
 										$current_cursor = ($pagenum - 1)* $total_per_page;
 									}
 
-									$all_episodes_stats = array_slice( $all_episodes_stats, $current_cursor, $total_per_page , true );	
+									$all_episodes_stats = array_slice( $all_episodes_stats, $current_cursor, $total_per_page , true );
 
 								} else {
 
-									$all_episodes_stats = array_slice( $all_episodes_stats, 0, $total_per_page, true );	
+									$all_episodes_stats = array_slice( $all_episodes_stats, 0, $total_per_page, true );
 
-								}								
+								}
 
 								//Display the data
 								foreach( $all_episodes_stats as $ep ){
@@ -982,7 +983,7 @@ class SSP_Stats {
 							//Only show page links if there's more than 25 episodes in the table
 							$pagination_html = "";
 							if( $total_posts >= $total_per_page ){
-								
+
 								if( isset( $_GET['pagenum'] ) ){
 									$pagenum = intval( $_GET['pagenum'] );
 								} else {
@@ -1011,12 +1012,12 @@ class SSP_Stats {
 								$pagination_html .= '			<span id="table-paging" class="paging-input"><span class="tablenav-paging-text">'.$pagenum.' of <span class="total-pages">'.$total_pages.'</span> </span>';
 
 								$next_page = $pagenum + 1;
-								
+
 								if( $next_page <= $total_pages ){
-									$pagination_html .= '		<a class="next-page table-paging"" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$next_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Next page', 'seriously-simple-stats').'</span><span aria-hidden="true">»</span></a>';	
+									$pagination_html .= '		<a class="next-page table-paging"" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$next_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Next page', 'seriously-simple-stats').'</span><span aria-hidden="true">»</span></a>';
 								}
 								$pagination_html .= "		</span>&nbsp;" . "\n";
-								$pagination_html .= "	</div>" . "\n";	
+								$pagination_html .= "	</div>" . "\n";
 								$pagination_html .= "</div>" . "\n";
 							}
 
@@ -1171,7 +1172,7 @@ class SSP_Stats {
 		$data = array();
 
 		foreach( $date_data as $date => $listens ){
-			$data[] = array( $date, $listens );	
+			$data[] = array( $date, $listens );
 		}
 
 		return $this->generate_chart( 'LineChart', '', $columns, $data, 'weekly_listens', 250 );
@@ -1525,7 +1526,7 @@ class SSP_Stats {
 
 		$html = "";
 
-		$html .= "<div class='wrap dashboard_widget_podcast_settings' id='podcast_settings'>";		
+		$html .= "<div class='wrap dashboard_widget_podcast_settings' id='podcast_settings'>";
 
 		// Count total entries for episode selection
 		$count_entries_sql = "SELECT COUNT(id) FROM $this->_table";
@@ -1542,7 +1543,7 @@ class SSP_Stats {
 					$html .= '<p>' . __( 'No stats yet!', 'seriously-simple-stats' ) . '</p>' . "\n";
 				$html .= '</div>' . "\n";
 			$html .= '</div>' . "\n";
-		} else {			
+		} else {
 
 			$html .= "<div id='weekly_listens'></div>";
 
@@ -1577,7 +1578,7 @@ class SSP_Stats {
 
 				$html .= '</div>' . "\n";
 			$html .= '</div>' . "\n";
-            
+
             $html .= '<p class="ssp_dashboard_more"><a class="button" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats").'">'.__('View All Data', 'seriously-simple-stats')."</a></p>";
 
 		}
