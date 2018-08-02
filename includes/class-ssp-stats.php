@@ -791,17 +791,10 @@ class SSP_Stats {
 							if( ! $listens_last_week ) {
 								$week_diff = '-';
 							} else {
-								$week_diff = ( $listens_this_week / $listens_last_week ) * 100;
+								$week_diff = ( ( $listens_this_week - $listens_last_week ) / $listens_last_week ) * 100;
 								$week_diff = round( $week_diff, 1 );
-								if( $week_diff < 100 ) {
-									$week_diff = '-' . ( 100 - $week_diff ) . '%';
-								} elseif( $week_diff > 100 ) {
-									$week_diff = '+' . ( $week_diff - 100 ) . '%';
-								} else {
-									$week_diff = '0%';
-								}
 							}
-							$html .= $this->daily_stat( $week_diff, __( 'Change from last week', 'seriously-simple-stats' ) );
+							$html .= $this->daily_stat( $week_diff . '%', __( 'Change from last week', 'seriously-simple-stats' ) );
 
 							$html .= '<br class="clear" />';
 
