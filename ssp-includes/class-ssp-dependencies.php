@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SSP Dependency Checker
  *
@@ -23,10 +24,10 @@ class SSP_Dependencies {
 			self::init();
 		}
 
-		if( in_array( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins ) || array_key_exists( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins ) ) {
-			if( $minimum_version ) {
+		if ( in_array( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins, true ) || array_key_exists( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins ) ) {
+			if ( $minimum_version ) {
 				$ssp_version = get_option( 'ssp_version', '1.0' );
-				if( version_compare( $ssp_version, $minimum_version, '>=' ) ) {
+				if ( version_compare( $ssp_version, $minimum_version, '>=' ) ) {
 					return true;
 				}
 			} else {
