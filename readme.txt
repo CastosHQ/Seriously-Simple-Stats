@@ -1,9 +1,9 @@
 === Seriously Simple Stats ===
-Contributors: PodcastMotor, psykro, simondowdles, hlashbrooke, seriouspodcaster
+Contributors: PodcastMotor, psykro, simondowdles, hlashbrooke, seriouspodcaster, lajala
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
 Requires at least: 4.4
 Tested up to: 4.8.2
-Stable tag: 1.2.1
+Stable tag: 1.3.0-beta
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,15 @@ Note that Stitcher download stats are not currently possible to gather accuratel
 Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-Detect) library to make sure that crawlers/bots are not recorded as listens.
 
 == Changelog ==
+
+= 1.3.0-beta=
+* [NEW] Added support for download tracking through Google Analytics events
+* [NEW] Added support for Podtrac download tracking
+* [NEW] Added stats tab on the Seriously Simple Podcasting options page
+* [FIX] Addressed errors in logging Podtrac and Google Analytics tracking
+* [FIX] Addressed errors on stats overview page due to changes in episode status
+* [TWEAK] Improved logging of downloads by catching and eliminating Google Podcast and iTunes Music Store bots
+* [TWEAK] Smoothed display of the dashboard widget styles
 
 = 1.2.2 =
 * 2018-05-28
