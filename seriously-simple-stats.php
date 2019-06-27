@@ -25,16 +25,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once 'vendor/autoload.php';
+
 define( 'SSP_STATS_VERSION', '1.2.2' );
 
 if ( ! function_exists( 'is_ssp_active' ) ) {
-	require_once( 'ssp-includes/ssp-functions.php' );
+	require_once 'ssp-includes/ssp-functions.php';
 }
 
 if ( is_ssp_active( '1.13.1' ) ) {
 
 	// Load plugin class files
-	require_once( 'includes/class-ssp-stats.php' );
+	require_once 'includes/class-ssp-stats.php';
 
 	/**
 	 * Returns the main instance of SSP_Stats to prevent the need to use globals.
