@@ -78,6 +78,10 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 
 == Changelog ==
 
+= 1.2.3 =
+* 2018-06-27
+* [FIX] Updated the CrawlerDetect library
+
 = 1.2.2 =
 * 2018-05-28
 * [FIX] Fixed a bug introduced in the 1.2.1 update
