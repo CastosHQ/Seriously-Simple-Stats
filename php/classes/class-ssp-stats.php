@@ -782,6 +782,8 @@ class Stats {
 
 		}
 
+		// @todo move this into the stats-all-episodes partial as well
+        
 		//Only show page links if there's more than 25 episodes in the table
 		$pagination_html = "";
 		if( $total_posts >= $total_per_page ){
