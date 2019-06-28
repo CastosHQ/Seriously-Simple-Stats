@@ -25,5 +25,8 @@
 
     "require": {
         "jaybizzle/crawler-detect": "1.*"
+    },
+    "autoload"   : {
+        "classmap": ["php/"]
     }
 }

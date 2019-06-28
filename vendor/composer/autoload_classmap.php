@@ -6,4 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'SeriouslySimpleStats\\Classes\\Stats' => $baseDir . '/php/classes/class-ssp-stats.php',
+    'SeriouslySimpleStats\\Classes\\Stats_Hit' => $baseDir . '/php/classes/class-ssp-stats-hit.php',
 );

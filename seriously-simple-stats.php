@@ -25,6 +25,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use SeriouslySimpleStats\Classes\Stats;
+use SeriouslySimpleStats\Classes\Stats_Hit;
+
 require_once 'vendor/autoload.php';
 
 define( 'SSP_STATS_VERSION', '1.2.3' );
@@ -34,22 +37,6 @@ if ( ! function_exists( 'is_ssp_active' ) ) {
 }
 
 if ( is_ssp_active( '1.13.1' ) ) {
-
-	// Load plugin class files
-	require_once 'includes/class-ssp-stats.php';
-
-	/**
-	 * Returns the main instance of SSP_Stats to prevent the need to use globals.
-	 *
-	 * @since  1.0.0
-	 * @return object SSP_Stats
-	 */
-	function SSP_Stats() {
-		$instance = SSP_Stats::instance( __FILE__, SSP_STATS_VERSION, '1.0.0' );
-
-		return $instance;
-	}
-
-	SSP_Stats();
-
+	$ssp_stats     = Stats::instance( __FILE__, SSP_STATS_VERSION, '1.0.0' );
+	$ssp_stats_hit = Stats_Hit::instance( SSP_STATS_VERSION );
 }

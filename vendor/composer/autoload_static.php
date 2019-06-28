@@ -20,11 +20,17 @@ class ComposerStaticInit29d45b4732829c4d4fb553f9c1fc539c
         ),
     );
 
+    public static $classMap = array (
+        'SeriouslySimpleStats\\Classes\\Stats' => __DIR__ . '/../..' . '/php/classes/class-ssp-stats.php',
+        'SeriouslySimpleStats\\Classes\\Stats_Hit' => __DIR__ . '/../..' . '/php/classes/class-ssp-stats-hit.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit29d45b4732829c4d4fb553f9c1fc539c::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit29d45b4732829c4d4fb553f9c1fc539c::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit29d45b4732829c4d4fb553f9c1fc539c::$classMap;
 
         }, null, ClassLoader::class);
     }
