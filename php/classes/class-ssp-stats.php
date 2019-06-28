@@ -157,53 +157,38 @@ class Stats {
 	 * @access  public
 	 * @since   1.0.0
 	 */
-	public function __construct ( $file = '', $version = '1.0.0', $db_version = '1.0.0' ) {
+	public function __construct( $file = '', $version = '1.0.0', $db_version = '1.0.0' ) {
+		$this->bootstrap( $file, $version, $db_version );
+		$this->set_filters();
+	} // End __construct ()
+
+	/**
+	 * Set up plugin parameters and action/filter hooks
+	 *
+	 * @param $file
+	 * @param $version
+	 * @param $db_version
+	 */
+	public function bootstrap( $file, $version, $db_version ) {
 		global $wpdb;
 
 		// Load plugin constants
-		$this->_version = $version;
+		$this->_version    = $version;
 		$this->_db_version = $db_version;
-		$this->_token = 'ssp_stats';
-		$this->_table = $wpdb->prefix . $this->_token;
+		$this->_token      = 'ssp_stats';
+		$this->_table      = $wpdb->prefix . $this->_token;
 
 		// Load plugin environment variables
-		$this->file = $file;
-		$this->dir = dirname( $this->file );
-		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
-		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
+		$this->file          = $file;
+		$this->dir           = dirname( $this->file );
+		$this->assets_dir    = trailingslashit( $this->dir ) . 'assets';
+		$this->assets_url    = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
 		$this->script_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		// Set current time based on WordPress time zone settings
 		$this->current_time = current_time( 'timestamp' );
 
-		// Set start date for charts
-		if( isset( $_GET['start'] ) ) {
-			$this->start_date = strtotime( sanitize_text_field( $_GET['start'] ) );
-		} else {
-			$this->start_date = strtotime( '1 month ago', $this->current_time );
-		}
-
-		// Set end date for charts
-		if( isset( $_GET['end'] ) ) {
-			$this->end_date = strtotime( date( 'Y-m-d 23:59:59', strtotime( sanitize_text_field( $_GET['end'] ) ) ) );
-		} else {
-			$this->end_date = $this->current_time;
-		}
-
-		// Set series selection for charts
-		if( isset( $_GET['series'] ) ) {
-			$this->series = sanitize_text_field( $_GET['series'] );
-		}
-
-		// Set episode selection for charts
-		if( isset( $_GET['episode'] ) ) {
-			$this->episode = sanitize_text_field( $_GET['episode'] );
-		}
-
-		// Set filter selection for charts
-		if( isset( $_GET['filter'] ) ) {
-			$this->filter = sanitize_text_field( $_GET['filter'] );
-		}
+		$this->stats_hit = new Stats_Hit( $this->_version );
 
 		register_activation_hook( $this->file, array( $this, 'install' ) );
 
@@ -219,13 +204,11 @@ class Stats {
 		// Anonymise the IP address details stored in the database
 		add_action( 'admin_init', array( $this, 'maybe_update_stats_data' ), 11 );
 
-
-
 		// Add stats meta box to episodes edit screen
 		add_action( 'ssp_meta_boxes', array( $this, 'post_meta_box' ), 10, 1 );
 
 		// Add menu item
-		add_action( 'admin_menu', array( $this , 'add_menu_item' ) );
+		add_action( 'admin_menu', array( $this, 'add_menu_item' ) );
 
 		// Load necessary javascript for charts
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
@@ -239,9 +222,42 @@ class Stats {
 
 		// Add dashboard widget
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget' ), 1 );
+	}
 
-	} // End __construct ()
+	public function set_filters() {
+		// Set start date for charts
+		if ( isset( $_GET['start'] ) ) {
+			$this->start_date = strtotime( sanitize_text_field( $_GET['start'] ) );
+		} else {
+			$this->start_date = strtotime( '1 month ago', $this->current_time );
+		}
 
+		// Set end date for charts
+		if ( isset( $_GET['end'] ) ) {
+			$this->end_date = strtotime( date( 'Y-m-d 23:59:59', strtotime( sanitize_text_field( $_GET['end'] ) ) ) );
+		} else {
+			$this->end_date = $this->current_time;
+		}
+
+		// Set series selection for charts
+		if ( isset( $_GET['series'] ) ) {
+			$this->series = sanitize_text_field( $_GET['series'] );
+		}
+
+		// Set episode selection for charts
+		if ( isset( $_GET['episode'] ) ) {
+			$this->episode = sanitize_text_field( $_GET['episode'] );
+		}
+
+		// Set filter selection for charts
+		if ( isset( $_GET['filter'] ) ) {
+			$this->filter = sanitize_text_field( $_GET['filter'] );
+		}
+	}
+
+	/**
+	 * Load episode ids for stats
+	 */
 	public function load_episode_ids () {
 
 		switch( $this->filter ) {
@@ -272,7 +288,14 @@ class Stats {
 	}
 
 
-
+	/**
+	 * Get the stats data from the database table
+	 *
+	 * @param int $episode_id
+	 * @param string $fields
+	 *
+	 * @return array|object|void|null
+	 */
 	public function get_episode_stats ( $episode_id = 0, $fields = '*' ) {
 		global $wpdb;
 

@@ -11,22 +11,6 @@ use Jaybizzle\CrawlerDetect\CrawlerDetect;
 class Stats_Hit {
 
 	/**
-	 * The single instance of SSP_Stats_Hit.
-	 * @var    object
-	 * @access  private
-	 * @since    1.2.3
-	 */
-	private static $_instance = null;
-
-	/**
-	 * The version number.
-	 * @var     string
-	 * @access  public
-	 * @since   1.2.3
-	 */
-	public $_version;
-
-	/**
 	 * The token.
 	 * @var     string
 	 * @access  public
@@ -49,17 +33,16 @@ class Stats_Hit {
 	 */
 	public $current_time;
 
-	public function __construct( $version = '1.0.0' ) {
-		$this->bootstrap( $version );
+	public function __construct() {
+		$this->bootstrap();
 	}
 
 	/**
 	 * Set up any required class parameters or action/filter hooks
 	 */
-	public function bootstrap( $version ) {
+	public function bootstrap() {
 		global $wpdb;
 
-		$this->_version = $version;
 		$this->_token = 'ssp_stats';
 		$this->_table = $wpdb->prefix . $this->_token;
 
@@ -215,41 +198,5 @@ class Stats_Hit {
 		}
 
 	}
-
-	/**
-	 * Main SSP_Stats_Hit Instance
-	 *
-	 * Ensures only one instance of SSP_Stats_Hit is loaded or can be loaded.
-	 *
-	 * @return Main SSP_Stats_Hit instance
-	 * @see SSP_Stats()
-	 * @since 1.0.0
-	 * @static
-	 */
-	public static function instance( $version = '1.0.0' ) {
-		if ( is_null( self::$_instance ) ) {
-			self::$_instance = new self( $version );
-		}
-
-		return self::$_instance;
-	} // End instance ()
-
-	/**
-	 * Cloning is forbidden.
-	 *
-	 * @since 1.0.0
-	 */
-	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?' ), $this->_version );
-	} // End __clone ()
-
-	/**
-	 * Unserializing instances of this class is forbidden.
-	 *
-	 * @since 1.0.0
-	 */
-	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?' ), $this->_version );
-	} // End __wakeup ()
 
 }

@@ -26,7 +26,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use SeriouslySimpleStats\Classes\Stats;
-use SeriouslySimpleStats\Classes\Stats_Hit;
 
 require_once 'vendor/autoload.php';
 
@@ -37,6 +36,19 @@ if ( ! function_exists( 'is_ssp_active' ) ) {
 }
 
 if ( is_ssp_active( '1.13.1' ) ) {
-	$ssp_stats     = Stats::instance( __FILE__, SSP_STATS_VERSION, '1.0.0' );
-	$ssp_stats_hit = Stats_Hit::instance( SSP_STATS_VERSION );
+
+	/**
+	 * Returns the main instance of SSP_Stats to prevent the need to use globals.
+	 *
+	 * @return Object Stats
+	 * @since  1.0.0
+	 */
+	function SSP_Stats() {
+		$ssp_stats = Stats::instance( __FILE__, SSP_STATS_VERSION, '1.0.0' );
+
+		return $ssp_stats;
+	}
+
+	SSP_Stats();
+
 }
