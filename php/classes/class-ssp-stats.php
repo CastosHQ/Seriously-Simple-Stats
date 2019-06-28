@@ -224,6 +224,9 @@ class Stats {
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget' ), 1 );
 	}
 
+	/**
+	 * Sets up some filters based on GET vars
+	 */
 	public function set_filters() {
 		// Set start date for charts
 		if ( isset( $_GET['start'] ) ) {
@@ -312,10 +315,20 @@ class Stats {
 		return $results;
 	}
 
+	/**
+	 * Adds the stats meta box to posts
+	 *
+	 * @param $post
+	 */
 	public function post_meta_box ( $post ) {
 		add_meta_box( 'podcast-episode-stats', __( 'Episode Stats' , 'seriously-simple-stats' ), array( $this, 'stats_meta_box_content' ), $post->post_type, 'side', 'low' );
 	}
 
+	/**
+	 * Renders the Stats meta box content
+	 *
+	 * @param $post
+	 */
 	public function stats_meta_box_content ( $post ) {
 
 		if( ! isset( $post->ID ) ) {
@@ -644,173 +657,7 @@ class Stats {
 					$html .= '</div>' . "\n";
 
 					//Displays all episodes, 25 per page
-					$html .= '<div class="postbox" id="last-three-months-container">' . "\n";
-						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
-
-			    			$html .= '<span>' . __( 'All Episodes for the Last Three Months', 'seriously-simple-stats' ) . '</span>' . "\n";
-						$html .= '</' . $metabox_title . '>' . "\n";
-						$html .= '<div class="inside">' . "\n";
-
-							$all_episodes_stats = array();
-
-							$this->start_date = strtotime( current_time('Y-m-d').' -2 MONTH' );
-
-							$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id";
-
-							$results = $wpdb->get_results( $sql );
-
-							$total_posts = count( $results );
-
-							if( is_array( $results ) ){
-
-								foreach( $results as $result ){
-
-									// Define the previous three months array keys
-									$total_listens_array = array(
-										intval( current_time( 'm' ) ) => 0,
-										intval( date( 'm', strtotime( current_time('Y-m-d').' -1 MONTH' ) ) ) => 0,
-										intval( date( 'm', strtotime( current_time('Y-m-d').' -2 MONTH' ) ) ) => 0
-									);
-
-									$post = get_post( intval( $result->post_id ) );
-
-									if ( ! $post ) {
-										continue;
-									}
-
-									$sql = "SELECT `date` FROM $this->_table WHERE `post_id` = '".$result->post_id."'";
-
-									$episode_results = $wpdb->get_results( $sql );
-
-									$lifetime_count = count( $episode_results );
-
-									foreach( $episode_results as $ref ) {
-										//Increase the count of listens per month
-										if( isset( $total_listens_array[intval( date('m', intval( $ref->date ) ) )] ) )
-											++$total_listens_array[intval( date('m', intval( $ref->date ) ) )];
-									}
-
-									$all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
-										'episode_name' => $post->post_title,
-										'date' => date( 'm-d-Y', strtotime( $post->post_date ) ),
-										'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
-										'listens' => $lifetime_count,
-										'listens_array' => $total_listens_array,
-									) );
-
-								}
-
-							}
-
-							//24 because we're counting an array
-							$total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 );
-
-							$html .= "<table class='form-table striped'>" . "\n";
-							$html .= "	<thead>" . "\n";
-							$html .= "		<tr>" . "\n";
-							$html .= "			<td>".__('Publish Date', 'seriously-simple-stats')."</td>" . "\n";
-							$html .= "			<td>".__('Episode Name', 'seriously-simple-stats')."</td>" . "\n";
-							$html .= "			<td style='text-align: center;'>".current_time('F')."</a></td>" . "\n";
-							$html .= "			<td style='text-align: center;'>".date('F', strtotime( current_time("Y-m-d")." -1 MONTH" ) )."</td>" . "\n";
-							$html .= "			<td style='text-align: center;'>".date('F', strtotime( current_time("Y-m-d")." -2 MONTH" ) )."</td>" . "\n";
-							$html .= "			<td style='text-align: center;' class='ssp_stats_3m_total'>".__('Lifetime', 'seriously-simple-stats')."</td>" . "\n";
-							$html .= "		</tr>" . "\n";
-							$html .= "	</thead>" . "\n";
-
-							if( !empty( $all_episodes_stats ) && is_array( $all_episodes_stats ) ){
-
-								//Sort list by episode name
-								foreach( $all_episodes_stats as $listen ){
-									$listen_sorting[] = $listen['episode_name'];
-								}
-
-								array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
-
-								if( isset( $_GET['pagenum'] ) ){
-
-									$pagenum = intval( $_GET['pagenum'] );
-
-									if( $pagenum <= 1){
-										$current_cursor = 0;
-									} else {
-										$current_cursor = ($pagenum - 1)* $total_per_page;
-									}
-
-									$all_episodes_stats = array_slice( $all_episodes_stats, $current_cursor, $total_per_page , true );
-
-								} else {
-
-									$all_episodes_stats = array_slice( $all_episodes_stats, 0, $total_per_page, true );
-
-								}
-
-								//Display the data
-								foreach( $all_episodes_stats as $ep ){
-
-									$html .= "<tr>" . "\n";
-									$html .= "	<td>".$ep['date']."</td>" . "\n";
-									$html .= "	<td><a href='".$ep['slug']."'>".$ep['episode_name']."</a></td>" . "\n";
-									if( isset( $ep['listens_array'] ) ){
-										foreach( $ep['listens_array'] as $listen ){
-											//Each months total listens
-											$html .= "<td style='text-align: center;'>".$listen."</td>" . "\n";
-										}
-									}
-									//Total Listen Count
-									$html .= "	<td style='text-align: center;' class='ssp_stats_3m_total'>".$ep['listens']."</td>" . "\n";
-									$html .= "</tr>" . "\n";
-
-								}
-
-							}
-
-							$html .= "</table>";
-
-							//Only show page links if there's more than 25 episodes in the table
-							$pagination_html = "";
-							if( $total_posts >= $total_per_page ){
-
-								if( isset( $_GET['pagenum'] ) ){
-									$pagenum = intval( $_GET['pagenum'] );
-								} else {
-									$pagenum = 1;
-								}
-
-								$total_pages = ceil($total_posts/$total_per_page);
-
-								$pagination_html .= "<div class='tablenav bottom'>" . "\n";
-								$pagination_html .= '	<div class="tablenav-pages">' . "\n";
-								$pagination_html .= '		<span class="displaying-num">'.$total_posts.' '.__('items', 'seriously-simple-stats').'</span>' . "\n";
-
-								$prev_page = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
-
-								$order_by = isset( $_GET['orderby'] ) ? '&orderby='.sanitize_text_field( $_GET['orderby'] ) : "";
-
-								$order = isset( $_GET['order'] ) ? '&order='.sanitize_text_field( $_GET['order'] ) : "";
-
-								$month_num = isset( $_GET['month_num'] ) ? '&month_num='.sanitize_text_field( $_GET['month_num'] ) : "";
-
-								$pagination_html .= "		<span class='pagination-links'>";
-								if( $pagenum != 1 ){
-									$pagination_html .= '		<a class="next-page" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$prev_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Previous page', 'seriously-simple-stats').'</span><span aria-hidden="true">«</span></a>';
-								}
-
-								$pagination_html .= '			<span id="table-paging" class="paging-input"><span class="tablenav-paging-text">'.$pagenum.' of <span class="total-pages">'.$total_pages.'</span> </span>';
-
-								$next_page = $pagenum + 1;
-
-								if( $next_page <= $total_pages ){
-									$pagination_html .= '		<a class="next-page table-paging"" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$next_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Next page', 'seriously-simple-stats').'</span><span aria-hidden="true">»</span></a>';
-								}
-								$pagination_html .= "		</span>&nbsp;" . "\n";
-								$pagination_html .= "	</div>" . "\n";
-								$pagination_html .= "</div>" . "\n";
-							}
-
-							$html .= $pagination_html;
-
-						$html .= '</div>' . "\n";
-					$html .= '</div>' . "\n";
+					$html = $this->render_all_episodes_stats();
 
 					$html .= '<div class="postbox" id="top-ten-container">' . "\n";
 						$html .= '<' . $metabox_title . ' class="hndle ui-sortable-handle">' . "\n";
@@ -846,6 +693,139 @@ class Stats {
 		$wpdb->flush();
 
 		echo $html;
+	}
+
+	private function render_all_episodes_stats(){
+
+		global $wpdb;
+
+		$all_episodes_stats = array();
+
+		$this->start_date = strtotime( current_time('Y-m-d').' -2 MONTH' );
+
+		$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id";
+
+		$results = $wpdb->get_results( $sql );
+
+		$total_posts = count( $results );
+
+		if( is_array( $results ) ){
+
+			foreach( $results as $result ){
+
+				// Define the previous three months array keys
+				$total_listens_array = array(
+					intval( current_time( 'm' ) ) => 0,
+					intval( date( 'm', strtotime( current_time('Y-m-d').' -1 MONTH' ) ) ) => 0,
+					intval( date( 'm', strtotime( current_time('Y-m-d').' -2 MONTH' ) ) ) => 0
+				);
+
+				$post = get_post( intval( $result->post_id ) );
+
+				if ( ! $post ) {
+					continue;
+				}
+
+				$sql = "SELECT `date` FROM $this->_table WHERE `post_id` = '".$result->post_id."'";
+
+				$episode_results = $wpdb->get_results( $sql );
+
+				$lifetime_count = count( $episode_results );
+
+				foreach( $episode_results as $ref ) {
+					//Increase the count of listens per month
+					if( isset( $total_listens_array[intval( date('m', intval( $ref->date ) ) )] ) )
+						++$total_listens_array[intval( date('m', intval( $ref->date ) ) )];
+				}
+
+				$all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
+					'episode_name' => $post->post_title,
+					'date' => date( 'm-d-Y', strtotime( $post->post_date ) ),
+					'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
+					'listens' => $lifetime_count,
+					'listens_array' => $total_listens_array,
+				) );
+
+			}
+
+		}
+
+		//24 because we're counting an array
+		$total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 );
+
+		if( !empty( $all_episodes_stats ) && is_array( $all_episodes_stats ) ){
+
+			//Sort list by episode name
+			foreach( $all_episodes_stats as $listen ){
+				$listen_sorting[] = $listen['episode_name'];
+			}
+
+			array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
+
+			if( isset( $_GET['pagenum'] ) ){
+
+				$pagenum = intval( $_GET['pagenum'] );
+
+				if( $pagenum <= 1){
+					$current_cursor = 0;
+				} else {
+					$current_cursor = ($pagenum - 1)* $total_per_page;
+				}
+
+				$all_episodes_stats = array_slice( $all_episodes_stats, $current_cursor, $total_per_page , true );
+
+			} else {
+
+				$all_episodes_stats = array_slice( $all_episodes_stats, 0, $total_per_page, true );
+
+			}
+
+		}
+
+		//Only show page links if there's more than 25 episodes in the table
+		$pagination_html = "";
+		if( $total_posts >= $total_per_page ){
+
+			if( isset( $_GET['pagenum'] ) ){
+				$pagenum = intval( $_GET['pagenum'] );
+			} else {
+				$pagenum = 1;
+			}
+
+			$total_pages = ceil($total_posts/$total_per_page);
+
+			$pagination_html .= "<div class='tablenav bottom'>" . "\n";
+			$pagination_html .= '	<div class="tablenav-pages">' . "\n";
+			$pagination_html .= '		<span class="displaying-num">'.$total_posts.' '.__('items', 'seriously-simple-stats').'</span>' . "\n";
+
+			$prev_page = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
+
+			$order_by = isset( $_GET['orderby'] ) ? '&orderby='.sanitize_text_field( $_GET['orderby'] ) : "";
+
+			$order = isset( $_GET['order'] ) ? '&order='.sanitize_text_field( $_GET['order'] ) : "";
+
+			$month_num = isset( $_GET['month_num'] ) ? '&month_num='.sanitize_text_field( $_GET['month_num'] ) : "";
+
+			$pagination_html .= "		<span class='pagination-links'>";
+			if( $pagenum != 1 ){
+				$pagination_html .= '		<a class="next-page" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$prev_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Previous page', 'seriously-simple-stats').'</span><span aria-hidden="true">«</span></a>';
+			}
+
+			$pagination_html .= '			<span id="table-paging" class="paging-input"><span class="tablenav-paging-text">'.$pagenum.' of <span class="total-pages">'.$total_pages.'</span> </span>';
+
+			$next_page = $pagenum + 1;
+
+			if( $next_page <= $total_pages ){
+				$pagination_html .= '		<a class="next-page table-paging"" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$next_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Next page', 'seriously-simple-stats').'</span><span aria-hidden="true">»</span></a>';
+			}
+			$pagination_html .= "		</span>&nbsp;" . "\n";
+			$pagination_html .= "	</div>" . "\n";
+			$pagination_html .= "</div>" . "\n";
+		}
+
+		$html .= $pagination_html;
+
+		return $html;
 	}
 
 	private function daily_stat ( $number = '', $description = '' ) {
