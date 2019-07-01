@@ -6,12 +6,17 @@
 		<table class='form-table striped'>
 			<thead>
 			<tr>
-				<td><?php echo __( 'Publish Date', 'seriously-simple-stats' ); ?></td>
-				<td><?php echo __( 'Episode Name', 'seriously-simple-stats' ); ?></td>
-				<td style='text-align: center;'><?php echo current_time( 'F' ); ?></a></td>
-				<td style='text-align: center;'><?php echo date( 'F', strtotime( current_time( "Y-m-d" ) . '-1 MONTH' ) ); ?></td>
-				<td style='text-align: center;'><?php echo date( 'F', strtotime( current_time( "Y-m-d" ) . '-2 MONTH' ) ); ?></td>
-				<td style='text-align: center;' class='ssp_stats_3m_total'><?php echo __( 'Lifetime', 'seriously-simple-stats' ); ?></td>
+				<th class="sortable desc">
+					<a href="#">
+						<span><?php echo __( 'Publish Date', 'seriously-simple-stats' ); ?></span>
+						<span class="sorting-indicator"></span>
+					</a>
+				</th>
+				<th><?php echo __( 'Episode Name', 'seriously-simple-stats' ); ?></th>
+				<th style='text-align: center;'><?php echo current_time( 'F' ); ?></a></th>
+				<th style='text-align: center;'><?php echo date( 'F', strtotime( current_time( "Y-m-d" ) . '-1 MONTH' ) ); ?></th>
+				<th style='text-align: center;'><?php echo date( 'F', strtotime( current_time( "Y-m-d" ) . '-2 MONTH' ) ); ?></th>
+				<th style='text-align: center;' class='ssp_stats_3m_total'><?php echo __( 'Lifetime', 'seriously-simple-stats' ); ?></th>
 			</tr>
 			</thead>
 			<?php foreach ( $all_episodes_stats as $episode ) { ?>
