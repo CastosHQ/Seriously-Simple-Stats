@@ -782,50 +782,29 @@ class Stats {
 
 		}
 
-		// @todo move this into the stats-all-episodes partial as well
-        
-		//Only show page links if there's more than 25 episodes in the table
-		$pagination_html = "";
-		if( $total_posts >= $total_per_page ){
+		$html = '';
+		ob_start();
+		require_once 'partials/stats-all-episodes.php';
+		$html = ob_get_clean();
 
-			if( isset( $_GET['pagenum'] ) ){
+		//Only show page links if there's more than 25 episodes in the table
+		if ( $total_posts >= $total_per_page ) {
+			if ( isset( $_GET['pagenum'] ) ) {
 				$pagenum = intval( $_GET['pagenum'] );
 			} else {
 				$pagenum = 1;
 			}
-
-			$total_pages = ceil($total_posts/$total_per_page);
-
-			$pagination_html .= "<div class='tablenav bottom'>" . "\n";
-			$pagination_html .= '	<div class="tablenav-pages">' . "\n";
-			$pagination_html .= '		<span class="displaying-num">'.$total_posts.' '.__('items', 'seriously-simple-stats').'</span>' . "\n";
-
-			$prev_page = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
-
-			$order_by = isset( $_GET['orderby'] ) ? '&orderby='.sanitize_text_field( $_GET['orderby'] ) : "";
-
-			$order = isset( $_GET['order'] ) ? '&order='.sanitize_text_field( $_GET['order'] ) : "";
-
-			$month_num = isset( $_GET['month_num'] ) ? '&month_num='.sanitize_text_field( $_GET['month_num'] ) : "";
-
-			$pagination_html .= "		<span class='pagination-links'>";
-			if( $pagenum != 1 ){
-				$pagination_html .= '		<a class="next-page" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$prev_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Previous page', 'seriously-simple-stats').'</span><span aria-hidden="true">«</span></a>';
-			}
-
-			$pagination_html .= '			<span id="table-paging" class="paging-input"><span class="tablenav-paging-text">'.$pagenum.' of <span class="total-pages">'.$total_pages.'</span> </span>';
-
-			$next_page = $pagenum + 1;
-
-			if( $next_page <= $total_pages ){
-				$pagination_html .= '		<a class="next-page table-paging"" href="'.admin_url("edit.php?post_type=podcast&page=podcast_stats".$order_by.$month_num.$order."&pagenum=".$next_page."#last-three-months-container" ).'"><span class="screen-reader-text">'.__('Next page', 'seriously-simple-stats').'</span><span aria-hidden="true">»</span></a>';
-			}
-			$pagination_html .= "		</span>&nbsp;" . "\n";
-			$pagination_html .= "	</div>" . "\n";
-			$pagination_html .= "</div>" . "\n";
+			$total_pages   = ceil( $total_posts / $total_per_page );
+			$prev_page     = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
+			$order_by      = isset( $_GET['orderby'] ) ? '&orderby=' . sanitize_text_field( $_GET['orderby'] ) : "";
+			$order         = isset( $_GET['order'] ) ? '&order=' . sanitize_text_field( $_GET['order'] ) : "";
+			$month_num     = isset( $_GET['month_num'] ) ? '&month_num=' . sanitize_text_field( $_GET['month_num'] ) : "";
+			$next_page_url = admin_url( "edit.php?post_type=podcast&page=podcast_stats" . $order_by . $month_num . $order . "&pagenum=" . $prev_page . "#last-three-months-container" );
+			$next_page     = $pagenum + 1;
+			ob_start();
+			require_once 'partials/stats-all-episodes-pagination.php';
+			$html .= ob_get_clean();
 		}
-
-		$html .= $pagination_html;
 
 		return $html;
 	}
