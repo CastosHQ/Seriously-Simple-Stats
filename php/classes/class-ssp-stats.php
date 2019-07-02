@@ -705,41 +705,38 @@ class Stats {
 		global $wpdb;
 
 		$dates = array(
-            intval( current_time( 'm' ) ) => current_time( 'F' ),
-            intval( date( 'm', strtotime( current_time('Y-m-d').' -1 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-1 MONTH' ) ),
-            intval( date( 'm', strtotime( current_time('Y-m-d').' -2 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-2 MONTH' ) ),
-        );
+			intval( current_time( 'm' ) ) => current_time( 'F' ),
+			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . ' -1 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-1 MONTH' ) ),
+			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . ' -2 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-2 MONTH' ) ),
+		);
 
 		$all_episodes_stats = array();
-		$this->start_date = strtotime( current_time('Y-m-d').' -2 MONTH' );
-		$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id";
-		$results = $wpdb->get_results( $sql );
+		//$this->start_date = strtotime(current_time('Y-m-d') . ' -2 MONTH');
+		$sql         = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id";
+		$results     = $wpdb->get_results( $sql );
 		$total_posts = count( $results );
-		if( is_array( $results ) ){
-			foreach( $results as $result ){
-				// Define the previous three months array keys
-				$total_listens_array = array(
-					intval( current_time( 'm' ) ) => 0,
-					intval( date( 'm', strtotime( current_time('Y-m-d').' -1 MONTH' ) ) ) => 0,
-					intval( date( 'm', strtotime( current_time('Y-m-d').' -2 MONTH' ) ) ) => 0
-				);
-				$post = get_post( intval( $result->post_id ) );
+		if ( is_array( $results ) ) {
+			foreach ( $results as $result ) {
+				$date_keys           = array_keys( $dates );
+				$total_listens_array = array_combine( $date_keys, array( 0, 0, 0 ) );
+				$post                = get_post( intval( $result->post_id ) );
 				if ( ! $post ) {
 					continue;
 				}
-				$sql = "SELECT `date` FROM $this->_table WHERE `post_id` = '".$result->post_id."'";
+				$sql             = "SELECT `date` FROM $this->_table WHERE `post_id` = '" . $result->post_id . "'";
 				$episode_results = $wpdb->get_results( $sql );
-				$lifetime_count = count( $episode_results );
-				foreach( $episode_results as $ref ) {
+				$lifetime_count  = count( $episode_results );
+				foreach ( $episode_results as $ref ) {
 					//Increase the count of listens per month
-					if( isset( $total_listens_array[intval( date('m', intval( $ref->date ) ) )] ) )
-						++$total_listens_array[intval( date('m', intval( $ref->date ) ) )];
+					if ( isset( $total_listens_array[ intval( date( 'm', intval( $ref->date ) ) ) ] ) ) {
+						++ $total_listens_array[ intval( date( 'm', intval( $ref->date ) ) ) ];
+					}
 				}
 				$all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
-					'episode_name' => $post->post_title,
-					'date' => date( 'm-d-Y', strtotime( $post->post_date ) ),
-					'slug' => admin_url('post.php?post='.$post->ID.'&action=edit'),
-					'listens' => $lifetime_count,
+					'episode_name'  => $post->post_title,
+					'date'          => date( 'm-d-Y', strtotime( $post->post_date ) ),
+					'slug'          => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
+					'listens'       => $lifetime_count,
 					'listens_array' => $total_listens_array,
 				) );
 			}
