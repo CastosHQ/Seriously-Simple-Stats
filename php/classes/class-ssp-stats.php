@@ -704,6 +704,12 @@ class Stats {
 
 		global $wpdb;
 
+		$dates = array(
+            intval( current_time( 'm' ) ) => current_time( 'F' ),
+            intval( date( 'm', strtotime( current_time('Y-m-d').' -1 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-1 MONTH' ) ),
+            intval( date( 'm', strtotime( current_time('Y-m-d').' -2 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-2 MONTH' ) ),
+        );
+
 		$all_episodes_stats = array();
 		$this->start_date = strtotime( current_time('Y-m-d').' -2 MONTH' );
 		$sql = "SELECT COUNT(id) AS listens, post_id FROM $this->_table GROUP BY post_id";
@@ -760,6 +766,11 @@ class Stats {
 				$all_episodes_stats = array_slice( $all_episodes_stats, 0, $total_per_page, true );
 			}
 		}
+
+		$sort_order = array(
+	        'publish' => 'sortable desc',
+            'name' => 'sortable desc',
+        );
 
 		$html = '';
 		ob_start();
