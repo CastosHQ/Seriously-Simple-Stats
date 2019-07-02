@@ -6,17 +6,35 @@
 		<table class='form-table striped'>
 			<thead>
 			<tr>
-				<th class="sortable desc">
+				<th style="text-align: center;" class="<?php echo $sort_order['publish']; ?>">
 					<a href="#">
 						<span><?php echo __( 'Publish Date', 'seriously-simple-stats' ); ?></span>
 						<span class="sorting-indicator"></span>
 					</a>
 				</th>
-				<th><?php echo __( 'Episode Name', 'seriously-simple-stats' ); ?></th>
-				<th style='text-align: center;'><?php echo current_time( 'F' ); ?></a></th>
-				<th style='text-align: center;'><?php echo date( 'F', strtotime( current_time( "Y-m-d" ) . '-1 MONTH' ) ); ?></th>
-				<th style='text-align: center;'><?php echo date( 'F', strtotime( current_time( "Y-m-d" ) . '-2 MONTH' ) ); ?></th>
-				<th style='text-align: center;' class='ssp_stats_3m_total'><?php echo __( 'Lifetime', 'seriously-simple-stats' ); ?></th>
+				<th style="text-align: center;" class="<?php echo $sort_order['name']; ?>">
+					<a href="#">
+						<span><?php echo __( 'Episode Name', 'seriously-simple-stats' ); ?></span>
+						<span class="sorting-indicator"></span>
+					</a>
+				</th>
+
+				<?php foreach ( $this->dates as $date ) { ?>
+					<th style="text-align: center;" class="<?php echo $sort_order[ $date ]; ?>">
+						<a href="#">
+							<span><?php echo __( $date, 'seriously-simple-stats' ); ?></span>
+							<span class="sorting-indicator"></span>
+						</a>
+					</th>
+				<?php } ?>
+
+				<th style="text-align: center;" class="ssp_stats_3m_total <?php echo $sort_order['lifetime']; ?>">
+					<a href="#">
+						<span><?php echo __( 'Lifetime', 'seriously-simple-stats' ); ?></span>
+						<span class="sorting-indicator"></span>
+					</a>
+				</th>
+
 			</tr>
 			</thead>
 			<?php foreach ( $all_episodes_stats as $episode ) { ?>
