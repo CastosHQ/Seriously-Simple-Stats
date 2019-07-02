@@ -12,7 +12,7 @@
 						<span class="sorting-indicator"></span>
 					</a>
 				</th>
-				<th style="text-align: center;" class="<?php echo $sort_order['name']; ?>">
+				<th style="text-align: center; width: 50%;" class="<?php echo $sort_order['name']; ?>">
 					<a href="#">
 						<span><?php echo __( 'Episode Name', 'seriously-simple-stats' ); ?></span>
 						<span class="sorting-indicator"></span>
@@ -40,7 +40,7 @@
 			<?php foreach ( $all_episodes_stats as $episode ) { ?>
 				<tr>
 					<td><?php echo $episode['date']; ?></td>
-					<td><a href='<?php echo $episode['slug']; ?>'><?php echo $episode['episode_name']; ?></a></td>
+					<td style="width: 50%;"><a href='<?php echo $episode['slug']; ?>'><?php echo $episode['episode_name']; ?></a></td>
 					<?php
 					if ( isset( $episode['listens_array'] ) ) {
 						foreach ( $episode['listens_array'] as $listen ) {

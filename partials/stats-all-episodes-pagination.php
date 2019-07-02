@@ -1,6 +1,6 @@
 <div class='tablenav bottom'>
 	<div class="tablenav-pages">
-		<span class="displaying-num"><?php echo $total_posts . ' ' . __( 'items', 'seriously-simple-stats' ) ?></span>
+		<span class="displaying-num"><?php echo $this->total_posts . ' ' . __( 'items', 'seriously-simple-stats' ) ?></span>
 		<span class='pagination-links'>
 		<?php if ( $pagenum != 1 ) { ?>
 			<a class="next-page" href="<?php echo $next_page_url ?>">
