@@ -2,6 +2,8 @@
 
 namespace SeriouslySimpleStats\Classes;
 
+use SeriouslySimplePodcasting\Helpers\Log_Helper;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,6 +18,8 @@ class All_Episode_Stats {
 
 	public $total_per_page = 0;
 
+	public $logger = null;
+
 	public function __construct() {
 		global $wpdb;
 		$this->table = $wpdb->prefix . 'ssp_stats';
@@ -24,6 +28,7 @@ class All_Episode_Stats {
 			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . ' -1 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-1 MONTH' ) ),
 			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . ' -2 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-2 MONTH' ) ),
 		);
+		$this->logger = new Log_Helper();
 	}
 
 	/**
@@ -70,7 +75,11 @@ class All_Episode_Stats {
 		global $wpdb;
 		$date_keys = array_keys( $this->dates );
 
+		$order_by = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'episode_name';
+		$order    = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
+
 		$all_episodes_stats = array();
+		$all_episode_count  = 0;
 		//$this->start_date = strtotime(current_time('Y-m-d') . ' -2 MONTH');
 		$sql         = "SELECT COUNT(id) AS listens, post_id FROM $this->table GROUP BY post_id";
 		$results     = $wpdb->get_results( $sql );
@@ -82,6 +91,7 @@ class All_Episode_Stats {
 				if ( ! $post ) {
 					continue;
 				}
+				$all_episode_count++;
 				$sql             = "SELECT `date` FROM $this->table WHERE `post_id` = '" . $result->post_id . "'";
 				$episode_results = $wpdb->get_results( $sql );
 				$lifetime_count  = count( $episode_results );
@@ -91,15 +101,25 @@ class All_Episode_Stats {
 						++ $total_listens_array[ intval( date( 'm', intval( $ref->date ) ) ) ];
 					}
 				}
-				$all_episodes_stats[] = apply_filters( 'ssp_stats_three_months_all_episodes', array(
+
+				$episode_stats = array(
 					'episode_name'  => $post->post_title,
 					'date'          => date( 'm-d-Y', strtotime( $post->post_date ) ),
 					'slug'          => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
 					'listens'       => $lifetime_count,
-					'listens_array' => $total_listens_array,
-				) );
+				);
+
+				foreach ( $this->dates as $date_key => $date ) {
+					$episode_stats[ $date ] = $total_listens_array[ $date_key ];
+				}
+
+				$all_episodes_stats[ $all_episode_count ] = $episode_stats;
 			}
 		}
+
+		$all_episodes_stats = apply_filters('ssp_stats_three_months_all_episodes', $all_episodes_stats);
+
+		$this->logger->log( 'All Episodes Stats', $all_episodes_stats );
 
 		//24 because we're counting an array
 		$this->total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 );
@@ -107,9 +127,19 @@ class All_Episode_Stats {
 		if( !empty( $all_episodes_stats ) && is_array( $all_episodes_stats ) ){
 			//Sort list by episode name
 			foreach( $all_episodes_stats as $listen ){
-				$listen_sorting[] = $listen['episode_name'];
+				$listen_sorting[] = $listen[$order_by];
 			}
-			array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
+
+			//$logger->log( 'Listen Sorting', $listen_sorting );
+
+			if ( 'desc' === $order ) {
+				array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
+			} else {
+				array_multisort( $listen_sorting, SORT_ASC, $all_episodes_stats );
+			}
+
+			//$logger->log( 'All Episodes Stats Sorted', $all_episodes_stats );
+
 			if( isset( $_GET['pagenum'] ) ){
 				$pagenum = intval( $_GET['pagenum'] );
 				if( $pagenum <= 1){
@@ -131,13 +161,33 @@ class All_Episode_Stats {
 	 * @return array
 	 */
 	private function get_all_episodes_sort_order() {
-		$sort_order = array(
-			'publish'  => 'sortable desc',
-			'name'     => 'sortable desc',
-			'lifetime' => 'sortable desc',
+
+		$order_by = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'episode_name';
+		$order    = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
+
+		$publish_order_url  = admin_url( 'edit.php?post_type=podcast&page=podcast_stats&orderby=date&order=desc#last-three-months-container' );
+		$name_order_url     = admin_url( 'edit.php?post_type=podcast&page=podcast_stats&orderby=episode_name&order=desc#last-three-months-container' );
+		$lifetime_order_url = admin_url( 'edit.php?post_type=podcast&page=podcast_stats&orderby=listens&order=desc#last-three-months-container' );
+
+		$sorting = array(
+			'date'  => array( 'sortable desc', $publish_order_url ),
+			'episode_name'     => array( 'sortable desc', $name_order_url ),
+			'listens' => array( 'sortable desc', $lifetime_order_url ),
 		);
 		foreach ( $this->dates as $date_key => $date ) {
-			$sort_order[ $date ] = 'sortable desc';
+			$date_order_url      = admin_url( 'edit.php?post_type=podcast&page=podcast_stats&orderby='.$date.'&order=desc#last-three-months-container' );
+			$sorting[ $date ] = array( 'sortable desc', $date_order_url );
+		}
+
+		$sort_order = array();
+		foreach ( $sorting as $key => $sorting_item ) {
+			if ( $key === $order_by ) {
+				$sorting_item[0] = 'sorted ' . $order;
+				if ( 'desc' === $order ) {
+					$sorting_item[1] = str_replace( 'desc', 'asc', $sorting_item[1] );
+				}
+			}
+			$sort_order[ $key ] = $sorting_item;
 		}
 
 		return $sort_order;
