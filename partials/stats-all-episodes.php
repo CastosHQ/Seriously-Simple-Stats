@@ -20,14 +20,14 @@
 				</th>
 				<?php foreach ( $this->dates as $date ) { ?>
 					<th style="text-align: center;" class="<?php echo $sort_order[ $date ][0]; ?>">
-						<a href="<?php echo $sort_order[ $date ][1] ?>">
+						<a style="margin-left: 40%" href="<?php echo $sort_order[ $date ][1] ?>">
 							<span><?php echo __( $date, 'seriously-simple-stats' ); ?></span>
 							<span class="sorting-indicator"></span>
 						</a>
 					</th>
 				<?php } ?>
 				<th style="text-align: center;" class="ssp_stats_3m_total <?php echo $sort_order['listens'][0]; ?>">
-					<a href="<?php echo $sort_order['listens'][1] ?>">
+					<a style="margin-left: 20%" href="<?php echo $sort_order['listens'][1] ?>">
 						<span><?php echo __( 'Lifetime', 'seriously-simple-stats' ); ?></span>
 						<span class="sorting-indicator"></span>
 					</a>
