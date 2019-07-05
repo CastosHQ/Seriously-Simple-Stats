@@ -200,7 +200,7 @@ class Stats {
 		add_action( 'init', array( $this, 'update_database' ), 1 );
 
 		// Get required episode IDs for stats
-		add_action( 'init', array( $this, 'load_episode_ids' ), 10 );
+		add_action( 'init', array( $this, 'load_episode_ids' ), 11 );
 
 		// Add admin notice to upgrade stats table
 		add_action( 'admin_notices', array( $this, 'maybe_notify_stats_update' ) );
@@ -267,11 +267,14 @@ class Stats {
 	 */
 	public function load_episode_ids () {
 
+
+
 		switch( $this->filter ) {
 			case 'series':
 				if( 'all' != $this->series ) {
 
 					$episodes = ssp_episodes( -1, $this->series, false, 'stats' );
+
 					foreach( $episodes as $episode ) {
 						if( $this->episode_ids ) {
 							$this->episode_ids .= ',';
