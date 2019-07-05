@@ -152,6 +152,8 @@ class Stats {
 	 */
 	public $episode_id_where = '';
 
+	public $upgrade = null;
+
 	public $all_episode_stats = null;
 
 	/**
@@ -187,6 +189,7 @@ class Stats {
 		$this->assets_url    = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
 		$this->script_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
+		$this->upgrade = new Stats_Upgrade( $version );
 		$this->all_episode_stats = new All_Episode_Stats();
 
 		// Set current time based on WordPress time zone settings
@@ -932,7 +935,7 @@ class Stats {
 			$column_data .= "data.addColumn('$column_type', '$column_label');" . "\n";
 			//Added to ensure a unix timestamp is created for this column types data
 			if( $column_type === 'date' ){
-				$column_date++;
+				$column_date++;http://jonspodcast.test/wp-admin/edit.php?post_type=feedback
 			}
 		}
 

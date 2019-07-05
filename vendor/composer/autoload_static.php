@@ -24,6 +24,7 @@ class ComposerStaticInit29d45b4732829c4d4fb553f9c1fc539c
         'SeriouslySimpleStats\\Classes\\All_Episode_Stats' => __DIR__ . '/../..' . '/php/classes/class-all-episode-stats.php',
         'SeriouslySimpleStats\\Classes\\Stats' => __DIR__ . '/../..' . '/php/classes/class-ssp-stats.php',
         'SeriouslySimpleStats\\Classes\\Stats_Hit' => __DIR__ . '/../..' . '/php/classes/class-ssp-stats-hit.php',
+        'SeriouslySimpleStats\\Classes\\Stats_Upgrade' => __DIR__ . '/../..' . '/php/classes/class-ssp-stats-upgrade.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
