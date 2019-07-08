@@ -78,8 +78,9 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 
 == Changelog ==
 
-= 1.2.3 =
-* 2018-06-27
+= 1.2.3-beta =
+* 2018-07-03
+* [NEW] Added the ability to sort the All Episodes for the Last Three Months Stats data
 * [FIX] Updated the CrawlerDetect library
 
 = 1.2.2 =
