@@ -1,0 +1,32 @@
+{
+    "name"       : "castos/seriously-simple-stats",
+    "description": "Integrated analytics and stats tracking for Seriously Simple Podcasting.",
+    "keywords"   : ["wordpress", "podcasting"],
+    "type"       : "wordpress-plugin",
+    "homepage"   : "https://github.com/TheCraigHewitt/Seriously-Simple-Stats",
+    "license"    : "GPL-2.0",
+    "authors"    : [
+        {
+            "name"    : "Craig Hewitt",
+            "homepage": "https://castos.com/"
+        },
+        {
+            "name"    : "Jonathan Bossenger",
+            "homepage": "https://jonathanbossenger.com/"
+        },
+        {
+            "name"    : "Hugh Lashbrooke",
+            "homepage": "https://hugh.blog/"
+        }
+    ],
+    "support"    : {
+        "issues": "https://github.com/TheCraigHewitt/Seriously-Simple-Stats/issues"
+    },
+
+    "require": {
+        "jaybizzle/crawler-detect": "1.*"
+    },
+    "autoload"   : {
+        "classmap": ["php/"]
+    }
+}
