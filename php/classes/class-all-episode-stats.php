@@ -44,8 +44,8 @@ class All_Episode_Stats {
 		$this->table = $wpdb->prefix . 'ssp_stats';
 		$this->dates = array(
 			intval( current_time( 'm' ) )                                             => current_time( 'F' ),
-			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . ' -1 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-1 MONTH' ) ),
-			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . ' -2 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . '-2 MONTH' ) ),
+			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . 'FIRST DAY OF -1 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . 'FIRST DAY OF -1 MONTH' ) ),
+			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . 'FIRST DAY OF -2 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . 'FIRST DAY OF -2 MONTH' ) ),
 		);
 	}
 
