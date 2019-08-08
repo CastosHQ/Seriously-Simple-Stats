@@ -36,7 +36,7 @@
 			</thead>
 			<?php foreach ( $all_episodes_stats as $episode ) { ?>
 				<tr>
-					<td><?php echo $episode['date']; ?></td>
+					<td><?php echo $episode['formatted_date']; ?></td>
 					<td style="width: 50%;"><a href='<?php echo $episode['slug']; ?>'><?php echo $episode['episode_name']; ?></a></td>
 					<?php foreach ( $this->dates as $date ) { ?>
 							<td style='text-align: center;'><?php echo $episode[$date]; ?></td>
