@@ -78,6 +78,12 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 
 == Changelog ==
 
+= 1.2.5-beta =
+* 2018-08-08
+* [FIX] Fixed a bug in the All episode stats pagination (props [wudanbal](https://github.com/wudanbal))
+* [UPDATE] Default sorting for All episode stats set to date (props [wudanbal](https://github.com/wudanbal))
+* [UPDATE] Date display field uses WordPress Date Format setting, to display date (props [wudanbal](https://github.com/wudanbal))
+
 = 1.2.4 =
 * 2018-07-31
 * [FIX] Fixed a PHP warning which only occurs on the last day of the month
