@@ -73,10 +73,8 @@ class All_Episode_Stats {
 			$order_by      = isset( $_GET['orderby'] ) ? '&orderby=' . sanitize_text_field( $_GET['orderby'] ) : "";
 			$order         = isset( $_GET['order'] ) ? '&order=' . sanitize_text_field( $_GET['order'] ) : "";
 			$prev_page     = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
-			// added $previous_page_url here 
 			$prev_page_url = admin_url( "edit.php?post_type=podcast&page=podcast_stats" . $order_by . $order . "&pagenum=" . $prev_page . "#last-three-months-container" );
 			$next_page     = $pagenum + 1;
-			// updated $next_page_url to have the $ext_page variable 
 			$next_page_url = admin_url( "edit.php?post_type=podcast&page=podcast_stats" . $order_by . $order . "&pagenum=" . $next_page . "#last-three-months-container" );
 			ob_start();
 			require_once SSP_STATS_DIR_PATH . 'partials/stats-all-episodes-pagination.php';
@@ -95,7 +93,6 @@ class All_Episode_Stats {
 		global $wpdb;
 		$date_keys = array_keys( $this->dates );
 
-		// updated default sort order to be date desc
 		$order_by = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'date';
 		$order    = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
 
@@ -129,7 +126,6 @@ class All_Episode_Stats {
 
 			$episode_stats = array(
 				'episode_name' => $post->post_title,
-				// updated date format here to fix sort order 
 				'date'         => date( 'Y-m-d', strtotime( $post->post_date ) ), 
 				'slug'         => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
 				'listens'      => $lifetime_count,
