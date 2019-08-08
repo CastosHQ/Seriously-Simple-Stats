@@ -3,7 +3,7 @@
 		<span class="displaying-num"><?php echo $this->total_posts . ' ' . __( 'items', 'seriously-simple-stats' ) ?></span>
 		<span class='pagination-links'>
 		<?php if ( $pagenum != 1 ) { ?>
-			<a class="next-page" href="<?php echo $next_page_url ?>">
+			<a class="next-page" href="<?php echo $prev_page_url ?>">
 				<span class="screen-reader-text"><?php echo __( 'Previous page', 'seriously-simple-stats' ); ?></span>
 				<span aria-hidden="true">«</span>
 			</a>

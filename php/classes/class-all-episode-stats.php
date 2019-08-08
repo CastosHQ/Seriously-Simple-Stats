@@ -70,11 +70,12 @@ class All_Episode_Stats {
 				$pagenum = 1;
 			}
 			$total_pages   = ceil( $this->total_posts / $this->total_per_page );
-			$prev_page     = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
 			$order_by      = isset( $_GET['orderby'] ) ? '&orderby=' . sanitize_text_field( $_GET['orderby'] ) : "";
 			$order         = isset( $_GET['order'] ) ? '&order=' . sanitize_text_field( $_GET['order'] ) : "";
-			$next_page_url = admin_url( "edit.php?post_type=podcast&page=podcast_stats" . $order_by . $order . "&pagenum=" . $prev_page . "#last-three-months-container" );
+			$prev_page     = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
+			$prev_page_url = admin_url( "edit.php?post_type=podcast&page=podcast_stats" . $order_by . $order . "&pagenum=" . $prev_page . "#last-three-months-container" );
 			$next_page     = $pagenum + 1;
+			$next_page_url = admin_url( "edit.php?post_type=podcast&page=podcast_stats" . $order_by . $order . "&pagenum=" . $next_page . "#last-three-months-container" );
 			ob_start();
 			require_once SSP_STATS_DIR_PATH . 'partials/stats-all-episodes-pagination.php';
 			$html .= ob_get_clean();
@@ -92,7 +93,7 @@ class All_Episode_Stats {
 		global $wpdb;
 		$date_keys = array_keys( $this->dates );
 
-		$order_by = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'episode_name';
+		$order_by = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'date';
 		$order    = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
 
 		$all_episodes_stats = array();
@@ -125,9 +126,10 @@ class All_Episode_Stats {
 
 			$episode_stats = array(
 				'episode_name' => $post->post_title,
-				'date'         => date( 'm-d-Y', strtotime( $post->post_date ) ),
+				'date'         => date( 'Y-m-d', strtotime( $post->post_date ) ), 
 				'slug'         => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
 				'listens'      => $lifetime_count,
+				'formatted_date'  => date_i18n( get_option('date_format'), strtotime( $post->post_date ) ), 
 			);
 
 			foreach ( $this->dates as $date_key => $date ) {
