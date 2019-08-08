@@ -129,6 +129,7 @@ class All_Episode_Stats {
 				'date'         => date( 'Y-m-d', strtotime( $post->post_date ) ), 
 				'slug'         => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
 				'listens'      => $lifetime_count,
+				'formatted_date'  => date_i18n( get_option('date_format'), strtotime( $post->post_date ) ), 
 			);
 
 			foreach ( $this->dates as $date_key => $date ) {
