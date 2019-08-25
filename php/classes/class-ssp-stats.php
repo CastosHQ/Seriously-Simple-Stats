@@ -729,12 +729,20 @@ class Stats {
 	 */
 	public function chart_data ( ) {
 
-		$output = '';
+		$current_screen = get_current_screen();
 
-		$output .= $this->daily_listens_chart();
-		$output .= $this->referrers_chart();
+		if( $current_screen == null ) return;
 
-		echo $output;
+		if( $current_screen->id == 'dashboard' || $current_screen->id == 'podcast_page_podcast_stats' ) {
+
+			$output = '';
+
+			$output .= $this->daily_listens_chart();
+			$output .= $this->referrers_chart();
+
+			echo $output;
+
+		}
 	}
 
 	/**
