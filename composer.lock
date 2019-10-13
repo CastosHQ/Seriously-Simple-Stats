@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f0d3dda2f34646bb432a5fa2b2824f32",
+    "content-hash": "03201cbe0d748bca6e7ebdb37f1a6742",
     "packages": [
         {
             "name": "jaybizzle/crawler-detect",
-            "version": "v1.2.84",
+            "version": "v1.2.85",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JayBizzle/Crawler-Detect.git",
-                "reference": "b7f35477a56609dd0d753c07ada912b66af3df01"
+                "reference": "185ff3e00a5b7821eadfce8fe767fcd89193f578"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JayBizzle/Crawler-Detect/zipball/b7f35477a56609dd0d753c07ada912b66af3df01",
-                "reference": "b7f35477a56609dd0d753c07ada912b66af3df01",
+                "url": "https://api.github.com/repos/JayBizzle/Crawler-Detect/zipball/185ff3e00a5b7821eadfce8fe767fcd89193f578",
+                "reference": "185ff3e00a5b7821eadfce8fe767fcd89193f578",
                 "shasum": ""
             },
             "require": {
@@ -53,7 +53,7 @@
                 "crawlerdetect",
                 "php crawler detect"
             ],
-            "time": "2019-06-14T21:10:21+00:00"
+            "time": "2019-10-05T13:27:35+00:00"
         }
     ],
     "packages-dev": [],
