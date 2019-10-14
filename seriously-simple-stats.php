@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use SeriouslySimpleStats\Classes\Stats;
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . 'vendor/autoload.php';
 
 define( 'SSP_STATS_VERSION', '1.2.4' );
 define( 'SSP_STATS_DIR_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
