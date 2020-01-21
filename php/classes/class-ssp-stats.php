@@ -1025,8 +1025,11 @@ class Stats {
 	 */
 	public function admin_enqueue_scripts ( $hook = '' ) {
 
-		//index.php added to accommodate dashboard widget chart
-		if( 'podcast_page_podcast_stats' == $hook || 'index.php' == $hook ) {
+		global $typenow;
+
+		// index.php added to accommodate dashboard widget chart
+		// 'podcast' == $typenow added to serve right side panel with podcast stats in podcast edition mode
+		if( 'podcast_page_podcast_stats' === $hook || 'index.php' === $hook || 'podcast' === $typenow ) {
 
 			// Include Google Charts scripts
 			wp_enqueue_script( 'google-charts', "//www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}", array(), $this->_version, false );
