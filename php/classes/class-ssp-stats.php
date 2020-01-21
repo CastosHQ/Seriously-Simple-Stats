@@ -925,7 +925,7 @@ class Stats {
 	 */
 	private function generate_chart ( $type = '', $title = '', $columns = array(), $data = array(), $target = '', $height = 400, $width = '100%' ) {
 
-		if( ! $type || ! $target || ! is_array( $columns )  || ! is_array( $data ) ) {
+		if( ! $type || ! $target || ! is_array( $columns )  || ! is_array( $data ) || ! wp_script_is( 'google-charts' ) ) {
 			return;
 		}
 
