@@ -1157,9 +1157,9 @@ class Stats {
 	 * @return  void
 	 */
 	public function add_dashboard_widget(){
-
-		add_meta_box( 'ssp_stats_dashboard_widget', __('Seriously Simple Stats - Overview', 'seriously-simple-stats' ), array( $this, 'dashboard_widget_callback' ), 'dashboard', 'normal', 'high' );
-
+if ( current_user_can( 'manage_podcast' ) ) {
+	add_meta_box( 'ssp_stats_dashboard_widget', __('Seriously Simple Stats - Overview', 'seriously-simple-stats' ), array( $this, 'dashboard_widget_callback' ), 'dashboard', 'normal', 'high' );
+}
 	}
 
 	/**
