@@ -1,13 +1,13 @@
 <?php
 /*
  * Plugin Name: Seriously Simple Stats
- * Version: 1.2.5
+ * Version: 1.2.6
  * Plugin URI: https://wordpress.org/plugins/seriously-simple-stats
  * Description: Integrated analytics and stats tracking for Seriously Simple Podcasting.
  * Author: Castos
  * Author URI: https://www.castos.com/
  * Requires at least: 4.4
- * Tested up to: 5.1.1
+ * Tested up to: 5.3.2
  *
  * Text Domain: seriously-simple-stats
  * Domain Path: /languages
@@ -29,7 +29,7 @@ use SeriouslySimpleStats\Classes\Stats;
 
 require_once 'vendor/autoload.php';
 
-define( 'SSP_STATS_VERSION', '1.2.5' );
+define( 'SSP_STATS_VERSION', '1.2.6' );
 define( 'SSP_STATS_DIR_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 if ( ! function_exists( 'is_ssp_active' ) ) {
