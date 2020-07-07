@@ -984,6 +984,8 @@ class Stats {
 		?>
 		<script type="text/javascript">
 
+            google.charts.load('current', {packages: ['corechart']});
+
 			// Set a callback to run when the Google Visualization API is loaded
 			google.setOnLoadCallback(draw_chart_<?php echo $chartid; ?>);
 
@@ -1029,7 +1031,8 @@ class Stats {
 		if( 'podcast_page_podcast_stats' == $hook || 'index.php' == $hook ) {
 
 			// Include Google Charts scripts
-			wp_enqueue_script( 'google-charts', "//www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}", array(), $this->_version, false );
+			wp_register_script( 'google-charts', "https://www.gstatic.com/charts/loader.js", array(), $this->_version, false );
+			wp_enqueue_script( 'google-charts' );
 
 			// Load custom scripts
 			wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin' . $this->script_suffix . '.js', array( 'jquery' ), $this->_version );
