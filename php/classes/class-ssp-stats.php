@@ -925,7 +925,7 @@ class Stats {
 	 */
 	private function generate_chart ( $type = '', $title = '', $columns = array(), $data = array(), $target = '', $height = 400, $width = '100%' ) {
 
-		if( ! $type || ! $target || ! is_array( $columns )  || ! is_array( $data ) ) {
+		if( ! $type || ! $target || ! is_array( $columns )  || ! is_array( $data ) || ! wp_script_is( 'google-charts' ) ) {
 			return;
 		}
 
@@ -1027,8 +1027,11 @@ class Stats {
 	 */
 	public function admin_enqueue_scripts ( $hook = '' ) {
 
-		//index.php added to accommodate dashboard widget chart
-		if( 'podcast_page_podcast_stats' == $hook || 'index.php' == $hook ) {
+		global $typenow;
+
+		// index.php added to accommodate dashboard widget chart
+		// 'podcast' == $typenow added to serve right side panel with podcast stats in podcast edition mode
+		if( 'podcast_page_podcast_stats' === $hook || 'index.php' === $hook || 'podcast' === $typenow ) {
 
 			// Include Google Charts scripts
 			wp_register_script( 'google-charts', "https://www.gstatic.com/charts/loader.js", array(), $this->_version, false );
@@ -1160,9 +1163,9 @@ class Stats {
 	 * @return  void
 	 */
 	public function add_dashboard_widget(){
-
-		add_meta_box( 'ssp_stats_dashboard_widget', __('Seriously Simple Stats - Overview', 'seriously-simple-stats' ), array( $this, 'dashboard_widget_callback' ), 'dashboard', 'normal', 'high' );
-
+		if ( current_user_can( 'manage_podcast' ) ) {
+			add_meta_box( 'ssp_stats_dashboard_widget', __('Seriously Simple Stats - Overview', 'seriously-simple-stats' ), array( $this, 'dashboard_widget_callback' ), 'dashboard', 'normal', 'high' );
+		}
 	}
 
 	/**
