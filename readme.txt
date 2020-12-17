@@ -78,6 +78,11 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 
 == Changelog ==
 
+= 1.2.10 =
+* 2020-12-18
+* [FIX] Fixes a bug in the per episode stats meta box
+* [UPDATE] Updated crawler detect library to version 1.2.103
+
 = 1.2.9 =
 * 2020-07-07
 * [FIX] Fixes a JavaScript bug related to the Google Charts libraries, when loading regular admin pages (props [lrynek](https://github.com/lrynek))
