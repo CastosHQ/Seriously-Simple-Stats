@@ -435,7 +435,7 @@ class Stats {
 		}
 		// Commented out for now, could be included in the future
 		if( $android ){
-			$html .= '<li class="android">' . __( 'Android App', 'seriously-simple-stats' ) . ': <b>' . $android . '</b></li>';
+			$html .= '<li class="google">' . __( 'Android App', 'seriously-simple-stats' ) . ': <b>' . $android . '</b></li>';
 		}
 		if ( $podcast_addict ) {
 			$html .= '<li class="podcast_addict">' . __( 'Podcast Addict', 'seriously-simple-stats' ) . ': <b>' . $podcast_addict . '</b></li>';
