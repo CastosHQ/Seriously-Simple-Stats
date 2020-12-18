@@ -3,7 +3,7 @@ Contributors: PodcastMotor, psykro, simondowdles, hlashbrooke, seriouspodcaster
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
 Requires at least: 4.4
 Tested up to: 5.5
-Stable tag: 1.2.9
+Stable tag: 1.2.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,7 +79,7 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 == Changelog ==
 
 = 1.2.10 =
-* 2020-12-18
+* 2020-12-21
 * [FIX] Fixes a bug in the per episode stats meta box
 * [UPDATE] Updated crawler detect library to version 1.2.103
 
