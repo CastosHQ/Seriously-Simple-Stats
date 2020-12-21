@@ -1,8 +1,11 @@
+/_repo_assets
 /bin
 /tests
 .git
 .gitignore
 .idea
 travis.yml
+composer.json
+composer.lock
 phpcs.xml.dist
 phpunit.xml.dist

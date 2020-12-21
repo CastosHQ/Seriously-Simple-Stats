@@ -22,7 +22,6 @@
     "support"    : {
         "issues": "https://github.com/TheCraigHewitt/Seriously-Simple-Stats/issues"
     },
-
     "require": {
         "jaybizzle/crawler-detect": "1.*"
     },
