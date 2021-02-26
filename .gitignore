@@ -3,3 +3,5 @@ bin
 *.iml
 .gitignore
 vendor/
+node_modules
+package-lock.json
