@@ -711,16 +711,13 @@ class Stats {
 		echo $html;
 	}
 
-
-
-
-
-
-
 	private function daily_stat ( $number = '', $description = '' ) {
-
 		$html = '<div class="overview-stat">' . "\n";
-			$html .= '<div class="stat-total">' . $number . '</div>' . "\n";
+		    $classes = 'stat-total';
+            if ( $number > 999 ) {
+                $classes .= ' stat-font-small';
+            }
+			$html .= sprintf('<div class="%s">', $classes) . $number . '</div>' . "\n";
 			$html .= '<div class="stat-description">' . $description . '</div>' . "\n";
 		$html .= '</div>' . "\n";
 
