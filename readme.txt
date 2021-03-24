@@ -3,7 +3,7 @@ Contributors: PodcastMotor, psykro, simondowdles, hlashbrooke, seriouspodcaster
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
 Requires at least: 4.4
 Tested up to: 5.5
-Stable tag: 1.2.10
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,11 @@ Note that Stitcher download stats are not currently possible to gather accuratel
 Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-Detect) library to make sure that crawlers/bots are not recorded as listens.
 
 == Changelog ==
+
+= 1.3.0 =
+* 2021-03-24
+* [FIX] Fixes a style bug when there is a big number of listens
+* [UPDATE] Added development npm dependencies
 
 = 1.2.10 =
 * 2020-12-21
