@@ -1,6 +1,7 @@
-/_repo_assets
-/bin
-/tests
+_repo_assets/
+node_modules/
+bin/
+tests/
 .git
 .gitignore
 .idea
