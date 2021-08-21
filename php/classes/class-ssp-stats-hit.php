@@ -134,7 +134,7 @@ class Stats_Hit {
 			$referrer = 'android';
 		}
 
-        // Get episode ID for database insert
+		// Get episode ID for database insert
 		$episode_id = $episode->ID;
 
 		// Get remote client IP address
