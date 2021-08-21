@@ -124,17 +124,17 @@ class Stats_Hit {
 			$referrer = 'overcast';
 		} else if ( stripos( $user_agent, 'Pocket Casts' ) !== false ) {
 			$referrer = 'pocketcasts';
-		} else if ( stripos( $user_agent, 'Android' ) !== false ) {
-			$referrer = 'android';
 		} else if ( stripos( $user_agent, 'PodcastAddict' ) !== false ) {
 			$referrer = 'podcast_addict';
 		} else if ( stripos( $user_agent, 'Player FM' ) !== false ) {
 			$referrer = 'playerfm';
 		} else if ( stripos( $user_agent, 'Google-Play' ) !== false ) {
 			$referrer = 'google_play';
+		} else if ( stripos( $user_agent, 'Android' ) !== false ) {
+			$referrer = 'android';
 		}
 
-		// Get episode ID for database insert
+        // Get episode ID for database insert
 		$episode_id = $episode->ID;
 
 		// Get remote client IP address
