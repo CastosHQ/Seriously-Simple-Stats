@@ -28,12 +28,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 use SeriouslySimpleStats\Classes\Stats;
 
 define( 'SSP_STATS_VERSION', '1.3.0' );
-define( 'SSP_STATS_DIR_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
+define( 'SSP_STATS_DIR_PATH', plugin_dir_path( __FILE__ ) );
 
 require_once SSP_STATS_DIR_PATH . 'vendor/autoload.php';
 
 if ( ! function_exists( 'is_ssp_active' ) ) {
 	require_once SSP_STATS_DIR_PATH . 'ssp-includes/ssp-functions.php';
+}
+
+if ( ! defined( 'SSP_CPT_PODCAST' ) ) {
+	define( 'SSP_CPT_PODCAST', 'podcast' );
 }
 
 if ( is_ssp_active( '1.13.1' ) ) {

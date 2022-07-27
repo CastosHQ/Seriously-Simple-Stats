@@ -73,9 +73,9 @@ class All_Episode_Stats {
 			$order_by      = isset( $_GET['orderby'] ) ? '&orderby=' . sanitize_text_field( $_GET['orderby'] ) : "";
 			$order         = isset( $_GET['order'] ) ? '&order=' . sanitize_text_field( $_GET['order'] ) : "";
 			$prev_page     = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
-			$prev_page_url = admin_url( "edit.php?post_type=podcast&page=podcast_stats" . $order_by . $order . "&pagenum=" . $prev_page . "#last-three-months-container" );
+			$prev_page_url = admin_url( "edit.php?post_type=" . SSP_CPT_PODCAST . "&page=podcast_stats" . $order_by . $order . "&pagenum=" . $prev_page . "#last-three-months-container" );
 			$next_page     = $pagenum + 1;
-			$next_page_url = admin_url( "edit.php?post_type=podcast&page=podcast_stats" . $order_by . $order . "&pagenum=" . $next_page . "#last-three-months-container" );
+			$next_page_url = admin_url( "edit.php?post_type=" . SSP_CPT_PODCAST . "&page=podcast_stats" . $order_by . $order . "&pagenum=" . $next_page . "#last-three-months-container" );
 			ob_start();
 			require_once SSP_STATS_DIR_PATH . 'partials/stats-all-episodes-pagination.php';
 			$html .= ob_get_clean();
@@ -126,10 +126,10 @@ class All_Episode_Stats {
 
 			$episode_stats = array(
 				'episode_name' => $post->post_title,
-				'date'         => date( 'Y-m-d', strtotime( $post->post_date ) ), 
+				'date'         => date( 'Y-m-d', strtotime( $post->post_date ) ),
 				'slug'         => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
 				'listens'      => $lifetime_count,
-				'formatted_date'  => date_i18n( get_option('date_format'), strtotime( $post->post_date ) ), 
+				'formatted_date'  => date_i18n( get_option('date_format'), strtotime( $post->post_date ) ),
 			);
 
 			foreach ( $this->dates as $date_key => $date ) {
@@ -183,9 +183,9 @@ class All_Episode_Stats {
 		$order_by = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'episode_name';
 		$order    = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
 
-		$publish_order_url  = admin_url( 'edit.php?post_type=podcast&page=podcast_stats&orderby=date&order=desc#last-three-months-container' );
-		$name_order_url     = admin_url( 'edit.php?post_type=podcast&page=podcast_stats&orderby=episode_name&order=desc#last-three-months-container' );
-		$lifetime_order_url = admin_url( 'edit.php?post_type=podcast&page=podcast_stats&orderby=listens&order=desc#last-three-months-container' );
+		$publish_order_url  = admin_url( 'edit.php?post_type=' . SSP_CPT_PODCAST . '&page=podcast_stats&orderby=date&order=desc#last-three-months-container' );
+		$name_order_url     = admin_url( 'edit.php?post_type=' . SSP_CPT_PODCAST . '&page=podcast_stats&orderby=episode_name&order=desc#last-three-months-container' );
+		$lifetime_order_url = admin_url( 'edit.php?post_type=' . SSP_CPT_PODCAST . '&page=podcast_stats&orderby=listens&order=desc#last-three-months-container' );
 
 		$sorting = array(
 			'date'         => array( 'sortable desc', $publish_order_url ),
@@ -193,7 +193,7 @@ class All_Episode_Stats {
 			'listens'      => array( 'sortable desc', $lifetime_order_url ),
 		);
 		foreach ( $this->dates as $date_key => $date ) {
-			$date_order_url   = admin_url( 'edit.php?post_type=podcast&page=podcast_stats&orderby=' . $date . '&order=desc#last-three-months-container' );
+			$date_order_url   = admin_url( 'edit.php?post_type=' . SSP_CPT_PODCAST . '&page=podcast_stats&orderby=' . $date . '&order=desc#last-three-months-container' );
 			$sorting[ $date ] = array( 'sortable desc', $date_order_url );
 		}
 

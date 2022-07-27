@@ -452,7 +452,7 @@ class Stats {
 		}
 		$html .= '</ul>';
 
-		$html .= '<p>' . sprintf( __( '%1$sSee more detail %2$s%3$s', 'seriously-simple-stats' ), '<a href="' . admin_url( 'edit.php?post_type=podcast&page=podcast_stats&filter=episode&episode=' . $post->ID ) . '">', '&raquo;', '</a>' ) . '<p>';
+		$html .= '<p>' . sprintf( __( '%1$sSee more detail %2$s%3$s', 'seriously-simple-stats' ), '<a href="' . admin_url( 'edit.php?post_type=' . SSP_CPT_PODCAST . '&page=podcast_stats&filter=episode&episode=' . $post->ID ) . '">', '&raquo;', '</a>' ) . '<p>';
 
 		echo $html;
 	}
@@ -464,7 +464,7 @@ class Stats {
 	 * @return  void
 	 */
 	public function add_menu_item() {
-		add_submenu_page( 'edit.php?post_type=podcast' , __( 'Podcast Stats', 'seriously-simple-stats' ) , __( 'Stats', 'seriously-simple-stats' ), 'manage_podcast' , 'podcast_stats' , array( $this , 'stats_page' ) );
+		add_submenu_page( 'edit.php?post_type=' . SSP_CPT_PODCAST , __( 'Podcast Stats', 'seriously-simple-stats' ) , __( 'Stats', 'seriously-simple-stats' ), 'manage_podcast' , 'podcast_stats' , array( $this , 'stats_page' ) );
 	}
 
 	/**
@@ -1034,7 +1034,7 @@ class Stats {
 
 		// index.php added to accommodate dashboard widget chart
 		// 'podcast' == $typenow added to serve right side panel with podcast stats in podcast edition mode
-		if( 'podcast_page_podcast_stats' === $hook || 'index.php' === $hook || 'podcast' === $typenow ) {
+		if( 'podcast_page_podcast_stats' === $hook || 'index.php' === $hook || SSP_CPT_PODCAST === $typenow ) {
 
 			// Include Google Charts scripts
 			wp_register_script( 'google-charts', "https://www.gstatic.com/charts/loader.js", array(), $this->_version, false );
@@ -1202,7 +1202,7 @@ class Stats {
 			$html .= '</div>' . "\n";
 		} else {
 
-			$html .= "<p class='ssps_last_30_days_graph_text'>".__('Last 30 Days', 'seriously-simple-stats')." <a href='".admin_url("edit.php?post_type=podcast&page=podcast_stats")."'>".__('View All Data', 'seriously-simple-stats')."</a>"."</p>";
+			$html .= "<p class='ssps_last_30_days_graph_text'>".__('Last 30 Days', 'seriously-simple-stats')." <a href='".admin_url("edit.php?post_type=" . SSP_CPT_PODCAST . "&page=podcast_stats")."'>".__('View All Data', 'seriously-simple-stats')."</a>"."</p>";
 
 			$html .= "<div id='weekly_listens'></div>";
 
