@@ -18,19 +18,39 @@ class SSP_Dependencies {
 		}
 	}
 
+	/**
+	 * @param $minimum_version
+	 *
+	 * @return bool
+	 */
 	public static function ssp_active_check( $minimum_version = '' ) {
+
+		if (! self::is_ssp_plugin_enabled() ) {
+			return false;
+		}
+
+		if ( ! $minimum_version ) {
+			return true;
+		}
+
+
+		$ssp_version = get_option( 'ssp_version', '1.0' );
+
+		return version_compare( $ssp_version, $minimum_version, '>=' );
+	}
+
+	/**
+	 * @return bool
+	 */
+	protected static function is_ssp_plugin_enabled() {
+		$ssp_file_name = 'seriously-simple-podcasting.php';
 
 		if ( ! self::$active_plugins ) {
 			self::init();
 		}
 
-		if ( in_array( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins, true ) || array_key_exists( 'seriously-simple-podcasting/seriously-simple-podcasting.php', self::$active_plugins ) ) {
-			if ( $minimum_version ) {
-				$ssp_version = get_option( 'ssp_version', '1.0' );
-				if ( version_compare( $ssp_version, $minimum_version, '>=' ) ) {
-					return true;
-				}
-			} else {
+		foreach ( self::$active_plugins as $active_plugin ) {
+			if ( false !== strpos( $active_plugin, $ssp_file_name ) ) {
 				return true;
 			}
 		}
