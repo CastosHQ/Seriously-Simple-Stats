@@ -27,13 +27,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use SeriouslySimpleStats\Classes\Stats;
 
-require_once 'vendor/autoload.php';
-
 define( 'SSP_STATS_VERSION', '1.3.0' );
 define( 'SSP_STATS_DIR_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 
+require_once SSP_STATS_DIR_PATH . 'vendor/autoload.php';
+
 if ( ! function_exists( 'is_ssp_active' ) ) {
-	require_once 'ssp-includes/ssp-functions.php';
+	require_once SSP_STATS_DIR_PATH . 'ssp-includes/ssp-functions.php';
 }
 
 if ( is_ssp_active( '1.13.1' ) ) {
