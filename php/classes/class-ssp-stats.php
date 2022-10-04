@@ -362,7 +362,7 @@ class Stats {
 
 		$html .= '<p class="episode-stat-data total-downloads">' . __( 'Total listens', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
 
-		$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $xiaoyuzhou = $moonFM = $castro = $watchOS = $unknown = 0;
+		$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $xiaoyuzhou = $moonfm = $castro = $watchos = $unknown = 0;
 
 		foreach ( $stats as $stat ) {
 			$listeners[ $stat->ip_address ] = $stat->ip_address;
@@ -404,14 +404,14 @@ class Stats {
                 case 'xiaoyuzhou':
                     ++ $xiaoyuzhou;
                     break;
-                case 'MoonFM':
-                    ++ $moonFM;
+                case 'moonfm':
+                    ++ $moonfm;
                     break;
-                case 'Castro':
+                case 'castro':
                     ++ $castro;
                     break;
-                case 'watchOS':
-                    ++ $watchOS;
+                case 'watchos':
+                    ++ $watchos;
                     break;
 				default:
 					++ $unknown;
@@ -425,54 +425,53 @@ class Stats {
 		$html .= '<p class="episode-stat-data sources">' . __( 'Listening sources', 'seriously-simple-stats' ) . ':</p>';
 		$html .= '<ul class="sources-list">';
 		if ( $itunes ) {
-			$html .= '<li class="itunes">' . __( 'iTunes', 'seriously-simple-stats' ) . ': <b>' . $itunes . '</b></li>';
+			$html .= '<li class="source itunes">' . __( 'iTunes', 'seriously-simple-stats' ) . ': <b>' . $itunes . '</b></li>';
 		}
 		if ( $stitcher ) {
-			$html .= '<li class="stitcher">' . __( 'Stitcher', 'seriously-simple-stats' ) . ': <b>' . $stitcher . '</b></li>';
+			$html .= '<li class="source stitcher">' . __( 'Stitcher', 'seriously-simple-stats' ) . ': <b>' . $stitcher . '</b></li>';
 		}
 		if ( $overcast ) {
-			$html .= '<li class="overcast">' . __( 'Overcast', 'seriously-simple-stats' ) . ': <b>' . $overcast . '</b></li>';
+			$html .= '<li class="source overcast">' . __( 'Overcast', 'seriously-simple-stats' ) . ': <b>' . $overcast . '</b></li>';
 		}
 		if ( $pocketcasts ) {
-			$html .= '<li class="pocketcasts">' . __( 'Pocket Casts', 'seriously-simple-stats' ) . ': <b>' . $pocketcasts . '</b></li>';
+			$html .= '<li class="source pocketcasts">' . __( 'Pocket Casts', 'seriously-simple-stats' ) . ': <b>' . $pocketcasts . '</b></li>';
 		}
 		if ( $direct ) {
-			$html .= '<li class="direct">' . __( 'Direct download', 'seriously-simple-stats' ) . ': <b>' . $direct . '</b></li>';
+			$html .= '<li class="source direct">' . __( 'Direct download', 'seriously-simple-stats' ) . ': <b>' . $direct . '</b></li>';
 		}
 		if ( $new_window ) {
-			$html .= '<li class="new_window">' . __( 'Played in new window', 'seriously-simple-stats' ) . ': <b>' . $new_window . '</b></li>';
+			$html .= '<li class="source new_window">' . __( 'Played in new window', 'seriously-simple-stats' ) . ': <b>' . $new_window . '</b></li>';
 		}
 		if ( $player ) {
-			$html .= '<li class="player">' . __( 'Audio player', 'seriously-simple-stats' ) . ': <b>' . $player . '</b></li>';
+			$html .= '<li class="source player">' . __( 'Audio player', 'seriously-simple-stats' ) . ': <b>' . $player . '</b></li>';
 		}
 		// Commented out for now, could be included in the future
 		if( $android ){
-			$html .= '<li class="android">' . __( 'Android App', 'seriously-simple-stats' ) . ': <b>' . $android . '</b></li>';
+			$html .= '<li class="source android">' . __( 'Android App', 'seriously-simple-stats' ) . ': <b>' . $android . '</b></li>';
 		}
 		if ( $podcast_addict ) {
-			$html .= '<li class="podcast_addict">' . __( 'Podcast Addict', 'seriously-simple-stats' ) . ': <b>' . $podcast_addict . '</b></li>';
+			$html .= '<li class="source podcast_addict">' . __( 'Podcast Addict', 'seriously-simple-stats' ) . ': <b>' . $podcast_addict . '</b></li>';
 		}
 		if ( $playerfm ) {
-			$html .= '<li class="playerfm">' . __( 'Player FM', 'seriously-simple-stats' ) . ': <b>' . $playerfm . '</b></li>';
+			$html .= '<li class="source playerfm">' . __( 'Player FM', 'seriously-simple-stats' ) . ': <b>' . $playerfm . '</b></li>';
 		}
         if ( $xiaoyuzhou ) {
-            $html .= '<li class="xiaoyuzhou">' . __( 'Xiaoyuzhou', 'seriously-simple-stats' ) . ': <b>' . $xiaoyuzhou . '</b></li>';
+            $html .= '<li class="source xiaoyuzhou">' . __( 'Xiaoyuzhou', 'seriously-simple-stats' ) . ': <b>' . $xiaoyuzhou . '</b></li>';
         }
-        if ( $moonFM ) {
-            $html .= '<li class="moonFM">' . __( 'MoonFM', 'seriously-simple-stats' ) . ': <b>' . $moonFM . '</b></li>';
+        if ( $moonfm ) {
+            $html .= '<li class="source moonfm">' . __( 'MoonFM', 'seriously-simple-stats' ) . ': <b>' . $moonfm . '</b></li>';
         }
         if ( $castro ) {
-            $html .= '<li class="castro">' . __( 'Castro', 'seriously-simple-stats' ) . ': <b>' . $castro . '</b></li>';
+            $html .= '<li class="source castro">' . __( 'Castro', 'seriously-simple-stats' ) . ': <b>' . $castro . '</b></li>';
         }
-        if ( $watchOS ) {
-            $html .= '<li class="watchOS">' . __( 'watchOS', 'seriously-simple-stats' ) . ': <b>' . $watchOS . '</b></li>';
+        if ( $watchos ) {
+            $html .= '<li class="source watchos">' . __( 'WatchOS', 'seriously-simple-stats' ) . ': <b>' . $watchos . '</b></li>';
         }
-		// Commented out for now, could be used in the future
-		/*if( $google_play ){
-			$html .= '<li class="google_play">' . __( 'Google Play', 'seriously-simple-stats' ) . ': <b>' . $google_play . '</b></li>';
-		}*/
+		if( $google_play ){
+			$html .= '<li class="source google_play">' . __( 'Google Play', 'seriously-simple-stats' ) . ': <b>' . $google_play . '</b></li>';
+		}
 		if ( $unknown ) {
-			$html .= '<li class="unknown">' . __( 'Other', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
+			$html .= '<li class="source unknown">' . __( 'Other', 'seriously-simple-stats' ) . ': <b>' . $unknown . '</b></li>';
 		}
 		$html .= '</ul>';
 
@@ -912,8 +911,8 @@ class Stats {
 			'playerfm' => __( 'Player FM', 'seriously-simple-stats' ),
 			// 'google_play' => __( 'Google Play', 'seriously-simple-stats' ) //Commented out for now
             'xiaoyuzhou' => __( 'Xiaoyuzhou', 'seriously-simple-stats' ),
-            'MoonFM' => __( 'MoonFM', 'seriously-simple-stats' ),
-            'Castro' => __( 'Castro', 'seriously-simple-stats' ),
+            'moonfm' => __( 'MoonFM', 'seriously-simple-stats' ),
+            'castro' => __( 'Castro', 'seriously-simple-stats' ),
             'watchOS' => __( 'watchOS', 'seriously-simple-stats' ),
 		);
 

@@ -133,11 +133,11 @@ class Stats_Hit {
 		} else if ( stripos( $user_agent, 'Google-Play' ) !== false ) {
 			$referrer = 'google_play';
 		} else if ( stripos( $user_agent, 'Moon FM' ) !== false ) {
-			$referrer = 'MoonFM';
+			$referrer = 'moonfm';
 		} else if ( stripos( $user_agent, 'Castro' ) !== false ) {
-			$referrer = 'Castro';
+			$referrer = 'castro';
 		} else if ( stripos( $user_agent, 'watchOS' ) !== false ) {
-			$referrer = 'watchOS';
+			$referrer = 'watchos';
 		} else if ( stripos( $user_agent, 'Android' ) !== false ) {
 			$referrer = 'android';
 		}
