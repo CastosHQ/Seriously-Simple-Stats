@@ -1,9 +1,9 @@
 === Seriously Simple Stats ===
-Contributors: PodcastMotor, psykro, simondowdles, hlashbrooke, seriouspodcaster
+Contributors: PodcastMotor, psykro, zahardoc, simondowdles, hlashbrooke, seriouspodcaster
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
 Requires at least: 4.4
-Tested up to: 5.5
-Stable tag: 1.3.0
+Tested up to: 5.6
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,13 @@ Note that Stitcher download stats are not currently possible to gather accuratel
 Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-Detect) library to make sure that crawlers/bots are not recorded as listens.
 
 == Changelog ==
+
+= 1.4.0 =
+* 2022-10-04
+* [UPDATE] Use absolute require file paths (props [dd32](https://github.com/dd32))
+* [UPDATE] Improved SSP dependencies check
+* [UPDATE] Reordered user agent check (props [jonathanbossenger](https://github.com/jonathanbossenger))
+* [UPDATE] Added new listening sources (Xiaoyuzhou,Moon FM,Castro,watchOS) (props [justinyanme](https://github.com/justinyanme))
 
 = 1.3.0 =
 * 2021-03-24
