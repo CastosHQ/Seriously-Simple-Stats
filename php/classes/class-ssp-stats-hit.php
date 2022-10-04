@@ -124,7 +124,10 @@ class Stats_Hit {
 			$referrer = 'overcast';
 		} else if ( stripos( $user_agent, 'Pocket Casts' ) !== false ) {
 			$referrer = 'pocketcasts';
-		} else if ( stripos( $user_agent, 'Android' ) !== false ) {
+		} else if ( stripos( $user_agent, 'Xiaoyuzhou' ) !== false ) {
+            // Put Xiaoyuzhou before 'android' otherwise 'Xiaoyuzhou Android' will miss match
+            $referrer = 'xiaoyuzhou';
+        } else if ( stripos( $user_agent, 'Android' ) !== false ) {
 			$referrer = 'android';
 		} else if ( stripos( $user_agent, 'PodcastAddict' ) !== false ) {
 			$referrer = 'podcast_addict';
@@ -132,7 +135,13 @@ class Stats_Hit {
 			$referrer = 'playerfm';
 		} else if ( stripos( $user_agent, 'Google-Play' ) !== false ) {
 			$referrer = 'google_play';
-		}
+		} else if ( stripos( $user_agent, 'Moon FM' ) !== false ) {
+            $referrer = 'MoonFM';
+        } else if ( stripos( $user_agent, 'Castro' ) !== false ) {
+            $referrer = 'Castro';
+        } else if ( stripos( $user_agent, 'watchOS' ) !== false ) {
+            $referrer = 'watchOS';
+        }
 
 		// Get episode ID for database insert
 		$episode_id = $episode->ID;
