@@ -2,8 +2,8 @@
 Contributors: PodcastMotor, psykro, zahardoc, simondowdles, hlashbrooke, seriouspodcaster
 Tags: seriously simple podcasting, stats, statistics, listeners, analytics, podcast, podcasting, ssp, free, add-ons, extensions, addons
 Requires at least: 4.4
-Tested up to: 5.6
-Stable tag: 1.4.0
+Tested up to: 5.9
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,10 +78,14 @@ Yes. This plugin uses the [Crawler Detect](https://github.com/JayBizzle/Crawler-
 
 == Changelog ==
 
+= 1.4.1 =
+* 2022-10-04
+* [UPDATE] Updated the tested WordPress version
+
 = 1.4.0 =
 * 2022-10-04
 * [UPDATE] Use absolute require file paths (props [dd32](https://github.com/dd32))
-* [UPDATE] Improved SSP dependencies check
+* [UPDATE] Improved SSP compatibility check
 * [UPDATE] Reordered user agent check (props [jonathanbossenger](https://github.com/jonathanbossenger))
 * [UPDATE] Added new listening sources (Xiaoyuzhou,Moon FM,Castro,watchOS) (props [justinyanme](https://github.com/justinyanme))
 
