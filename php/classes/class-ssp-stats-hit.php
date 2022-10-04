@@ -124,12 +124,20 @@ class Stats_Hit {
 			$referrer = 'overcast';
 		} else if ( stripos( $user_agent, 'Pocket Casts' ) !== false ) {
 			$referrer = 'pocketcasts';
+		} else if ( stripos( $user_agent, 'Xiaoyuzhou' ) !== false ) {
+			$referrer = 'xiaoyuzhou';
 		} else if ( stripos( $user_agent, 'PodcastAddict' ) !== false ) {
 			$referrer = 'podcast_addict';
 		} else if ( stripos( $user_agent, 'Player FM' ) !== false ) {
 			$referrer = 'playerfm';
 		} else if ( stripos( $user_agent, 'Google-Play' ) !== false ) {
 			$referrer = 'google_play';
+		} else if ( stripos( $user_agent, 'Moon FM' ) !== false ) {
+			$referrer = 'MoonFM';
+		} else if ( stripos( $user_agent, 'Castro' ) !== false ) {
+			$referrer = 'Castro';
+		} else if ( stripos( $user_agent, 'watchOS' ) !== false ) {
+			$referrer = 'watchOS';
 		} else if ( stripos( $user_agent, 'Android' ) !== false ) {
 			$referrer = 'android';
 		}

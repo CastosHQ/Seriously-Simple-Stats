@@ -362,7 +362,7 @@ class Stats {
 
 		$html .= '<p class="episode-stat-data total-downloads">' . __( 'Total listens', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
 
-		$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $unknown = 0;
+		$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $xiaoyuzhou = $moonFM = $castro = $watchOS = $unknown = 0;
 
 		foreach ( $stats as $stat ) {
 			$listeners[ $stat->ip_address ] = $stat->ip_address;
@@ -401,6 +401,18 @@ class Stats {
 				case 'google_play':
 					++ $google_play;
 					break;
+                case 'xiaoyuzhou':
+                    ++ $xiaoyuzhou;
+                    break;
+                case 'MoonFM':
+                    ++ $moonFM;
+                    break;
+                case 'Castro':
+                    ++ $castro;
+                    break;
+                case 'watchOS':
+                    ++ $watchOS;
+                    break;
 				default:
 					++ $unknown;
 					break;
@@ -443,6 +455,18 @@ class Stats {
 		if ( $playerfm ) {
 			$html .= '<li class="playerfm">' . __( 'Player FM', 'seriously-simple-stats' ) . ': <b>' . $playerfm . '</b></li>';
 		}
+        if ( $xiaoyuzhou ) {
+            $html .= '<li class="xiaoyuzhou">' . __( 'Xiaoyuzhou', 'seriously-simple-stats' ) . ': <b>' . $xiaoyuzhou . '</b></li>';
+        }
+        if ( $moonFM ) {
+            $html .= '<li class="moonFM">' . __( 'MoonFM', 'seriously-simple-stats' ) . ': <b>' . $moonFM . '</b></li>';
+        }
+        if ( $castro ) {
+            $html .= '<li class="castro">' . __( 'Castro', 'seriously-simple-stats' ) . ': <b>' . $castro . '</b></li>';
+        }
+        if ( $watchOS ) {
+            $html .= '<li class="watchOS">' . __( 'watchOS', 'seriously-simple-stats' ) . ': <b>' . $watchOS . '</b></li>';
+        }
 		// Commented out for now, could be used in the future
 		/*if( $google_play ){
 			$html .= '<li class="google_play">' . __( 'Google Play', 'seriously-simple-stats' ) . ': <b>' . $google_play . '</b></li>';
@@ -887,6 +911,10 @@ class Stats {
 			'podcast_addict' => __( 'Podcast Addict', 'seriously-simple-stats' ),
 			'playerfm' => __( 'Player FM', 'seriously-simple-stats' ),
 			// 'google_play' => __( 'Google Play', 'seriously-simple-stats' ) //Commented out for now
+            'xiaoyuzhou' => __( 'Xiaoyuzhou', 'seriously-simple-stats' ),
+            'MoonFM' => __( 'MoonFM', 'seriously-simple-stats' ),
+            'Castro' => __( 'Castro', 'seriously-simple-stats' ),
+            'watchOS' => __( 'watchOS', 'seriously-simple-stats' ),
 		);
 
 		$data = array();
