@@ -362,7 +362,7 @@ class Stats {
 
 		$html .= '<p class="episode-stat-data total-downloads">' . __( 'Total listens', 'seriously-simple-stats' ) . ': <b>' . $total_downloads . '</b></p>';
 
-		$itunes = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $unknown = 0;
+		$itunes = $spotify = $stitcher = $overcast = $pocketcasts = $direct = $new_window = $player = $android = $podcast_addict = $playerfm = $google_play = $unknown = 0;
 
 		foreach ( $stats as $stat ) {
 			$listeners[ $stat->ip_address ] = $stat->ip_address;
@@ -370,6 +370,9 @@ class Stats {
 			switch ( $stat->referrer ) {
 				case 'itunes':
 					++ $itunes;
+					break;
+				case 'spotify':
+					++ $spotify;
 					break;
 				case 'stitcher':
 					++ $stitcher;
@@ -414,6 +417,9 @@ class Stats {
 		$html .= '<ul class="sources-list">';
 		if ( $itunes ) {
 			$html .= '<li class="itunes">' . __( 'iTunes', 'seriously-simple-stats' ) . ': <b>' . $itunes . '</b></li>';
+		}
+		if ( $spotify ) {
+			$html .= '<li class="spotify">' . __( 'Spotify', 'seriously-simple-stats' ) . ': <b>' . $spotify . '</b></li>';
 		}
 		if ( $stitcher ) {
 			$html .= '<li class="stitcher">' . __( 'Stitcher', 'seriously-simple-stats' ) . ': <b>' . $stitcher . '</b></li>';
@@ -879,6 +885,7 @@ class Stats {
 			'player' => __( 'Audio player', 'seriously-simple-stats' ),
 			'new_window' => __( 'Played in new window', 'seriously-simple-stats' ),
 			'itunes' => __( 'iTunes', 'seriously-simple-stats' ),
+			'spotify' => __( 'Spotify', 'seriously-simple-stats' ),
 			'stitcher' => __( 'Stitcher', 'seriously-simple-stats' ),
 			'overcast' => __( 'Overcast', 'seriously-simple-stats' ),
 			'pocketcasts' => __( 'Pocket Casts', 'seriously-simple-stats' ),

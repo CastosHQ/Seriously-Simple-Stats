@@ -118,6 +118,8 @@ class Stats_Hit {
 
 		if ( stripos( $user_agent, 'itunes' ) !== false || stripos( $user_agent, 'AppleCoreMedia' ) !== false ) {
 			$referrer = 'itunes';
+		} else if ( stripos( $user_agent, 'Spotify' ) !== false ) {
+			$referrer = 'spotify';
 		} else if ( stripos( $user_agent, 'stitcher' ) !== false ) {
 			$referrer = 'stitcher';
 		} else if ( stripos( $user_agent, 'overcast' ) !== false ) {
