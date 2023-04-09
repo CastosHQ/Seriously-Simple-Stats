@@ -90,56 +90,11 @@ class All_Episode_Stats {
 	 * @return array
 	 */
 	private function get_all_episode_stats() {
-		global $wpdb;
-		$date_keys = array_keys( $this->dates );
 
 		$order_by = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'date';
 		$order    = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
 
-		$all_episodes_stats = array();
-		$all_episode_count  = 0;
-
-		$sql     = "SELECT COUNT(id) AS listens, post_id FROM $this->table GROUP BY post_id";
-		$results = $wpdb->get_results( $sql );
-
-		if ( ! is_array( $results ) ) {
-			return $all_episodes_stats;
-		}
-
-		$this->total_posts = count( $results );
-		foreach ( $results as $result ) {
-			$total_listens_array = array_combine( $date_keys, array( 0, 0, 0 ) );
-			$post                = get_post( intval( $result->post_id ) );
-			if ( ! $post ) {
-				continue;
-			}
-			$all_episode_count ++;
-			$sql             = "SELECT `date` FROM $this->table WHERE `post_id` = '" . $result->post_id . "'";
-			$episode_results = $wpdb->get_results( $sql );
-			$lifetime_count  = count( $episode_results );
-			foreach ( $episode_results as $ref ) {
-				//Increase the count of listens per month
-				if ( isset( $total_listens_array[ intval( date( 'm', intval( $ref->date ) ) ) ] ) ) {
-					++ $total_listens_array[ intval( date( 'm', intval( $ref->date ) ) ) ];
-				}
-			}
-
-			$episode_stats = array(
-				'episode_name' => $post->post_title,
-				'date'         => date( 'Y-m-d', strtotime( $post->post_date ) ),
-				'slug'         => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
-				'listens'      => $lifetime_count,
-				'formatted_date'  => date_i18n( get_option('date_format'), strtotime( $post->post_date ) ),
-			);
-
-			foreach ( $this->dates as $date_key => $date ) {
-				$episode_stats[ $date ] = $total_listens_array[ $date_key ];
-			}
-
-			$all_episodes_stats[ $all_episode_count ] = $episode_stats;
-		}
-
-		$all_episodes_stats = apply_filters( 'ssp_stats_three_months_all_episodes', $all_episodes_stats );
+		$all_episodes_stats = $this->fetch_all_episodes_stats();
 
 		//24 because we're counting an array, which starts at zero
 		$this->total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 );
@@ -171,6 +126,83 @@ class All_Episode_Stats {
 		}
 
 		return $all_episodes_stats;
+	}
+
+	/**
+	 * Fetches all episodes stats for the last 3 months from the database
+	 *
+	 * @return array|mixed|void
+	 */
+	private function fetch_all_episodes_stats(){
+
+		$all_episodes_stats = get_transient( 'ssp_stats_three_months' ) ?: array();
+
+		if ( $all_episodes_stats ) {
+			return $all_episodes_stats;
+		}
+
+		global $wpdb;
+
+		$sql         = "SELECT COUNT(id) AS listens, post_id FROM $this->table GROUP BY post_id";
+		$total_stats = $wpdb->get_results( $sql );
+
+		$all_episodes_lifetime_stats = array();
+		foreach ( $total_stats as $total_stat ) {
+			$all_episodes_lifetime_stats[ $total_stat->post_id ] = intval( $total_stat->listens );
+		}
+
+		if ( ! is_array( $total_stats ) ) {
+			return $all_episodes_stats;
+		}
+
+		$this->total_posts = count( $total_stats );
+
+		$start_month_template = sprintf( '%s-%%s-01 00:00:00', date( 'Y' ) );
+		$end_month_template   = sprintf( '%s-%%s-%s 23:59:59', date( 'Y' ), date( 't' ) );
+
+		$last_months_stats = array();
+
+		foreach ( $this->dates as $month_number => $month_name ) {
+			$month_formatted = sprintf( "%02d", $month_number );
+			$month_start     = strtotime( sprintf( $start_month_template, $month_formatted ) );
+			$month_end       = strtotime( sprintf( $end_month_template, $month_formatted ) );
+
+			$month_sql = $wpdb->prepare( "SELECT COUNT(id) as `listens`, `post_id` FROM `$this->table` WHERE `date` >= %d AND `date` <= %d GROUP BY post_id", $month_start, $month_end );
+
+			$month_stats = $wpdb->get_results( $month_sql );
+
+			if ( ! is_array( $month_stats ) ) {
+				continue;
+			}
+
+			foreach ( $month_stats as $episode_data ) {
+				$last_months_stats[ $month_name ][ $episode_data->post_id ] = intval( $episode_data->listens );
+			}
+		}
+
+		foreach ( $total_stats as $episode_data ) {
+			$post = get_post( intval( $episode_data->post_id ) );
+			if ( ! $post ) {
+				continue;
+			}
+			$episode_stats = array(
+				'episode_name'   => $post->post_title,
+				'date'           => date( 'Y-m-d', strtotime( $post->post_date ) ),
+				'slug'           => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
+				'listens'        => $all_episodes_lifetime_stats[ $post->ID ],
+				'formatted_date' => date_i18n( get_option( 'date_format' ), strtotime( $post->post_date ) ),
+			);
+
+			foreach ( $this->dates as $month_name ) {
+				$episode_stats[ $month_name ] = isset( $last_months_stats[ $month_name ][ $post->ID ] ) ? $last_months_stats[ $month_name ][ $post->ID ] : 0;
+			}
+
+			$all_episodes_stats[] = $episode_stats;
+		}
+
+		$all_episodes_stats = apply_filters( 'ssp_stats_three_months_all_episodes', $all_episodes_stats );
+
+		set_transient( 'ssp_stats_three_months', $all_episodes_stats, MINUTE_IN_SECONDS );
 	}
 
 	/**
