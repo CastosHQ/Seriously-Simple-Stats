@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: Seriously Simple Stats
- * Version: 1.5.0-beta.2
+ * Version: 1.5.0-beta.3
  * Plugin URI: https://wordpress.org/plugins/seriously-simple-stats
  * Description: Integrated analytics and stats tracking for Seriously Simple Podcasting.
  * Author: Castos
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use SeriouslySimpleStats\Classes\Stats;
 
-define( 'SSP_STATS_VERSION', '1.5.0-beta.2' );
+define( 'SSP_STATS_VERSION', '1.5.0-beta.3' );
 define( 'SSP_STATS_DIR_PATH', plugin_dir_path( __FILE__ ) );
 
 require_once SSP_STATS_DIR_PATH . 'vendor/autoload.php';
