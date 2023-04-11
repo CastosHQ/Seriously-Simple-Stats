@@ -1,3 +1,11 @@
+<?php
+/**
+ * @see \SeriouslySimpleStats\Classes\All_Episode_Stats::render_all_episodes_stats()
+ *
+ * @var array $all_episodes_stats
+ * @var array $sort_order
+ * */
+?>
 <div class="postbox" id="last-three-months-container">
 	<h2 class="hndle ui-sortable-handle">
 		<span><?php echo __( 'All Episodes for the Last Three Months', 'seriously-simple-stats' ); ?></span>

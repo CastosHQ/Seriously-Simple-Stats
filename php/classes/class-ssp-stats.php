@@ -152,9 +152,12 @@ class Stats {
 	 */
 	public $episode_id_where = '';
 
-	public $upgrade = null;
+	public $upgrade;
 
-	public $all_episode_stats = null;
+    /**
+     * @var All_Episode_Stats
+     * */
+	public $all_episode_stats;
 
 	/**
 	 * Constructor function.

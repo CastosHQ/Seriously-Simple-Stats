@@ -1,3 +1,16 @@
+<?php
+/**
+ * @see \SeriouslySimpleStats\Classes\All_Episode_Stats::render_all_episodes_stats()
+ *
+ * @var int $pagenum
+ * @var int $total_posts
+ * @var string $prev_page_url
+ * @var string $next_page
+ * @var string $next_page_url
+ * @var int $total_pages
+ *
+ * */
+?>
 <div class='tablenav bottom'>
 	<div class="tablenav-pages">
 		<span class="displaying-num"><?php echo $this->total_posts . ' ' . __( 'items', 'seriously-simple-stats' ) ?></span>

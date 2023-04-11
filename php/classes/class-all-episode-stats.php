@@ -63,13 +63,13 @@ class All_Episode_Stats {
 		$html = ob_get_clean();
 
 		//Only show page links if there's more than 25 episodes in the table
-		if ( $this->total_posts >= $this->total_per_page ) {
+		if ( $this->total_posts > $this->total_per_page ) {
 			if ( isset( $_GET['pagenum'] ) ) {
 				$pagenum = intval( $_GET['pagenum'] );
 			} else {
 				$pagenum = 1;
 			}
-			$total_pages   = ceil( $this->total_posts / $this->total_per_page );
+			$total_pages   = intval( ceil( $this->total_posts / $this->total_per_page ) );
 			$order_by      = isset( $_GET['orderby'] ) ? '&orderby=' . sanitize_text_field( $_GET['orderby'] ) : "";
 			$order         = isset( $_GET['order'] ) ? '&order=' . sanitize_text_field( $_GET['order'] ) : "";
 			$prev_page     = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
@@ -90,40 +90,61 @@ class All_Episode_Stats {
 	 * @return array
 	 */
 	private function get_all_episode_stats() {
+		$order_by           = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'date';
+		$order              = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
+		$all_episodes_stats = $this->get_sorted_stats( $order_by, $order );
 
-		$order_by = isset( $_GET['orderby'] ) ? sanitize_text_field( $_GET['orderby'] ) : 'date';
-		$order    = isset( $_GET['order'] ) ? sanitize_text_field( $_GET['order'] ) : 'desc';
+		$this->total_posts    = count( $all_episodes_stats );
+		$this->total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 25 );
+
+		// Sets up pagination
+		if ( isset( $_GET['pagenum'] ) ) {
+			$pagenum = intval( $_GET['pagenum'] );
+			if ( $pagenum <= 1 ) {
+				$current_cursor = 0;
+			} else {
+				$current_cursor = ( $pagenum - 1 ) * $this->total_per_page;
+			}
+			$all_episodes_stats = array_slice( $all_episodes_stats, $current_cursor, $this->total_per_page, true );
+		} else {
+			$all_episodes_stats = array_slice( $all_episodes_stats, 0, $this->total_per_page, true );
+		}
+
+		return $all_episodes_stats;
+	}
+
+	/**
+	 * @param string $order_by
+	 * @param string $order
+	 *
+	 * @return array|void
+	 */
+	private function get_sorted_stats( $order_by, $order ) {
+
+		$transient_key = sprintf( 'ssp_sorted_stats_three_months_%s_%s', $order_by, $order );
+
+		if ( $sorted_stats = get_transient( $transient_key ) ?: array() ) {
+			return $sorted_stats;
+		}
 
 		$all_episodes_stats = $this->fetch_all_episodes_stats();
 
-		//24 because we're counting an array, which starts at zero
-		$this->total_per_page = apply_filters( 'ssp_stats_three_months_per_page', 24 );
-
-		if ( ! empty( $all_episodes_stats ) && is_array( $all_episodes_stats ) ) {
-			//Sort array based on ordering fields passed
-			foreach ( $all_episodes_stats as $listen ) {
-				$listen_sorting[] = $listen[ $order_by ];
-			}
-
-			if ( 'desc' === $order ) {
-				array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
-			} else {
-				array_multisort( $listen_sorting, SORT_ASC, $all_episodes_stats );
-			}
-
-			// Sets up pagination
-			if ( isset( $_GET['pagenum'] ) ) {
-				$pagenum = intval( $_GET['pagenum'] );
-				if ( $pagenum <= 1 ) {
-					$current_cursor = 0;
-				} else {
-					$current_cursor = ( $pagenum - 1 ) * $this->total_per_page;
-				}
-				$all_episodes_stats = array_slice( $all_episodes_stats, $current_cursor, $this->total_per_page, true );
-			} else {
-				$all_episodes_stats = array_slice( $all_episodes_stats, 0, $this->total_per_page, true );
-			}
+		if ( empty( $all_episodes_stats ) ) {
+			return array();
 		}
+
+		//Sort array based on ordering fields passed
+		foreach ( $all_episodes_stats as $listen ) {
+			$listen_sorting[] = $listen[ $order_by ];
+		}
+
+		if ( 'desc' === $order ) {
+			array_multisort( $listen_sorting, SORT_DESC, $all_episodes_stats );
+		} else {
+			array_multisort( $listen_sorting, SORT_ASC, $all_episodes_stats );
+		}
+
+		set_transient( $transient_key, $all_episodes_stats, MINUTE_IN_SECONDS );
 
 		return $all_episodes_stats;
 	}
@@ -131,15 +152,11 @@ class All_Episode_Stats {
 	/**
 	 * Fetches all episodes stats for the last 3 months from the database
 	 *
-	 * @return array|mixed|void
+	 * @return array
 	 */
 	private function fetch_all_episodes_stats(){
 
-		$all_episodes_stats = get_transient( 'ssp_stats_three_months' ) ?: array();
-
-		if ( $all_episodes_stats ) {
-			return $all_episodes_stats;
-		}
+		$all_episodes_stats = array();
 
 		global $wpdb;
 
@@ -154,8 +171,6 @@ class All_Episode_Stats {
 		if ( ! is_array( $total_stats ) ) {
 			return $all_episodes_stats;
 		}
-
-		$this->total_posts = count( $total_stats );
 
 		$start_month_template = sprintf( '%s-%%s-01 00:00:00', date( 'Y' ) );
 		$end_month_template   = sprintf( '%s-%%s-%s 23:59:59', date( 'Y' ), date( 't' ) );
@@ -186,6 +201,7 @@ class All_Episode_Stats {
 				continue;
 			}
 			$episode_stats = array(
+				'id'             => $post->ID,
 				'episode_name'   => $post->post_title,
 				'date'           => date( 'Y-m-d', strtotime( $post->post_date ) ),
 				'slug'           => admin_url( 'post.php?post=' . $post->ID . '&action=edit' ),
@@ -200,9 +216,7 @@ class All_Episode_Stats {
 			$all_episodes_stats[] = $episode_stats;
 		}
 
-		$all_episodes_stats = apply_filters( 'ssp_stats_three_months_all_episodes', $all_episodes_stats );
-
-		set_transient( 'ssp_stats_three_months', $all_episodes_stats, MINUTE_IN_SECONDS );
+		return apply_filters( 'ssp_stats_three_months_all_episodes', $all_episodes_stats );
 	}
 
 	/**
