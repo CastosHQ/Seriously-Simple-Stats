@@ -649,9 +649,9 @@ class Stats {
 							} else {
 								$week_diff = round( ( $listens_this_week / $listens_last_week * 100 ), 1 );
 								if( $week_diff < 100 ) {
-									$week_diff = '-' . ( 100 - $week_diff ) . '%';
+									$week_diff = '-' . round(100 - $week_diff, 1) . '%';
 								} elseif( $week_diff > 100 ) {
-									$week_diff = '+' . ( $week_diff - 100 ) . '%';
+									$week_diff = '+' . round( $week_diff - 100, 1 ) . '%';
 								} else {
 									$week_diff = '0%';
 								}
@@ -714,6 +714,9 @@ class Stats {
 								$li_class = 'alternate';
 								foreach( $results as $result ) {
 									$episode = get_post( $result->post_id );
+									if ( ! $episode ) {
+										continue;
+									}
 									$episode_link = admin_url( 'post.php?post=' . $episode->ID . '&action=edit' );
 									$html .= '<li class="' . esc_attr( $li_class ) . '"><span class="first-col top-ten-count">' . sprintf( _n( '%d %slisten%s', '%d %slistens%s', $result->listens, 'seriously-simple-stats' ), $result->listens, '<span>', '</span>' ) . '</span> <span class="top-ten-title"><a href="' . $episode_link . '">' . esc_html( $episode->post_title ) . '</a></span></li>' . "\n";
 									if( '' == $li_class ) {
