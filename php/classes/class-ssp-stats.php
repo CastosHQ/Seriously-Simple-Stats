@@ -258,8 +258,10 @@ class Stats {
 		}
 
 		// Set episode selection for charts
+		// Can be either integer or string 'all'
 		if ( isset( $_GET['episode'] ) ) {
-			$this->episode = sanitize_text_field( $_GET['episode'] );
+			$episode       = sanitize_text_field( $_GET['episode'] );
+			$this->episode = is_numeric( $episode ) ? intval( $episode ) : 'all';
 		}
 
 		// Set filter selection for charts
@@ -285,13 +287,13 @@ class Stats {
 						if( $this->episode_ids ) {
 							$this->episode_ids .= ',';
 						}
-						$this->episode_ids .= $episode->ID;
+						$this->episode_ids .= intval( $episode->ID );
 					}
 				}
 			break;
 
 			case 'episode':
-				if( 'all' != $this->episode ) {
+				if ( 'all' != $this->episode && is_integer( $this->episode ) ) {
 					$this->episode_ids = $this->episode;
 				}
 			break;
@@ -520,7 +522,7 @@ class Stats {
 				}
 			break;
 			case 'episode':
-				if( 'all' != $this->episode ) {
+				if ( 'all' != $this->episode && is_integer( $this->episode ) ) {
 					$episode_name = get_the_title( $this->episode );
 					if( $episode_name ) {
 						$title_tail = sprintf( __( 'for Episode: %s', 'seriously-simple-stats' ), '<u>' . $episode_name . '</u>' );
