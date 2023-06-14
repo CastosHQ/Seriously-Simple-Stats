@@ -275,8 +275,6 @@ class Stats {
 	 */
 	public function load_episode_ids () {
 
-
-
 		switch( $this->filter ) {
 			case 'series':
 				if( 'all' != $this->series ) {

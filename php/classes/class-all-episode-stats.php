@@ -70,18 +70,33 @@ class All_Episode_Stats {
 				$pagenum = 1;
 			}
 			$total_pages   = intval( ceil( $this->total_posts / $this->total_per_page ) );
-			$order_by      = isset( $_GET['orderby'] ) ? '&orderby=' . sanitize_text_field( $_GET['orderby'] ) : "";
-			$order         = isset( $_GET['order'] ) ? '&order=' . sanitize_text_field( $_GET['order'] ) : "";
+			$order_by_qry  = isset( $_GET['orderby'] ) ? '&orderby=' . esc_attr( $_GET['orderby'] ) : "";
+			$order         = $this->get_requested_order();
+			$order_qry     = $order ? '&order=' . esc_attr( $order ) : "";
 			$prev_page     = ( $pagenum <= 1 ) ? 1 : $pagenum - 1;
-			$prev_page_url = admin_url( "edit.php?post_type=" . SSP_CPT_PODCAST . "&page=podcast_stats" . $order_by . $order . "&pagenum=" . $prev_page . "#last-three-months-container" );
+			$prev_page_url = admin_url( "edit.php?post_type=" . SSP_CPT_PODCAST . "&page=podcast_stats" . $order_by_qry . $order_qry . "&pagenum=" . $prev_page . "#last-three-months-container" );
 			$next_page     = $pagenum + 1;
-			$next_page_url = admin_url( "edit.php?post_type=" . SSP_CPT_PODCAST . "&page=podcast_stats" . $order_by . $order . "&pagenum=" . $next_page . "#last-three-months-container" );
+			$next_page_url = admin_url( "edit.php?post_type=" . SSP_CPT_PODCAST . "&page=podcast_stats" . $order_by_qry . $order_qry . "&pagenum=" . $next_page . "#last-three-months-container" );
 			ob_start();
 			require_once SSP_STATS_DIR_PATH . 'partials/stats-all-episodes-pagination.php';
 			$html .= ob_get_clean();
 		}
 
 		return $html;
+	}
+
+	/**
+	 *
+	 * @return string|null
+	 */
+	private function get_requested_order() {
+		if ( ! isset( $_GET['order'] ) ) {
+			return null;
+		}
+		$order          = strtolower( $_GET['order'] );
+		$allowed_orders = array( 'asc', 'desc' );
+
+		return in_array( $order, $allowed_orders ) ? $order : null;
 	}
 
 	/**
