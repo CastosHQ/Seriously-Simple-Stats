@@ -264,9 +264,10 @@ class Stats {
 			$this->episode = is_numeric( $episode ) ? intval( $episode ) : 'all';
 		}
 
-		// Set filter selection for charts
+		// Set filter selection for charts. Can be either series or episode.
 		if ( isset( $_GET['filter'] ) ) {
-			$this->filter = sanitize_text_field( $_GET['filter'] );
+			$allowed_filters = array( 'series', 'episode' );
+			$this->filter    = in_array( $_GET['filter'], $allowed_filters ) ? $_GET['filter'] : 'series';
 		}
 	}
 
@@ -323,9 +324,9 @@ class Stats {
 			$fields = implode( ', ', $fields );
 		}
 
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT ' . $fields . ' FROM ' . $this->_table.' WHERE post_id = %d', $episode_id ) );
-
-		return $results;
+		return $wpdb->get_results(
+			$wpdb->prepare( 'SELECT ' . $fields . ' FROM ' . $this->_table . ' WHERE post_id = %d', $episode_id )
+		);
 	}
 
 	/**
