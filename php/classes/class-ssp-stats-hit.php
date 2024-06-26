@@ -100,7 +100,7 @@ class Stats_Hit {
 		$referrer = (string) $referrer;
 
 		// Get request user agent
-		$user_agent = (string) $_SERVER['HTTP_USER_AGENT'];
+        $user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
 
 		// Check if this user agent is a crawler/bot to prevent false stats
 		$CrawlerDetect = new CrawlerDetect();
