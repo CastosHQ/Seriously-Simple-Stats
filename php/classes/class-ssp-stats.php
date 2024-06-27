@@ -159,6 +159,11 @@ class Stats {
      * */
 	public $all_episode_stats;
 
+    /**
+     * @var Stats_Hit
+     * */
+    public $stats_hit;
+
 	/**
 	 * Constructor function.
 	 * @access  public
@@ -198,7 +203,7 @@ class Stats {
 		// Set current time based on WordPress time zone settings
 		$this->current_time = current_time( 'timestamp' );
 
-		$this->stats_hit = new Stats_Hit( $this->_version );
+		$this->stats_hit = new Stats_Hit();
 
 		register_activation_hook( $this->file, array( $this, 'install' ) );
 
