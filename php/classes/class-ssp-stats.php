@@ -10,7 +10,7 @@ class Stats {
 
 	/**
 	 * The single instance of SSP_Stats.
-	 * @var 	object
+	 * @var 	self
 	 * @access  private
 	 * @since 	1.0.0
 	 */
@@ -1143,8 +1143,7 @@ class Stats {
 	 *
 	 * @since 1.0.0
 	 * @static
-	 * @see SSP_Stats()
-	 * @return Main SSP_Stats instance
+	 * @return self SSP_Stats instance
 	 */
 	public static function instance ( $file = '', $version = '1.0.0', $db_version = '1.0.0' ) {
 		if ( is_null( self::$_instance ) ) {

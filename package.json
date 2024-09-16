@@ -1,6 +1,6 @@
 {
   "name": "seriously-simple-stats",
-  "version": "1.5.2",
+  "version": "1.7.0",
   "main": "build/index.js",
   "author": "CastosHQ",
   "devDependencies": {

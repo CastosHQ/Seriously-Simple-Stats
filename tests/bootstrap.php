@@ -5,6 +5,8 @@
  * @package Seriously_Simple_Stats
  */
 
+use SeriouslySimpleStats\Classes\Stats;
+
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $_tests_dir ) {
@@ -23,12 +25,10 @@ require_once $_tests_dir . '/includes/functions.php';
  * This is because the plugin file checks to ensure that a verion of SSP is installed
  * and for unit tests that check would fail
  *
- * @return Main
+ * @return Stats
  */
 function SSP_Stats() {
-	$instance = SSP_Stats::instance( __FILE__, SSP_STATS_VERSION, '1.0.0' );
-
-	return $instance;
+	return Stats::instance( __FILE__, SSP_STATS_VERSION, '1.0.0' );
 }
 
 /**
