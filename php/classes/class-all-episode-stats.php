@@ -187,12 +187,18 @@ class All_Episode_Stats {
 			return $all_episodes_stats;
 		}
 
-		$start_month_template = sprintf( '%s-%%s-01 00:00:00', date( 'Y' ) );
-		$end_month_template   = sprintf( '%s-%%s-%s 23:59:59', date( 'Y' ), date( 't' ) );
-
 		$last_months_stats = array();
 
 		foreach ( $this->dates as $month_number => $month_name ) {
+
+			$year = date( 'Y' );
+			if ( 12 === $month_number ) {
+				$year = date( 'Y', strtotime( current_time( 'Y-m-d' ) . 'FIRST DAY OF -1 YEAR' ) );
+			}
+
+			$start_month_template = sprintf( '%s-%%s-01 00:00:00', $year );
+			$end_month_template   = sprintf( '%s-%%s-%s 23:59:59', $year, date( 't' ) );
+			
 			$month_formatted = sprintf( "%02d", $month_number );
 			$month_start     = strtotime( sprintf( $start_month_template, $month_formatted ) );
 			$month_end       = strtotime( sprintf( $end_month_template, $month_formatted ) );
