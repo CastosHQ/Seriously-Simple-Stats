@@ -231,9 +231,6 @@ class Stats {
 
 		// Add dashboard widget
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget' ), 1 );
-
-		// Enable passthrough URLs
-		add_action( 'ssp_series_passthrough_required', '__return_true' );
 	}
 
 	/**
