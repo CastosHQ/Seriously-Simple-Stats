@@ -17,6 +17,7 @@ class All_Episode_Stats {
 
 	/**
 	 * Current last three months dates
+	 * Format: 'Y-m' => month_name (e.g., '2025-12' => 'December')
 	 *
 	 * @var array
 	 */
@@ -42,11 +43,15 @@ class All_Episode_Stats {
 	public function __construct() {
 		global $wpdb;
 		$this->table = $wpdb->prefix . 'ssp_stats';
-		$this->dates = array(
-			intval( current_time( 'm' ) )                                             => current_time( 'F' ),
-			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . 'FIRST DAY OF -1 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . 'FIRST DAY OF -1 MONTH' ) ),
-			intval( date( 'm', strtotime( current_time( 'Y-m-d' ) . 'FIRST DAY OF -2 MONTH' ) ) ) => date( 'F', strtotime( current_time( "Y-m-d" ) . 'FIRST DAY OF -2 MONTH' ) ),
-		);
+		
+		// Build dates array with Y-m format keys (includes year) and month names as values
+		for ( $offset = 0; $offset <= 2; $offset++ ) {
+			$timestamp = strtotime( current_time( 'Y-m-d' ) . 'FIRST DAY OF -' . $offset . ' MONTH' );
+			$year_month = date( 'Y-m', $timestamp );
+			$month_name = date( 'F', $timestamp );
+			
+			$this->dates[ $year_month ] = $month_name;
+		}
 	}
 
 	/**
@@ -187,15 +192,14 @@ class All_Episode_Stats {
 			return $all_episodes_stats;
 		}
 
-		$start_month_template = sprintf( '%s-%%s-01 00:00:00', date( 'Y' ) );
-		$end_month_template   = sprintf( '%s-%%s-%s 23:59:59', date( 'Y' ), date( 't' ) );
-
 		$last_months_stats = array();
 
-		foreach ( $this->dates as $month_number => $month_name ) {
-			$month_formatted = sprintf( "%02d", $month_number );
-			$month_start     = strtotime( sprintf( $start_month_template, $month_formatted ) );
-			$month_end       = strtotime( sprintf( $end_month_template, $month_formatted ) );
+		foreach ( $this->dates as $year_month => $month_name ) {
+			// Get the correct number of days for this specific month
+			$days_in_month = intval( date( 't', strtotime( $year_month . '-01' ) ) );
+			
+			$month_start = strtotime( sprintf( '%s-01 00:00:00', $year_month ) );
+			$month_end   = strtotime( sprintf( '%s-%02d 23:59:59', $year_month, $days_in_month ) );
 
 			$month_sql = $wpdb->prepare( "SELECT COUNT(id) as `listens`, `post_id` FROM `$this->table` WHERE `date` >= %d AND `date` <= %d GROUP BY post_id", $month_start, $month_end );
 
